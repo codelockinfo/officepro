@@ -1,0 +1,27 @@
+RewriteEngine On
+RewriteBase /
+
+# Prevent direct access to uploads folder
+<FilesMatch "\.(php|php3|php4|php5|phtml)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Protect config files
+<Files "*.config.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Protect log files
+<FilesMatch "\.log$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Enable CORS for AJAX requests
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+
+

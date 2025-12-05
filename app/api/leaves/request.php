@@ -1,0 +1,143 @@
+<?php
+/**
+ * Leave Request API Endpoint
+ */
+
+session_start();
+header('Content-Type: application/json');
+
+require_once __DIR__ . '/../../helpers/Database.php';
+require_once __DIR__ . '/../../helpers/Auth.php';
+require_once __DIR__ . '/../../helpers/Tenant.php';
+require_once __DIR__ . '/../../helpers/Validator.php';
+
+// Check authentication
+if (!Auth::isLoggedIn()) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+    exit;
+}
+
+$companyId = Tenant::getCurrentCompanyId();
+$userId = Auth::getCurrentUser()['id'];
+$db = Database::getInstance();
+$validator = new Validator();
+
+// Get form data
+$leaveType = $_POST['leave_type'] ?? '';
+$startDate = $_POST['start_date'] ?? '';
+$endDate = $_POST['end_date'] ?? '';
+$reason = $validator->sanitize($_POST['reason'] ?? '');
+
+// Validate inputs
+$validator->required($leaveType, 'Leave Type');
+$validator->required($startDate, 'Start Date');
+$validator->required($endDate, 'End Date');
+$validator->required($reason, 'Reason');
+$validator->date($startDate, 'Start Date');
+$validator->date($endDate, 'End Date');
+$validator->dateRange($startDate, $endDate, 'Date Range');
+
+if (!in_array($leaveType, ['paid_leave', 'sick_leave', 'casual_leave', 'work_from_home'])) {
+    echo json_encode(['success' => false, 'message' => 'Invalid leave type']);
+    exit;
+}
+
+if ($validator->hasErrors()) {
+    echo json_encode(['success' => false, 'message' => 'Validation failed', 'errors' => $validator->getErrors()]);
+    exit;
+}
+
+// Calculate days
+$start = new DateTime($startDate);
+$end = new DateTime($endDate);
+$interval = $start->diff($end);
+$daysCount = $interval->days + 1;
+
+// Check leave balance
+$currentYear = date('Y');
+$balance = $db->fetchOne(
+    "SELECT * FROM leave_balances WHERE company_id = ? AND user_id = ? AND year = ?",
+    [$companyId, $userId, $currentYear]
+);
+
+if (!$balance) {
+    echo json_encode(['success' => false, 'message' => 'Leave balance not found']);
+    exit;
+}
+
+// Map leave types to balance columns
+$balanceField = [
+    'paid_leave' => 'paid_leave',
+    'sick_leave' => 'sick_leave',
+    'casual_leave' => 'casual_leave',
+    'work_from_home' => 'wfh_days'
+];
+
+$availableBalance = $balance[$balanceField[$leaveType]] ?? 0;
+
+if ($daysCount > $availableBalance) {
+    echo json_encode(['success' => false, 'message' => "Insufficient leave balance. You have {$availableBalance} days available."]);
+    exit;
+}
+
+// Handle file upload
+$attachment = null;
+if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
+    if ($validator->document($_FILES['attachment'], 'Attachment')) {
+        $filename = Validator::uploadFile($_FILES['attachment'], 'uploads/documents', 'leave_');
+        if ($filename) {
+            $attachment = 'uploads/documents/' . $filename;
+        }
+    }
+}
+
+try {
+    $db->beginTransaction();
+    
+    // Insert leave request
+    $db->execute(
+        "INSERT INTO leaves (company_id, user_id, leave_type, start_date, end_date, days_count, reason, attachment, status, created_at) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())",
+        [$companyId, $userId, $leaveType, $startDate, $endDate, $daysCount, $reason, $attachment]
+    );
+    
+    $leaveId = $db->lastInsertId();
+    
+    // Create notification for managers
+    $managers = $db->fetchAll(
+        "SELECT id FROM users WHERE company_id = ? AND role IN ('company_owner', 'manager') AND status = 'active'",
+        [$companyId]
+    );
+    
+    $currentUser = Auth::getCurrentUser();
+    $message = "{$currentUser['full_name']} requested {$leaveType} from {$startDate} to {$endDate}";
+    
+    foreach ($managers as $manager) {
+        $db->execute(
+            "INSERT INTO notifications (company_id, user_id, type, message, link, created_at) 
+            VALUES (?, ?, 'leave_request', ?, '/app/views/leave_approvals.php', NOW())",
+            [$companyId, $manager['id'], $message]
+        );
+    }
+    
+    $db->commit();
+    
+    echo json_encode([
+        'success' => true,
+        'message' => 'Leave request submitted successfully',
+        'data' => ['leave_id' => $leaveId]
+    ]);
+    
+} catch (Exception $e) {
+    $db->rollBack();
+    error_log("Leave Request Error: " . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => 'Failed to submit leave request']);
+}
+
+
