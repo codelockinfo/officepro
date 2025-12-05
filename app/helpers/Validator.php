@@ -77,10 +77,28 @@ class Validator {
      * Validate phone number
      */
     public function phone($value, $fieldName = 'Phone') {
-        if (!preg_match('/^[0-9\-\+\(\)\s]{10,20}$/', $value)) {
-            $this->errors[$fieldName] = "{$fieldName} is invalid";
+        // Allow empty (for optional fields)
+        if (empty($value)) {
+            return true;
+        }
+        
+        // Check if it contains only valid characters
+        if (!preg_match('/^[\+]?[0-9\s\-\(\)]+$/', $value)) {
+            $this->errors[$fieldName] = "{$fieldName} contains invalid characters";
             return false;
         }
+        
+        // Extract just the digits (excluding country code symbols)
+        $digitsOnly = preg_replace('/[^0-9]/', '', $value);
+        $digitCount = strlen($digitsOnly);
+        
+        // For Indian numbers with +91, allow 10-12 digits
+        // For international, allow 10-15 digits
+        if ($digitCount < 10 || $digitCount > 15) {
+            $this->errors[$fieldName] = "{$fieldName} must contain 10-15 digits";
+            return false;
+        }
+        
         return true;
     }
     
@@ -195,12 +213,22 @@ class Validator {
      */
     public static function uploadFile($file, $directory, $prefix = '') {
         if (!isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
+            error_log("Upload error: File not uploaded or tmp_name missing");
             return false;
         }
         
         // Create directory if not exists
         if (!file_exists($directory)) {
-            mkdir($directory, 0755, true);
+            if (!mkdir($directory, 0755, true)) {
+                error_log("Upload error: Failed to create directory: $directory");
+                return false;
+            }
+        }
+        
+        // Check if directory is writable
+        if (!is_writable($directory)) {
+            error_log("Upload error: Directory not writable: $directory");
+            return false;
         }
         
         // Generate unique filename
@@ -209,11 +237,14 @@ class Validator {
         $filepath = $directory . '/' . $filename;
         
         if (move_uploaded_file($file['tmp_name'], $filepath)) {
+            error_log("Upload success: File saved to $filepath");
             return $filename;
         }
         
+        error_log("Upload error: move_uploaded_file failed. From: {$file['tmp_name']} To: $filepath");
         return false;
     }
 }
+
 
 

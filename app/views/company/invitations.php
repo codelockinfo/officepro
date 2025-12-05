@@ -2,7 +2,6 @@
 /**
  * Company Invitations Management Page
  */
-session_start();
 
 $pageTitle = 'Employee Invitations';
 include __DIR__ . '/../includes/header.php';
@@ -12,7 +11,7 @@ require_once __DIR__ . '/../../helpers/Tenant.php';
 require_once __DIR__ . '/../../helpers/Invitation.php';
 
 // Only company owners and managers can access
-Auth::requireRole(['company_owner', 'manager']);
+Auth::checkRole(['company_owner', 'manager'], 'Only company owners and managers can manage invitations.');
 
 $companyId = Tenant::getCurrentCompanyId();
 $invitations = Invitation::getCompanyInvitations($companyId);
@@ -121,7 +120,7 @@ $invitations = Invitation::getCompanyInvitations($companyId);
         const formData = new FormData(event.target);
         const data = Object.fromEntries(formData);
         
-        ajaxRequest('/app/api/company/invite.php', 'POST', data, (response) => {
+        ajaxRequest('/officepro/app/api/company/invite.php', 'POST', data, (response) => {
             if (response.success) {
                 showMessage('success', 'Invitation sent successfully!');
                 closeModal('invite-modal');
@@ -142,7 +141,7 @@ $invitations = Invitation::getCompanyInvitations($companyId);
     }
     
     function resendInvite(id) {
-        ajaxRequest(`/app/api/company/invitations.php?action=resend&id=${id}`, 'POST', null, (response) => {
+        ajaxRequest(`/officepro/app/api/company/invitations.php?action=resend&id=${id}`, 'POST', null, (response) => {
             if (response.success) {
                 showMessage('success', 'Invitation resent successfully!');
                 setTimeout(() => location.reload(), 1000);
@@ -153,19 +152,26 @@ $invitations = Invitation::getCompanyInvitations($companyId);
     }
     
     function cancelInvite(id) {
-        confirmDialog('Are you sure you want to cancel this invitation?', () => {
-            ajaxRequest(`/app/api/company/invitations.php?action=cancel&id=${id}`, 'POST', null, (response) => {
-                if (response.success) {
-                    showMessage('success', 'Invitation cancelled');
-                    setTimeout(() => location.reload(), 1000);
-                } else {
-                    showMessage('error', response.message || 'Failed to cancel invitation');
-                }
-            });
-        });
+        confirmDialog(
+            'The employee will no longer be able to use this invitation link.',
+            () => {
+                ajaxRequest(`/officepro/app/api/company/invitations.php?action=cancel&id=${id}`, 'POST', null, (response) => {
+                    if (response.success) {
+                        showMessage('success', 'Invitation cancelled');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        showMessage('error', response.message || 'Failed to cancel invitation');
+                    }
+                });
+            },
+            null,
+            'Cancel Invitation',
+            '✉️'
+        );
     }
 </script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
+
 
 

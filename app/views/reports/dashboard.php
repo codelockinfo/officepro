@@ -2,7 +2,6 @@
 /**
  * Reports Dashboard
  */
-session_start();
 
 $pageTitle = 'Reports Dashboard';
 include __DIR__ . '/../includes/header.php';
@@ -11,7 +10,7 @@ require_once __DIR__ . '/../../helpers/Database.php';
 require_once __DIR__ . '/../../helpers/Tenant.php';
 
 // Only managers and owners can access
-Auth::requireRole(['company_owner', 'manager']);
+Auth::checkRole(['company_owner', 'manager'], 'Only managers and company owners can access reports.');
 
 $companyId = Tenant::getCurrentCompanyId();
 $db = Database::getInstance();
@@ -196,7 +195,7 @@ $totalEmployees = $db->fetchOne(
         });
         
         if (format === 'view') {
-            ajaxRequest(`/app/api/reports/attendance.php?${params}`, 'GET', null, (response) => {
+            ajaxRequest(`/officepro/app/api/reports/attendance.php?${params}`, 'GET', null, (response) => {
                 if (response.success) {
                     displayReport(response.data);
                 } else {
@@ -205,7 +204,7 @@ $totalEmployees = $db->fetchOne(
             });
         } else {
             // For CSV and PDF, open in new window
-            window.open(`/app/api/reports/export.php?${params}`, '_blank');
+            window.open(`/officepro/app/api/reports/export.php?${params}`, '_blank');
         }
     }
     
@@ -250,5 +249,6 @@ $totalEmployees = $db->fetchOne(
 </script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
+
 
 

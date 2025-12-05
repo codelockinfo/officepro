@@ -30,6 +30,11 @@ $validator->required($companyData['company_name'], 'Company Name');
 $validator->required($companyData['company_email'], 'Company Email');
 $validator->email($companyData['company_email'], 'Company Email');
 
+// Validate phone if provided
+if (!empty($companyData['phone'])) {
+    $validator->phone($companyData['phone'], 'Phone Number');
+}
+
 // Handle logo upload
 if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
     $logoFilename = Validator::uploadFile($_FILES['logo'], 'uploads/logos', 'logo_');
@@ -78,10 +83,26 @@ if ($result['success']) {
     // Send welcome email
     Email::sendCompanyWelcome($ownerData['email'], $ownerData['full_name'], $companyData['company_name']);
     
-    // Auto-login
-    Auth::login($ownerData['email'], $ownerData['password']);
+    // Auto-login - this sets the session including profile_image
+    $loginResult = Auth::login($ownerData['email'], $ownerData['password']);
+    
+    if ($loginResult['success']) {
+        error_log("Company registered and owner logged in. Profile image: " . $_SESSION['profile_image']);
+        echo json_encode([
+            'success' => true,
+            'message' => 'Company registered successfully',
+            'session_data' => [
+                'user_id' => $_SESSION['user_id'],
+                'profile_image' => $_SESSION['profile_image'],
+                'company_name' => $_SESSION['company_name']
+            ]
+        ]);
+    } else {
+        echo json_encode(['success' => true, 'message' => 'Company registered but login failed. Please login manually.']);
+    }
+} else {
+    echo json_encode($result);
 }
 
-echo json_encode($result);
 
 

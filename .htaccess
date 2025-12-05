@@ -1,27 +1,15 @@
-RewriteEngine On
-RewriteBase /
+# Apache 2.4 compatible .htaccess
+Options -Indexes
+DirectoryIndex index.php
 
-# Prevent direct access to uploads folder
-<FilesMatch "\.(php|php3|php4|php5|phtml)$">
-    Order Deny,Allow
-    Deny from all
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Protect sensitive files (Apache 2.4 syntax)
+<FilesMatch "^(composer\.json|composer\.lock|\.git|\.gitignore)$">
+    Require all denied
 </FilesMatch>
-
-# Protect config files
-<Files "*.config.php">
-    Order Allow,Deny
-    Deny from all
-</Files>
-
-# Protect log files
-<FilesMatch "\.log$">
-    Order Allow,Deny
-    Deny from all
-</FilesMatch>
-
-# Enable CORS for AJAX requests
-Header set Access-Control-Allow-Origin "*"
-Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-Header set Access-Control-Allow-Headers "Content-Type, Authorization"
-
-

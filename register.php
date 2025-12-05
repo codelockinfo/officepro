@@ -2,7 +2,9 @@
 /**
  * Employee Registration Page (with invitation token)
  */
-session_start();
+
+// Initialize application
+require_once __DIR__ . '/app/config/init.php';
 require_once __DIR__ . '/app/helpers/Database.php';
 require_once __DIR__ . '/app/helpers/Invitation.php';
 
@@ -127,8 +129,8 @@ if ($token) {
                 
                 <div class="form-group">
                     <label class="form-label" for="profile_image">Profile Image *</label>
-                    <input type="file" id="profile_image" name="profile_image" class="form-control" accept="image/*" onchange="previewImage(this)" required>
-                    <small class="text-muted">Minimum 200x200 pixels, max 2MB</small>
+                    <input type="file" id="profile_image" name="profile_image" class="form-control" accept="image/jpeg,image/png,image/jpg" onchange="previewImage(this)" required>
+                    <small class="text-muted">JPG or PNG, minimum 200x200 pixels, max 2MB</small>
                     <div id="profile-preview" class="image-preview">
                         <span>No image selected</span>
                     </div>
@@ -159,7 +161,7 @@ if ($token) {
             
             showLoader();
             
-            fetch('/app/api/auth/register.php', {
+            fetch('/officepro/app/api/auth/register.php', {
                 method: 'POST',
                 body: formData
             })
@@ -169,7 +171,7 @@ if ($token) {
                 if (data.success) {
                     showMessage('success', 'Registration successful! Redirecting...');
                     setTimeout(() => {
-                        window.location.href = 'app/views/dashboard.php';
+                        window.location.href = '/officepro/app/views/dashboard.php';
                     }, 1500);
                 } else {
                     showMessage('error', data.message || 'Registration failed');
@@ -183,5 +185,6 @@ if ($token) {
     </script>
 </body>
 </html>
+
 
 

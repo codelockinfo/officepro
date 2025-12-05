@@ -2,7 +2,9 @@
 /**
  * Company Registration Page
  */
-session_start();
+
+// Initialize application
+require_once __DIR__ . '/app/config/init.php';
 
 // Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
@@ -74,18 +76,23 @@ if (isset($_SESSION['user_id'])) {
             max-height: 100%;
             object-fit: cover;
         }
+        /* Phone input hint */
+        input[type="tel"]:invalid {
+            border-color: #ffc107;
+        }
+        input[type="tel"]:valid {
+            border-color: #28a745;
+        }
     </style>
 </head>
 <body>
     <div class="register-container">
         <div class="register-header">
             <h1>🏢 Register Your Company</h1>
-            <p>Start managing your team's attendance and leaves</p>
+            <p>Create your company account and start managing your team</p>
         </div>
         
         <form id="company-register-form" enctype="multipart/form-data" onsubmit="handleRegister(event)">
-            <h3 class="section-title">Company Information</h3>
-            
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label" for="company_name">Company Name *</label>
@@ -98,56 +105,83 @@ if (isset($_SESSION['user_id'])) {
                 </div>
             </div>
             
+            <div class="form-group">
+                <label class="form-label" for="phone">Phone Number</label>
+                <div style="display: grid; grid-template-columns: 150px 1fr; gap: 10px;">
+                    <select id="country_code" name="country_code" class="form-control">
+                        <option value="+91" selected>🇮🇳 India (+91)</option>
+                        <option value="+1">🇺🇸 USA (+1)</option>
+                        <option value="+44">🇬🇧 UK (+44)</option>
+                        <option value="+61">🇦🇺 Australia (+61)</option>
+                        <option value="+86">🇨🇳 China (+86)</option>
+                        <option value="+81">🇯🇵 Japan (+81)</option>
+                        <option value="+82">🇰🇷 Korea (+82)</option>
+                        <option value="+65">🇸🇬 Singapore (+65)</option>
+                        <option value="+971">🇦🇪 UAE (+971)</option>
+                        <option value="+966">🇸🇦 Saudi (+966)</option>
+                        <option value="+92">🇵🇰 Pakistan (+92)</option>
+                        <option value="+880">🇧🇩 Bangladesh (+880)</option>
+                        <option value="+94">🇱🇰 Sri Lanka (+94)</option>
+                        <option value="+977">🇳🇵 Nepal (+977)</option>
+                    </select>
+                    <input type="tel" 
+                           id="phone" 
+                           name="phone" 
+                           class="form-control" 
+                           placeholder="1234567890"
+                           maxlength="10"
+                           pattern="[0-9]{10}"
+                           title="Please enter a 10-digit phone number"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)">
+                </div>
+                <small class="text-muted">Enter 10-digit mobile number</small>
+            </div>
+            
+            <div class="form-row">
+                
+                <div class="form-group">
+                    <label class="form-label" for="address">Company Address</label>
+                    <input type="text" id="address" name="address" class="form-control" placeholder="123 Business St, City, State">
+                </div>
+            </div>
+            
             <div class="form-row">
                 <div class="form-group">
-                    <label class="form-label" for="phone">Phone</label>
-                    <input type="tel" id="phone" name="phone" class="form-control">
+                    <label class="form-label" for="logo">Company Logo (Optional)</label>
+                    <input type="file" id="logo" name="logo" class="form-control" accept="image/*" onchange="previewImage(this, 'logo-preview')">
+                    <div id="logo-preview" class="image-preview" style="width: 120px; height: 120px;">
+                        <span style="font-size: 12px; color: #999;">No logo</span>
+                    </div>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label" for="logo">Company Logo</label>
-                    <input type="file" id="logo" name="logo" class="form-control" accept="image/*" onchange="previewImage(this, 'logo-preview')">
-                    <div id="logo-preview" class="image-preview">
-                        <span>No logo selected</span>
+                    <label class="form-label" for="profile_image">Your Profile Photo *</label>
+                    <input type="file" id="profile_image" name="profile_image" class="form-control" accept="image/jpeg,image/png,image/jpg" onchange="previewImage(this, 'profile-preview')" required>
+                    <small class="text-muted">JPG or PNG, minimum 200x200 pixels, max 2MB</small>
+                    <div id="profile-preview" class="image-preview" style="width: 120px; height: 120px;">
+                        <span style="font-size: 12px; color: #999;">No photo</span>
                     </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="full_name">Your Full Name *</label>
+                    <input type="text" id="full_name" name="full_name" class="form-control" placeholder="John Doe" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="email">Your Email Address *</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="john@example.com" required>
                 </div>
             </div>
             
             <div class="form-group">
-                <label class="form-label" for="address">Address</label>
-                <textarea id="address" name="address" class="form-control" rows="3"></textarea>
+                <label class="form-label" for="password">Create Password * (min. 8 characters)</label>
+                <input type="password" id="password" name="password" class="form-control" minlength="8" required>
             </div>
             
-            <h3 class="section-title">Owner Account</h3>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" for="full_name">Full Name *</label>
-                    <input type="text" id="full_name" name="full_name" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="email">Email Address *</label>
-                    <input type="email" id="email" name="email" class="form-control" required>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" for="password">Password * (min. 8 characters)</label>
-                    <input type="password" id="password" name="password" class="form-control" minlength="8" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="profile_image">Profile Image *</label>
-                    <input type="file" id="profile_image" name="profile_image" class="form-control" accept="image/*" onchange="previewImage(this, 'profile-preview')" required>
-                    <div id="profile-preview" class="image-preview">
-                        <span>No image selected</span>
-                    </div>
-                </div>
-            </div>
-            
-            <button type="submit" class="btn btn-primary btn-lg w-100 mt-20">Register Company</button>
+            <button type="submit" class="btn btn-primary btn-lg w-100 mt-20">Register Company & Create Account</button>
         </form>
         
         <div class="login-links text-center mt-20">
@@ -173,9 +207,17 @@ if (isset($_SESSION['user_id'])) {
             
             const formData = new FormData(event.target);
             
+            // Combine country code and phone number
+            const countryCode = document.getElementById('country_code').value;
+            const phoneNumber = document.getElementById('phone').value;
+            
+            if (phoneNumber) {
+                formData.set('phone', countryCode + ' ' + phoneNumber);
+            }
+            
             showLoader();
             
-            fetch('/app/api/auth/register_company.php', {
+            fetch('/officepro/app/api/auth/register_company.php', {
                 method: 'POST',
                 body: formData
             })
@@ -185,7 +227,7 @@ if (isset($_SESSION['user_id'])) {
                 if (data.success) {
                     showMessage('success', 'Company registered successfully! Redirecting...');
                     setTimeout(() => {
-                        window.location.href = 'app/views/dashboard.php';
+                        window.location.href = '/officepro/app/views/dashboard.php';
                     }, 1500);
                 } else {
                     showMessage('error', data.message || 'Registration failed');
@@ -196,8 +238,28 @@ if (isset($_SESSION['user_id'])) {
                 showMessage('error', 'An error occurred. Please try again.');
             });
         }
+        
+        // Real-time phone validation feedback
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInput = document.getElementById('phone');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function() {
+                    const value = this.value;
+                    const countDigits = value.replace(/[^0-9]/g, '').length;
+                    
+                    if (countDigits === 10) {
+                        this.style.borderColor = '#28a745';
+                    } else if (countDigits > 0) {
+                        this.style.borderColor = '#ffc107';
+                    } else {
+                        this.style.borderColor = '#ddd';
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
+
 
 

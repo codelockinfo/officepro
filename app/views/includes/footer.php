@@ -2,8 +2,8 @@
         </div>
     </div>
     
-    <script src="/assets/js/app.js"></script>
-    <script src="/assets/js/modal.js"></script>
+    <script src="/officepro/assets/js/app.js"></script>
+    <script src="/officepro/assets/js/modal.js"></script>
     <script>
         function toggleUserMenu() {
             const menu = document.getElementById('user-menu');
@@ -11,11 +11,40 @@
         }
         
         function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                ajaxRequest('/app/api/auth/logout.php', 'POST', null, () => {
-                    window.location.href = '/login.php';
-                });
+            // Use custom modal instead of system confirm
+            const modalContent = `
+                <div style="text-align: center; padding: 30px 20px;">
+                    <div style="font-size: 64px; margin-bottom: 20px;">🚪</div>
+                    <h3 style="color: #333; margin-bottom: 15px;">Confirm Logout</h3>
+                    <p style="color: #666; font-size: 16px;">Are you sure you want to logout?</p>
+                </div>
+            `;
+            
+            const modalFooter = `
+                <button type="button" class="btn btn-secondary" onclick="closeModal(this.closest('.modal-overlay').id)">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="confirmLogout()">Yes, Logout</button>
+            `;
+            
+            createModal('', modalContent, modalFooter, 'modal-sm');
+        }
+        
+        function confirmLogout() {
+            // Close the modal
+            const activeModal = document.querySelector('.modal-overlay.active');
+            if (activeModal) {
+                closeModal(activeModal.id);
             }
+            
+            // Show loading
+            showLoader();
+            
+            // Perform logout
+            ajaxRequest('/officepro/app/api/auth/logout.php', 'POST', null, () => {
+                showMessage('success', 'Logged out successfully!');
+                setTimeout(() => {
+                    window.location.href = '/officepro/login.php';
+                }, 500);
+            });
         }
         
         // Close user menu when clicking outside
@@ -30,5 +59,6 @@
     </script>
 </body>
 </html>
+
 
 

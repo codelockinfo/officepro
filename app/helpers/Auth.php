@@ -204,8 +204,11 @@ class Auth {
         $_SESSION['profile_image'] = $user['profile_image'];
         $_SESSION['company_id'] = $user['company_id'];
         $_SESSION['company_name'] = $user['company_name'];
-        $_SESSION['company_logo'] = $user['company_logo'];
+        $_SESSION['company_logo'] = $user['company_logo'] ?? null;
         $_SESSION['last_activity'] = time();
+        
+        // Log successful login
+        error_log("Login successful - User ID: {$user['id']}, Email: {$user['email']}, Profile: {$user['profile_image']}");
         
         return ['success' => true, 'user' => $user];
     }
@@ -223,7 +226,12 @@ class Auth {
      * Check if user is logged in
      */
     public static function isLoggedIn() {
-        if (!isset($_SESSION['user_id'])) {
+        // Start session if not started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        if (!isset($_SESSION['user_id']) || !isset($_SESSION['email'])) {
             return false;
         }
         
@@ -247,12 +255,12 @@ class Auth {
         }
         
         return [
-            'id' => $_SESSION['user_id'],
-            'email' => $_SESSION['email'],
-            'full_name' => $_SESSION['full_name'],
-            'role' => $_SESSION['role'],
-            'profile_image' => $_SESSION['profile_image'],
-            'company_id' => $_SESSION['company_id']
+            'id' => $_SESSION['user_id'] ?? null,
+            'email' => $_SESSION['email'] ?? '',
+            'full_name' => $_SESSION['full_name'] ?? '',
+            'role' => $_SESSION['role'] ?? 'employee',
+            'profile_image' => $_SESSION['profile_image'] ?? 'assets/images/default-avatar.png',
+            'company_id' => $_SESSION['company_id'] ?? null
         ];
     }
     
@@ -269,12 +277,23 @@ class Auth {
     }
     
     /**
-     * Require specific role or throw exception
+     * Require specific role or throw exception (for API endpoints)
      */
     public static function requireRole($roles) {
         if (!self::hasRole($roles)) {
             http_response_code(403);
             echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+            exit;
+        }
+    }
+    
+    /**
+     * Check role for view pages (redirects to error page instead of JSON)
+     */
+    public static function checkRole($roles, $errorMessage = null) {
+        if (!self::hasRole($roles)) {
+            $message = $errorMessage ?? 'You do not have permission to access this page.';
+            header("Location: /officepro/app/views/error.php?code=403&message=" . urlencode($message));
             exit;
         }
     }
@@ -300,5 +319,6 @@ class Auth {
         return self::hasRole(['system_admin', 'company_owner']);
     }
 }
+
 
 

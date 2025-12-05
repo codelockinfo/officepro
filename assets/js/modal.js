@@ -91,14 +91,22 @@ function createModal(title, content, footer, size = '') {
     return modalId;
 }
 
-// Confirm dialog
-function confirmDialog(message, onConfirm, onCancel) {
+// Confirm dialog with custom styling
+function confirmDialog(message, onConfirm, onCancel, title = 'Confirm Action', icon = '⚠️') {
+    const content = `
+        <div style="text-align: center; padding: 30px 20px;">
+            <div style="font-size: 64px; margin-bottom: 20px;">${icon}</div>
+            <h3 style="color: #333; margin-bottom: 15px;">${title}</h3>
+            <p style="color: #666; font-size: 16px;">${message}</p>
+        </div>
+    `;
+    
     const footer = `
         <button type="button" class="btn btn-secondary" onclick="confirmDialogCancel()">Cancel</button>
         <button type="button" class="btn btn-danger" onclick="confirmDialogConfirm()">Confirm</button>
     `;
     
-    const modalId = createModal('Confirm Action', `<p>${message}</p>`, footer, 'modal-sm');
+    const modalId = createModal('', content, footer, 'modal-sm');
     
     window.confirmDialogConfirm = () => {
         closeModal(modalId);
@@ -170,5 +178,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
 
 

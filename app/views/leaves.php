@@ -2,7 +2,6 @@
 /**
  * Employee Leave Management Page
  */
-session_start();
 
 $pageTitle = 'My Leaves';
 include __DIR__ . '/includes/header.php';
@@ -218,7 +217,7 @@ $leaves = $db->fetchAll(
         
         showLoader();
         
-        fetch('/app/api/leaves/request.php', {
+            fetch('/officepro/app/api/leaves/request.php', {
             method: 'POST',
             body: formData
         })
@@ -240,7 +239,7 @@ $leaves = $db->fetchAll(
     }
     
     function viewLeaveDetails(id) {
-        ajaxRequest(`/app/api/leaves/view.php?id=${id}`, 'GET', null, (response) => {
+        ajaxRequest(`/officepro/app/api/leaves/view.php?id=${id}`, 'GET', null, (response) => {
             if (response.success) {
                 const leave = response.data;
                 const typeLabels = {
@@ -277,19 +276,26 @@ $leaves = $db->fetchAll(
     }
     
     function cancelLeave(id) {
-        confirmDialog('Are you sure you want to cancel this leave request?', () => {
-            ajaxRequest(`/app/api/leaves/cancel.php?id=${id}`, 'POST', null, (response) => {
-                if (response.success) {
-                    showMessage('success', 'Leave request cancelled');
-                    setTimeout(() => location.reload(), 1000);
-                } else {
-                    showMessage('error', response.message || 'Failed to cancel leave');
-                }
-            });
-        });
+        confirmDialog(
+            'This action cannot be undone.',
+            () => {
+                ajaxRequest(`/officepro/app/api/leaves/cancel.php?id=${id}`, 'POST', null, (response) => {
+                    if (response.success) {
+                        showMessage('success', 'Leave request cancelled');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        showMessage('error', response.message || 'Failed to cancel leave');
+                    }
+                });
+            },
+            null,
+            'Cancel Leave Request',
+            '📅'
+        );
     }
 </script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>
+
 
 

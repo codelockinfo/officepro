@@ -13,3 +13,4 @@ $result = Auth::logout();
 echo json_encode($result);
 
 
+

@@ -2,7 +2,6 @@
 /**
  * Leave Approval Page (Manager/Owner)
  */
-session_start();
 
 $pageTitle = 'Leave Approvals';
 include __DIR__ . '/includes/header.php';
@@ -11,7 +10,7 @@ require_once __DIR__ . '/../helpers/Database.php';
 require_once __DIR__ . '/../helpers/Tenant.php';
 
 // Only managers and owners can access
-Auth::requireRole(['company_owner', 'manager']);
+Auth::checkRole(['company_owner', 'manager'], 'Only managers and company owners can approve leaves.');
 
 $companyId = Tenant::getCurrentCompanyId();
 $db = Database::getInstance();
@@ -176,7 +175,7 @@ $allLeaves = $db->fetchAll(
 
 <script>
     function viewLeaveForApproval(id) {
-        ajaxRequest(`/app/api/leaves/view.php?id=${id}`, 'GET', null, (response) => {
+        ajaxRequest(`/officepro/app/api/leaves/view.php?id=${id}`, 'GET', null, (response) => {
             if (response.success) {
                 const leave = response.data;
                 const typeLabels = {
@@ -211,7 +210,7 @@ $allLeaves = $db->fetchAll(
     }
     
     function viewLeaveDetails(id) {
-        ajaxRequest(`/app/api/leaves/view.php?id=${id}`, 'GET', null, (response) => {
+        ajaxRequest(`/officepro/app/api/leaves/view.php?id=${id}`, 'GET', null, (response) => {
             if (response.success) {
                 const leave = response.data;
                 const typeLabels = {
@@ -252,12 +251,21 @@ $allLeaves = $db->fetchAll(
         document.getElementById('action_type').value = action;
         
         const message = action === 'approve' 
-            ? 'Are you sure you want to approve this leave request?' 
-            : 'Are you sure you want to decline this leave request?';
+            ? 'The employee will be notified and their leave balance will be deducted.' 
+            : 'The employee will be notified of the decline.';
         
-        if (confirm(message)) {
-            document.getElementById('approval-form').dispatchEvent(new Event('submit'));
-        }
+        const title = action === 'approve' ? 'Approve Leave Request' : 'Decline Leave Request';
+        const icon = action === 'approve' ? '✓' : '✗';
+        
+        confirmDialog(
+            message,
+            () => {
+                document.getElementById('approval-form').dispatchEvent(new Event('submit'));
+            },
+            null,
+            title,
+            icon
+        );
     }
     
     function submitApproval(event) {
@@ -266,7 +274,7 @@ $allLeaves = $db->fetchAll(
         const formData = new FormData(event.target);
         const data = Object.fromEntries(formData);
         
-        ajaxRequest('/app/api/leaves/approve.php', 'POST', data, (response) => {
+        ajaxRequest('/officepro/app/api/leaves/approve.php', 'POST', data, (response) => {
             if (response.success) {
                 showMessage('success', `Leave ${data.action}d successfully!`);
                 closeModal('approval-modal');
@@ -279,5 +287,6 @@ $allLeaves = $db->fetchAll(
 </script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>
+
 
 

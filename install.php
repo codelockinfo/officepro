@@ -4,6 +4,10 @@
  * One-time setup for the application
  */
 
+// Suppress errors during installation
+error_reporting(0);
+ini_set('display_errors', '0');
+
 // Start session
 session_start();
 
@@ -299,5 +303,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </body>
 </html>
+
 
 

@@ -2,7 +2,6 @@
 /**
  * Saved Credentials Management Page
  */
-session_start();
 
 $pageTitle = 'My Credentials';
 include __DIR__ . '/../includes/header.php';
@@ -119,7 +118,7 @@ $userId = $currentUser['id'];
     });
     
     function loadCredentials() {
-        ajaxRequest('/app/api/employee/credentials.php?action=list', 'GET', null, (response) => {
+        ajaxRequest('/officepro/app/api/employee/credentials.php?action=list', 'GET', null, (response) => {
             if (response.success) {
                 credentials = response.data;
                 renderCredentials(credentials);
@@ -195,7 +194,7 @@ $userId = $currentUser['id'];
         const cred = credentials.find(c => c.id === id);
         if (!cred) return;
         
-        ajaxRequest(`/app/api/employee/credentials.php?action=view&id=${id}`, 'GET', null, (response) => {
+        ajaxRequest(`/officepro/app/api/employee/credentials.php?action=view&id=${id}`, 'GET', null, (response) => {
             if (response.success) {
                 const data = response.data;
                 document.getElementById('credential-id').value = data.id;
@@ -211,7 +210,7 @@ $userId = $currentUser['id'];
     }
     
     function viewCredential(id) {
-        ajaxRequest(`/app/api/employee/credentials.php?action=view&id=${id}`, 'GET', null, (response) => {
+        ajaxRequest(`/officepro/app/api/employee/credentials.php?action=view&id=${id}`, 'GET', null, (response) => {
             if (response.success) {
                 const data = response.data;
                 const content = `
@@ -237,7 +236,7 @@ $userId = $currentUser['id'];
         delete data.id;
         
         const action = id ? 'update' : 'create';
-        const url = id ? `/app/api/employee/credentials.php?action=${action}&id=${id}` : `/app/api/employee/credentials.php?action=${action}`;
+        const url = id ? `/officepro/app/api/employee/credentials.php?action=${action}&id=${id}` : `/officepro/app/api/employee/credentials.php?action=${action}`;
         
         ajaxRequest(url, 'POST', data, (response) => {
             if (response.success) {
@@ -251,20 +250,26 @@ $userId = $currentUser['id'];
     }
     
     function deleteCredential(id) {
-        confirmDialog('Are you sure you want to delete this credential?', () => {
-            ajaxRequest(`/app/api/employee/credentials.php?action=delete&id=${id}`, 'DELETE', null, (response) => {
-                if (response.success) {
-                    showMessage('success', 'Credential deleted');
-                    loadCredentials();
-                } else {
-                    showMessage('error', response.message || 'Failed to delete');
-                }
-            });
-        });
+        confirmDialog(
+            'This credential will be permanently deleted.',
+            () => {
+                ajaxRequest(`/officepro/app/api/employee/credentials.php?action=delete&id=${id}`, 'DELETE', null, (response) => {
+                    if (response.success) {
+                        showMessage('success', 'Credential deleted');
+                        loadCredentials();
+                    } else {
+                        showMessage('error', response.message || 'Failed to delete');
+                    }
+                });
+            },
+            null,
+            'Delete Credential',
+            '🔑'
+        );
     }
     
     function loadEmployees() {
-        ajaxRequest('/app/api/company/employees.php?action=list', 'GET', null, (response) => {
+        ajaxRequest('/officepro/app/api/company/employees.php?action=list', 'GET', null, (response) => {
             if (response.success) {
                 employees = response.data;
             }
@@ -275,7 +280,7 @@ $userId = $currentUser['id'];
         document.getElementById('share-credential-id').value = id;
         
         // Load current sharing
-        ajaxRequest(`/app/api/employee/credentials.php?action=view&id=${id}`, 'GET', null, (response) => {
+        ajaxRequest(`/officepro/app/api/employee/credentials.php?action=view&id=${id}`, 'GET', null, (response) => {
             if (response.success) {
                 const sharedWith = response.data.shared_with || [];
                 renderEmployeesList(sharedWith);
@@ -308,7 +313,7 @@ $userId = $currentUser['id'];
         const checkboxes = document.querySelectorAll('#employees-list input[type="checkbox"]:checked');
         const sharedWith = Array.from(checkboxes).map(cb => parseInt(cb.value));
         
-        ajaxRequest(`/app/api/employee/credentials.php?action=share`, 'POST', {
+        ajaxRequest(`/officepro/app/api/employee/credentials.php?action=share`, 'POST', {
             id: credId,
             shared_with: sharedWith
         }, (response) => {
@@ -330,5 +335,6 @@ $userId = $currentUser['id'];
 </script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
+
 
 

@@ -2,7 +2,9 @@
 /**
  * Login Page
  */
-session_start();
+
+// Initialize application
+require_once __DIR__ . '/app/config/init.php';
 
 // Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
@@ -137,11 +139,11 @@ if (isset($_SESSION['user_id'])) {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
-            ajaxRequest('/app/api/auth/login.php', 'POST', { email, password }, (response) => {
+            ajaxRequest('/officepro/app/api/auth/login.php', 'POST', { email, password }, (response) => {
                 if (response.success) {
                     showMessage('success', 'Login successful! Redirecting...');
                     setTimeout(() => {
-                        window.location.href = 'app/views/dashboard.php';
+                        window.location.href = '/officepro/app/views/dashboard.php';
                     }, 1000);
                 } else {
                     const errorDiv = document.getElementById('error-message');
@@ -153,5 +155,6 @@ if (isset($_SESSION['user_id'])) {
     </script>
 </body>
 </html>
+
 
 

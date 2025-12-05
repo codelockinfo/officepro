@@ -139,7 +139,17 @@ let timerStartTime = null;
 let timerElapsedSeconds = 0;
 
 function startTimer(checkInTime) {
-    timerStartTime = new Date(checkInTime).getTime();
+    // Stop any existing timer
+    stopTimer();
+    
+    // Parse check-in time from server (format: YYYY-MM-DD HH:MM:SS)
+    timerStartTime = new Date(checkInTime.replace(' ', 'T')).getTime();
+    
+    console.log('Timer started. Check-in time:', checkInTime);
+    console.log('Timer start timestamp:', timerStartTime);
+    console.log('Current time:', Date.now());
+    
+    // Update immediately
     updateTimerDisplay();
     
     // Update every second
@@ -157,6 +167,11 @@ function updateTimerDisplay() {
     const now = Date.now();
     timerElapsedSeconds = Math.floor((now - timerStartTime) / 1000);
     
+    // Ensure positive time
+    if (timerElapsedSeconds < 0) {
+        timerElapsedSeconds = 0;
+    }
+    
     const hours = Math.floor(timerElapsedSeconds / 3600);
     const minutes = Math.floor((timerElapsedSeconds % 3600) / 60);
     const seconds = timerElapsedSeconds % 60;
@@ -166,9 +181,12 @@ function updateTimerDisplay() {
         const timeString = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         timerDisplay.textContent = timeString;
         
-        // Add overtime badge if > 8 hours
+        // Add overtime badge if >= 8 hours
         const isOvertime = hours >= 8;
         timerDisplay.className = isOvertime ? 'timer-overtime' : 'timer-regular';
+        timerDisplay.style.fontSize = '48px';
+        timerDisplay.style.fontWeight = 'bold';
+        timerDisplay.style.color = isOvertime ? 'var(--overtime-orange)' : 'var(--primary-blue)';
         
         // Update overtime badge
         const overtimeBadge = document.getElementById('overtime-badge');
@@ -176,8 +194,8 @@ function updateTimerDisplay() {
             if (isOvertime) {
                 overtimeBadge.style.display = 'inline-block';
                 const overtimeHours = hours - 8;
-                const overtimeMinutes = hours >= 8 ? minutes : 0;
-                overtimeBadge.textContent = `Overtime: ${overtimeHours}h ${overtimeMinutes}m`;
+                const overtimeMinutes = minutes;
+                overtimeBadge.textContent = `⏰ Overtime: ${overtimeHours}h ${overtimeMinutes}m`;
             } else {
                 overtimeBadge.style.display = 'none';
             }
@@ -187,20 +205,23 @@ function updateTimerDisplay() {
 
 // Poll attendance status (for timer persistence)
 function pollAttendanceStatus() {
-    ajaxRequest('/app/api/attendance/status.php', 'GET', null, (response) => {
+    ajaxRequest('/officepro/app/api/attendance/status.php', 'GET', null, (response) => {
         if (response.success && response.data.status === 'in') {
             if (!timerInterval) {
+                console.log('Poll: Starting timer with:', response.data.check_in_time);
                 startTimer(response.data.check_in_time);
             }
         } else {
             stopTimer();
         }
+    }, (error) => {
+        console.error('Poll error:', error);
     });
 }
 
 // Notification polling
 function fetchNotifications() {
-    ajaxRequest('/app/api/notifications/fetch.php', 'GET', null, (response) => {
+    ajaxRequest('/officepro/app/api/notifications/fetch.php', 'GET', null, (response) => {
         if (response.success) {
             updateNotificationBadge(response.data.unread_count);
             displayNotificationList(response.data.notifications);
@@ -245,7 +266,7 @@ function displayNotificationList(notifications) {
 }
 
 function markNotificationAsRead(notificationId) {
-    ajaxRequest('/app/api/notifications/mark_read.php', 'POST', { id: notificationId }, () => {
+    ajaxRequest('/officepro/app/api/notifications/mark_read.php', 'POST', { id: notificationId }, () => {
         fetchNotifications();
     });
 }
@@ -293,17 +314,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Start notification polling if user is logged in
+    // Start notification polling if user is logged in (reduced frequency)
     if (document.getElementById('notification-icon')) {
         fetchNotifications();
-        setInterval(fetchNotifications, 60000); // Poll every minute
+        // Only poll every 2 minutes to reduce load
+        setInterval(fetchNotifications, 120000);
     }
     
-    // Start attendance status polling if on dashboard
+    // Start attendance status polling if on dashboard and timer exists
     if (document.getElementById('timer-display')) {
-        pollAttendanceStatus();
-        setInterval(pollAttendanceStatus, 30000); // Poll every 30 seconds
+        // Only poll if timer is active and no modal is open
+        const pollInterval = setInterval(() => {
+            // Don't poll if modal is open (prevents interference)
+            const hasActiveModal = document.querySelector('.modal-overlay.active');
+            if (!hasActiveModal) {
+                pollAttendanceStatus();
+            }
+        }, 30000); // Poll every 30 seconds only when no modal is open
     }
 });
+
 
 

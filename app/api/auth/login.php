@@ -3,7 +3,11 @@
  * Login API Endpoint
  */
 
-session_start();
+// Start session
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 header('Content-Type: application/json');
 
 require_once __DIR__ . '/../../helpers/Database.php';
@@ -35,6 +39,12 @@ if ($validator->hasErrors()) {
 // Attempt login
 $result = Auth::login($email, $password);
 
+// Log for debugging
+if ($result['success']) {
+    error_log("Login successful for: $email, Session ID: " . session_id());
+}
+
 echo json_encode($result);
+
 
 

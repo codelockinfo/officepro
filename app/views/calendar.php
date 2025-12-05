@@ -2,7 +2,6 @@
 /**
  * Calendar View - Shows Attendance, Leaves, Holidays, Tasks
  */
-session_start();
 
 $pageTitle = 'Calendar';
 include __DIR__ . '/includes/header.php';
@@ -302,7 +301,7 @@ if ($nextMonth > 12) {
             recurring: formData.get('recurring') ? 1 : 0
         };
         
-        ajaxRequest('/app/api/admin/holidays.php?action=create', 'POST', data, (response) => {
+        ajaxRequest('/officepro/app/api/admin/holidays.php?action=create', 'POST', data, (response) => {
             if (response.success) {
                 showMessage('success', 'Holiday added successfully!');
                 closeModal('add-holiday-modal');
@@ -320,5 +319,6 @@ if ($nextMonth > 12) {
 </script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>
+
 
 

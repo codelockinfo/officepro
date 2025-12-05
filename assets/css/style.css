@@ -147,6 +147,9 @@ a:hover {
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--primary-blue);
+    /* Prevent jumping */
+    display: block;
+    flex-shrink: 0;
 }
 
 .user-name {
@@ -468,6 +471,21 @@ a:hover {
     }
 }
 
+/* Timer Styles */
+.timer-regular {
+    color: var(--primary-blue) !important;
+    font-size: 48px !important;
+    font-weight: bold !important;
+    font-family: 'Courier New', monospace;
+}
+
+.timer-overtime {
+    color: var(--overtime-orange) !important;
+    font-size: 48px !important;
+    font-weight: bold !important;
+    font-family: 'Courier New', monospace;
+}
+
 /* Utility Classes */
 .text-center { text-align: center; }
 .text-right { text-align: right; }
@@ -484,5 +502,6 @@ a:hover {
 .gap-10 { gap: 10px; }
 .gap-20 { gap: 20px; }
 .w-100 { width: 100%; }
+
 
 

@@ -2,7 +2,9 @@
 /**
  * Landing Page / Home
  */
-session_start();
+
+// Initialize application
+require_once __DIR__ . '/app/config/init.php';
 
 // Redirect to dashboard if already logged in
 if (isset($_SESSION['user_id'])) {
@@ -147,5 +149,6 @@ if (isset($_SESSION['user_id'])) {
     </div>
 </body>
 </html>
+
 
 

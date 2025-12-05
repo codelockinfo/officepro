@@ -26,8 +26,14 @@ $companyId = Tenant::getCurrentCompanyId();
 $userId = Auth::getCurrentUser()['id'];
 $db = Database::getInstance();
 
+// Set timezone from config
+$appConfig = require __DIR__ . '/../../config/app.php';
+date_default_timezone_set($appConfig['timezone']);
+
 $today = date('Y-m-d');
 $now = date('Y-m-d H:i:s');
+
+error_log("Check-in: User $userId checking in at $now");
 
 // Check if already checked in
 $existing = $db->fetchOne(
@@ -48,11 +54,15 @@ try {
         [$companyId, $userId, $now, $today]
     );
     
+    $attendanceId = $db->lastInsertId();
+    error_log("Check-in: Success! Attendance ID: $attendanceId, Time: $now");
+    
     echo json_encode([
         'success' => true,
         'message' => 'Checked in successfully',
         'data' => [
-            'check_in_time' => $now
+            'check_in_time' => $now,
+            'attendance_id' => $attendanceId
         ]
     ]);
     
@@ -60,5 +70,6 @@ try {
     error_log("Check-in Error: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Failed to check in']);
 }
+
 
 

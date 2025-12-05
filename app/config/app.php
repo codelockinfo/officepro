@@ -6,7 +6,8 @@
 return [
     'app_name' => 'OfficePro Attendance System',
     'app_url' => 'http://localhost/officepro',
-    'timezone' => 'UTC',
+    'base_path' => '/officepro',
+    'timezone' => 'America/New_York', // Change this to your timezone
     
     // Attendance settings
     'standard_work_hours' => 8,
@@ -38,5 +39,6 @@ return [
     // Security
     'bcrypt_cost' => 12,
 ];
+
 
 
