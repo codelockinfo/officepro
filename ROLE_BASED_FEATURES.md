@@ -240,3 +240,4 @@ If a company owner also wants to track their time, they can:
 
 **Perfect separation of concerns!** 🎯
 
+

@@ -63,3 +63,4 @@ echo "<a href='/officepro/app/views/profile.php'>Go to Profile Page</a> | ";
 echo "<a href='/officepro/app/views/dashboard.php'>Go to Dashboard</a>";
 ?>
 
+

@@ -192,3 +192,4 @@ if ($freshUser !== $_SESSION) {
 
 **All visual glitches are now fixed!** 🎉
 
+

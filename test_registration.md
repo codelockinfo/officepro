@@ -83,3 +83,4 @@ Check: `logs/error.log` for debug information
 
 The enhanced logging will tell us exactly what's happening!
 
+

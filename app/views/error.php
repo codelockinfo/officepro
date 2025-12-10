@@ -93,3 +93,4 @@ $description = $_GET['message'] ?? $errorDescriptions[$errorCode] ?? 'An error o
 </body>
 </html>
 
+
