@@ -53,16 +53,18 @@ if ($validator->hasErrors()) {
 
 $db = Database::getInstance();
 
-// Check if user already exists
+// Check if user already exists and is active (not pending)
 $existingUser = $db->fetchOne(
-    "SELECT id FROM users WHERE email = ? AND company_id = ?",
+    "SELECT id, status FROM users WHERE email = ? AND company_id = ?",
     [$email, $companyId]
 );
 
-if ($existingUser) {
+if ($existingUser && $existingUser['status'] !== 'pending') {
     echo json_encode(['success' => false, 'message' => 'User with this email already exists in your company']);
     exit;
 }
+
+// If user exists with pending status, we'll update the invitation instead of creating new user
 
 // Check if there's already a pending invitation
 $existingInvitation = $db->fetchOne(
@@ -78,6 +80,41 @@ if ($existingInvitation) {
 // Create invitation
 $result = Invitation::createInvitation($companyId, $email, $role, $userId);
 
+// Log invitation creation for debugging
+error_log("Invitation creation attempt - Company ID: {$companyId}, Email: {$email}, Role: {$role}, User ID: {$userId}");
+error_log("Invitation creation result: " . json_encode($result));
+
+// Verify invitation and user were stored in database
+if ($result['success']) {
+    $db = Database::getInstance();
+    
+    // Verify invitation
+    $verifyInvitation = $db->fetchOne(
+        "SELECT id, email, role, token, status FROM invitations WHERE id = ?",
+        [$result['invitation_id']]
+    );
+    
+    if ($verifyInvitation) {
+        error_log("Invitation verified in database - ID: {$verifyInvitation['id']}, Email: {$verifyInvitation['email']}, Role: {$verifyInvitation['role']}, Status: {$verifyInvitation['status']}");
+    } else {
+        error_log("ERROR: Invitation was not found in database after creation!");
+    }
+    
+    // Verify user was created
+    if (isset($result['user_id'])) {
+        $verifyUser = $db->fetchOne(
+            "SELECT id, email, role, status FROM users WHERE id = ?",
+            [$result['user_id']]
+        );
+        
+        if ($verifyUser) {
+            error_log("User verified in database - ID: {$verifyUser['id']}, Email: {$verifyUser['email']}, Role: {$verifyUser['role']}, Status: {$verifyUser['status']}");
+        } else {
+            error_log("ERROR: User was not found in database after creation!");
+        }
+    }
+}
+
 if ($result['success']) {
     // Get company name for email
     $company = $db->fetchOne("SELECT company_name FROM companies WHERE id = ?", [$companyId]);
@@ -86,8 +123,19 @@ if ($result['success']) {
     $currentUser = Auth::getCurrentUser();
     $inviterName = $currentUser['full_name'];
     
-    // Send invitation email
-    Email::sendEmployeeInvitation($email, $result['token'], $companyName, $inviterName);
+    // Send invitation email with personal message (non-blocking)
+    // Use output buffering to prevent hanging
+    try {
+        $emailSent = @Email::sendEmployeeInvitation($email, $result['token'], $companyName, $inviterName, $message);
+        
+        if (!$emailSent) {
+            // Log error but don't fail the invitation creation
+            error_log("Failed to send invitation email to: {$email}");
+        }
+    } catch (Exception $e) {
+        // Log exception but continue
+        error_log("Email sending exception: " . $e->getMessage());
+    }
     
     echo json_encode([
         'success' => true,

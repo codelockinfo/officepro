@@ -22,6 +22,10 @@ $companyId = Tenant::getCurrentCompanyId();
 $userId = Auth::getCurrentUser()['id'];
 $db = Database::getInstance();
 
+// Set timezone from config
+$appConfig = require __DIR__ . '/../../config/app.php';
+date_default_timezone_set($appConfig['timezone']);
+
 $today = date('Y-m-d');
 
 // Get current check-in status

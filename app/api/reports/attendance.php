@@ -22,6 +22,10 @@ Auth::requireRole(['company_owner', 'manager']);
 $companyId = Tenant::getCurrentCompanyId();
 $db = Database::getInstance();
 
+// Set timezone from config
+$appConfig = require __DIR__ . '/../../config/app.php';
+date_default_timezone_set($appConfig['timezone']);
+
 $startDate = $_GET['start_date'] ?? '';
 $endDate = $_GET['end_date'] ?? '';
 $employeeId = $_GET['employee_id'] ?? '';

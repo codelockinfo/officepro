@@ -4,14 +4,14 @@
  */
 
 return [
-    'smtp_host' => 'smtp.gmail.com',
-    'smtp_port' => 587,
-    'smtp_username' => 'your-email@gmail.com',
-    'smtp_password' => 'your-app-password',
-    'smtp_encryption' => 'tls',
-    'from_email' => 'noreply@officepro.com',
-    'from_name' => 'OfficePro Attendance System',
-    'reply_to' => 'support@officepro.com',
+    'smtp_host' => 'smtp.hostinger.com',
+    'smtp_port' => 465,
+    'smtp_username' => 'tailorpro@happyeventsurat.com',
+    'smtp_password' => 'Tailor@99',
+    'smtp_encryption' => 'ssl', // Port 465 requires SSL, not TLS
+    'from_email' => 'tailorpro@happyeventsurat.com',
+    'from_name' => 'TailorPro',
+    'reply_to' => 'tailorpro@happyeventsurat.com',
 ];
 
 

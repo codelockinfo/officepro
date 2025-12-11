@@ -24,6 +24,23 @@ if (!defined('HEADER_LOADED')) {
 }
 $companyName = $_SESSION['company_name'] ?? 'OfficePro';
 $companyLogo = $_SESSION['company_logo'] ?? null;
+
+// If logo not in session, fetch from database
+if (empty($companyLogo) && isset($_SESSION['company_id'])) {
+    require_once __DIR__ . '/../../helpers/Database.php';
+    $db = Database::getInstance();
+    $company = $db->fetchOne("SELECT logo FROM companies WHERE id = ?", [$_SESSION['company_id']]);
+    if ($company && !empty($company['logo'])) {
+        $companyLogo = $company['logo'];
+        $_SESSION['company_logo'] = $companyLogo; // Update session
+    }
+}
+
+// Ensure profile image has a valid path
+$profileImage = $currentUser['profile_image'] ?? 'assets/images/default-avatar.png';
+if (empty($profileImage) || trim($profileImage) === '') {
+    $profileImage = 'assets/images/default-avatar.png';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -42,10 +59,16 @@ $companyLogo = $_SESSION['company_logo'] ?? null;
             <header class="header">
                 <div class="header-left">
                     <button id="sidebar-toggle" class="btn btn-secondary" style="display: none;">☰</button>
-                    <?php if ($companyLogo): ?>
-                        <img src="/officepro/<?php echo htmlspecialchars($companyLogo); ?>" alt="Company Logo" class="company-logo" loading="lazy">
+                    <?php if ($companyLogo && !empty(trim($companyLogo))): ?>
+                        <img src="/officepro/<?php echo htmlspecialchars($companyLogo); ?>" 
+                             alt="Company Logo" 
+                             class="company-logo" 
+                             loading="lazy"
+                             onerror="this.style.display='none'; document.querySelector('.header-left .company-name').style.display='inline';">
+                        <span class="company-name" style="display: none;"><?php echo htmlspecialchars($companyName); ?></span>
+                    <?php else: ?>
+                        <span class="company-name"><?php echo htmlspecialchars($companyName); ?></span>
                     <?php endif; ?>
-                    <span class="company-name"><?php echo htmlspecialchars($companyName); ?></span>
                 </div>
                 
                 <div class="header-right">
@@ -55,10 +78,10 @@ $companyLogo = $_SESSION['company_logo'] ?? null;
                     </div>
                     
                     <div class="user-profile" onclick="toggleUserMenu()">
-                        <img src="/officepro/<?php echo htmlspecialchars($currentUser['profile_image']); ?>" 
+                        <img src="/officepro/<?php echo htmlspecialchars($profileImage); ?>" 
                              alt="Profile" 
                              class="user-avatar"
-                             onerror="this.src='/officepro/assets/images/default-avatar.png'"
+                             onerror="this.onerror=null; this.src='/officepro/assets/images/default-avatar.png'"
                              loading="lazy">
                         <span class="user-name"><?php echo htmlspecialchars($currentUser['full_name']); ?></span>
                         <span>▼</span>

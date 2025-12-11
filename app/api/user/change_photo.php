@@ -64,7 +64,7 @@ try {
     
     // Update database
     $affected = $db->execute(
-        "UPDATE users SET profile_image = ?, updated_at = NOW() WHERE id = ?",
+        "UPDATE users SET profile_image = ? WHERE id = ?",
         [$newImagePath, $userId]
     );
     

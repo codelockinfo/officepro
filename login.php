@@ -21,12 +21,27 @@ if (isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: url('assets/images/first.gif') center center / cover no-repeat;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
+            z-index: 0;
+        }
+        body > * {
+            position: relative;
+            z-index: 1;
         }
         .login-container {
             background: white;
@@ -39,13 +54,31 @@ if (isset($_SESSION['user_id'])) {
         .login-header {
             text-align: center;
             margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .login-header-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-header-icon img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
         }
         .login-header h1 {
-            color: #4da6ff;
+            color: #667eea;
             margin-bottom: 5px;
+            font-size: 32px;
         }
         .login-header p {
             color: #666;
+            margin: 0;
         }
         .form-group {
             margin-bottom: 20px;
@@ -58,38 +91,54 @@ if (isset($_SESSION['user_id'])) {
         }
         .form-control {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .form-control:hover {
+            border-color: #b0b0b0;
         }
         .form-control:focus {
             outline: none;
-            border-color: #4da6ff;
-            box-shadow: 0 0 0 3px rgba(77, 166, 255, 0.1);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         .btn-login {
             width: 100%;
-            padding: 12px;
-            background: #4da6ff;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: 500;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
         }
         .btn-login:hover {
-            background: #3d8ce6;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+            background: linear-gradient(135deg, #5568d3 0%, #653a8f 100%);
+            transform: translateY(-3px);
+            color: white;
+        }
+        .btn-login:active {
+            transform: translateY(-1px);
         }
         .login-links {
             text-align: center;
             margin-top: 20px;
         }
         .login-links a {
-            color: #4da6ff;
+            color: #667eea;
             text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .login-links a:hover {
+            color: #5568d3;
         }
         .error-message {
             background: #fee;
@@ -105,7 +154,10 @@ if (isset($_SESSION['user_id'])) {
 <body>
     <div class="login-container">
         <div class="login-header">
-            <h1>🏢 OfficePro</h1>
+            <div class="login-header-icon">
+                <img src="assets/images/logo-icon.svg" alt="OfficePro Icon" onerror="this.style.display='none'; this.parentElement.innerHTML='🏢';">
+            </div>
+            <h1>OfficePro</h1>
             <p>Welcome back! Please login to your account.</p>
         </div>
         

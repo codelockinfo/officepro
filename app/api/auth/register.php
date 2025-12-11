@@ -59,12 +59,33 @@ if ($validator->hasErrors()) {
     exit;
 }
 
+// Log registration attempt
+error_log("Registration attempt - Token: {$token}, Email: {$userData['email']}, Name: {$userData['full_name']}");
+
+// Validate invitation token first
+$invitation = Invitation::validateToken($token);
+if (!$invitation) {
+    error_log("Invalid invitation token: {$token}");
+    echo json_encode(['success' => false, 'message' => 'Invalid or expired invitation token']);
+    exit;
+}
+
+error_log("Invitation found - Company ID: {$invitation['company_id']}, Email: {$invitation['email']}, Role: {$invitation['role']}");
+
+// IMPORTANT: Override form email with invitation email to ensure it matches
+$userData['email'] = $invitation['email'];
+error_log("Using email from invitation: {$userData['email']}");
+
 // Register user
 $result = Auth::register($userData, $token);
 
+// Log registration result
+error_log("Registration result: " . json_encode($result));
+
 if ($result['success']) {
     // Auto-login
-    Auth::login($userData['email'], $userData['password']);
+    $loginResult = Auth::login($userData['email'], $userData['password']);
+    error_log("Auto-login result: " . json_encode($loginResult));
 }
 
 echo json_encode($result);

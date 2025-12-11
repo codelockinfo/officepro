@@ -23,6 +23,10 @@ $companyId = Tenant::getCurrentCompanyId();
 $employeeId = $_GET['id'] ?? 0;
 $db = Database::getInstance();
 
+// Set timezone from config
+$appConfig = require __DIR__ . '/../../config/app.php';
+date_default_timezone_set($appConfig['timezone']);
+
 // Get employee details
 $employee = $db->fetchOne(
     "SELECT u.*, d.name as department_name 

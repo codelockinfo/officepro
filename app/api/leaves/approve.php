@@ -32,6 +32,10 @@ $input = json_decode(file_get_contents('php://input'), true);
 $db = Database::getInstance();
 $validator = new Validator();
 
+// Set timezone from config
+$appConfig = require __DIR__ . '/../../config/app.php';
+date_default_timezone_set($appConfig['timezone']);
+
 $leaveId = $input['leave_id'] ?? 0;
 $action = $input['action'] ?? '';
 $comments = $validator->sanitize($input['comments'] ?? '');

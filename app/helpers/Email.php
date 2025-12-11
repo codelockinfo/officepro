@@ -22,8 +22,25 @@ class Email {
         $this->mail->SMTPAuth = true;
         $this->mail->Username = $this->config['smtp_username'];
         $this->mail->Password = $this->config['smtp_password'];
-        $this->mail->SMTPSecure = $this->config['smtp_encryption'];
+        
+        // Handle encryption - port 465 uses SSL, port 587 uses TLS
+        $encryption = strtolower($this->config['smtp_encryption']);
+        if ($encryption === 'ssl') {
+            $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        } elseif ($encryption === 'tls') {
+            $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        } else {
+            $this->mail->SMTPSecure = '';
+        }
+        
         $this->mail->Port = $this->config['smtp_port'];
+        
+        // Add timeout settings to prevent hanging
+        $this->mail->Timeout = 10; // 10 seconds timeout
+        $this->mail->SMTPKeepAlive = false; // Don't keep connection alive
+        
+        // Enable verbose debug output (optional - disable in production)
+        // $this->mail->SMTPDebug = 2;
         
         // Default from address
         $this->mail->setFrom($this->config['from_email'], $this->config['from_name']);
@@ -37,14 +54,24 @@ class Email {
      */
     public function send($to, $subject, $body) {
         try {
+            // Set timeout for the send operation
+            set_time_limit(30); // 30 seconds max for email sending
+            
             $this->mail->clearAddresses();
             $this->mail->addAddress($to);
             $this->mail->Subject = $subject;
             $this->mail->Body = $body;
             
-            return $this->mail->send();
+            $result = $this->mail->send();
+            
+            if (!$result) {
+                error_log("Email Send Failed: " . $this->mail->ErrorInfo);
+            }
+            
+            return $result;
         } catch (Exception $e) {
-            error_log("Email Error: " . $this->mail->ErrorInfo);
+            error_log("Email Exception: " . $e->getMessage());
+            error_log("Email Error Info: " . $this->mail->ErrorInfo);
             return false;
         }
     }
@@ -77,21 +104,39 @@ class Email {
     /**
      * Send employee invitation
      */
-    public static function sendEmployeeInvitation($email, $token, $companyName, $inviterName) {
+    public static function sendEmployeeInvitation($email, $token, $companyName, $inviterName, $personalMessage = '') {
         $emailer = new self();
         $appConfig = require __DIR__ . '/../config/app.php';
         
         $registrationLink = $appConfig['app_url'] . '/register.php?token=' . $token;
         
         $subject = "Invitation to join {$companyName}";
+        
+        $personalMessageSection = '';
+        if (!empty($personalMessage)) {
+            $personalMessageSection = "
+                <div style='background:#f0f7ff;border-left:4px solid #667eea;padding:15px;margin:20px 0;border-radius:5px;'>
+                    <p style='margin:0;font-style:italic;color:#555;'><strong>Personal Message:</strong><br>{$personalMessage}</p>
+                </div>
+            ";
+        }
+        
         $body = "
-            <h2>You've been invited to join {$companyName}!</h2>
-            <p>{$inviterName} has invited you to join their team on {$appConfig['app_name']}.</p>
-            <p>Click the button below to create your account:</p>
-            <p><a href='{$registrationLink}' style='background:#4da6ff;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;display:inline-block;'>Accept Invitation</a></p>
-            <p>Or copy this link: {$registrationLink}</p>
-            <p>This invitation will expire in 7 days.</p>
-            <p>Best regards,<br>{$appConfig['app_name']} Team</p>
+            <div style='font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;'>
+                <h2 style='color:#667eea;'>You've been invited to join {$companyName}!</h2>
+                <p>Hello,</p>
+                <p><strong>{$inviterName}</strong> has invited you to join their team on <strong>{$appConfig['app_name']}</strong>.</p>
+                {$personalMessageSection}
+                <p>Click the button below to create your account and complete your registration:</p>
+                <p style='text-align:center;margin:30px 0;'>
+                    <a href='{$registrationLink}' style='background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;padding:15px 30px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:600;box-shadow:0 4px 15px rgba(102,126,234,0.4);'>Accept Invitation</a>
+                </p>
+                <p style='color:#666;font-size:14px;'>Or copy and paste this link into your browser:</p>
+                <p style='color:#667eea;word-break:break-all;font-size:12px;'>{$registrationLink}</p>
+                <hr style='border:none;border-top:1px solid #eee;margin:30px 0;'>
+                <p style='color:#999;font-size:12px;'>This invitation will expire in 7 days. If you did not expect this invitation, you can safely ignore this email.</p>
+                <p style='margin-top:30px;'>Best regards,<br><strong>{$appConfig['app_name']} Team</strong></p>
+            </div>
         ";
         
         return $emailer->send($email, $subject, $body);

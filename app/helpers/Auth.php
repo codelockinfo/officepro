@@ -102,16 +102,51 @@ class Auth {
         if ($invitationToken) {
             $invitation = Invitation::validateToken($invitationToken);
             if (!$invitation) {
+                error_log("Registration failed - Invalid invitation token: {$invitationToken}");
                 return ['success' => false, 'message' => 'Invalid or expired invitation'];
             }
             
+            // Log invitation data
+            error_log("Invitation found - Email: {$invitation['email']}, Role: {$invitation['role']}, Company ID: {$invitation['company_id']}");
+            
             // Ensure email matches
             if ($invitation['email'] !== $userData['email']) {
+                error_log("Email mismatch - Invitation email: {$invitation['email']}, Form email: {$userData['email']}");
                 return ['success' => false, 'message' => 'Email does not match invitation'];
             }
             
             $companyId = $invitation['company_id'];
-            $role = $invitation['role'];
+            $role = $invitation['role']; // Use role from invitation, not from form
+            
+            // Check if user already exists (created during invitation)
+            try {
+                $existingUser = $db->fetchOne(
+                    "SELECT id, email, role, status FROM users WHERE email = ? AND company_id = ?",
+                    [$invitation['email'], $companyId]
+                );
+                
+                if ($existingUser) {
+                    // User exists - update it instead of creating new
+                    if ($existingUser['status'] !== 'pending') {
+                        error_log("User already exists and is not pending - ID: {$existingUser['id']}, Status: {$existingUser['status']}");
+                        return ['success' => false, 'message' => 'User already registered'];
+                    }
+                    
+                    error_log("Updating existing pending user - ID: {$existingUser['id']}, Email: {$existingUser['email']}, Role: {$existingUser['role']}");
+                    $userId = $existingUser['id'];
+                } else {
+                    error_log("ERROR: User not found for invitation email: {$invitation['email']}, Company ID: {$companyId}");
+                    // Try to find any user with this email
+                    $anyUser = $db->fetchOne("SELECT * FROM users WHERE email = ?", [$invitation['email']]);
+                    if ($anyUser) {
+                        error_log("User found but with different company - User Company ID: {$anyUser['company_id']}, Expected: {$companyId}");
+                    }
+                    return ['success' => false, 'message' => 'User record not found. The invitation may have expired or been cancelled. Please request a new invitation.'];
+                }
+            } catch (Exception $e) {
+                error_log("Error checking existing user: " . $e->getMessage());
+                return ['success' => false, 'message' => 'Error checking user: ' . $e->getMessage()];
+            }
         } else {
             return ['success' => false, 'message' => 'Invitation token required'];
         }
@@ -119,40 +154,107 @@ class Auth {
         try {
             $db->beginTransaction();
             
-            // Create user
+            // Update existing user with registration data
             $hashedPassword = password_hash($userData['password'], PASSWORD_BCRYPT);
-            $db->execute(
-                "INSERT INTO users (company_id, email, password, full_name, profile_image, role, department_id, status, created_at) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, 'active', NOW())",
+            
+            // Log the exact values being updated
+            error_log("Updating user - ID: {$userId}, Email: {$invitation['email']}, Role: {$role}, Name: {$userData['full_name']}");
+            
+            // Check if profile image path is valid
+            $profileImage = $userData['profile_image'] ?? 'assets/images/default-avatar.png';
+            if (empty($profileImage)) {
+                $profileImage = 'assets/images/default-avatar.png';
+            }
+            
+            // Verify user exists and is pending before update
+            $currentUser = $db->fetchOne("SELECT * FROM users WHERE id = ?", [$userId]);
+            if (!$currentUser) {
+                throw new Exception("User with ID {$userId} not found in database");
+            }
+            
+            if ($currentUser['status'] !== 'pending') {
+                error_log("User status is not pending - Current status: {$currentUser['status']}");
+                throw new Exception("User is not in pending status. Current status: {$currentUser['status']}");
+            }
+            
+            if ($currentUser['email'] !== $invitation['email']) {
+                error_log("Email mismatch - User email: {$currentUser['email']}, Invitation email: {$invitation['email']}");
+                throw new Exception("Email mismatch between user and invitation");
+            }
+            
+            // Log before update
+            error_log("Updating user - ID: {$userId}, Email: {$invitation['email']}, Company ID: {$companyId}");
+            error_log("Current user data: " . json_encode($currentUser));
+            
+            $updateResult = $db->execute(
+                "UPDATE users SET 
+                    password = ?, 
+                    full_name = ?, 
+                    profile_image = ?, 
+                    department_id = ?, 
+                    status = 'active'
+                WHERE id = ? AND email = ? AND company_id = ? AND status = 'pending'",
                 [
-                    $companyId,
-                    $userData['email'],
                     $hashedPassword,
                     $userData['full_name'],
-                    $userData['profile_image'],
-                    $role,
-                    $userData['department_id'] ?? null
+                    $profileImage,
+                    $userData['department_id'] ?? null,
+                    $userId,
+                    $invitation['email'],
+                    $companyId
                 ]
             );
             
-            $userId = $db->lastInsertId();
+            // Check if update affected any rows
+            if ($updateResult === false || $updateResult === 0) {
+                // Get current user state for debugging
+                $afterUpdateUser = $db->fetchOne("SELECT * FROM users WHERE id = ?", [$userId]);
+                error_log("Update failed or affected 0 rows. User state after update attempt: " . json_encode($afterUpdateUser));
+                throw new Exception("User update failed. No rows were updated. Please check database logs for details.");
+            }
             
-            // Create leave balance
+            error_log("Update successful - {$updateResult} row(s) affected");
+            
+            // Verify user was updated
+            $updatedUser = $db->fetchOne("SELECT id, email, role, status FROM users WHERE id = ?", [$userId]);
+            if (!$updatedUser) {
+                throw new Exception("User update verification failed - user not found");
+            }
+            
+            if ($updatedUser['status'] !== 'active') {
+                throw new Exception("User status was not updated to active. Current status: " . $updatedUser['status']);
+            }
+            
+            error_log("User updated successfully - ID: {$userId}, Email: {$updatedUser['email']}, Role: {$updatedUser['role']}, Status: {$updatedUser['status']}");
+            
+            // Create leave balance (only if it doesn't exist)
             $currentYear = date('Y');
             $appConfig = require __DIR__ . '/../config/app.php';
-            $db->execute(
-                "INSERT INTO leave_balances (company_id, user_id, year, paid_leave, sick_leave, casual_leave, wfh_days) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)",
-                [
-                    $companyId,
-                    $userId,
-                    $currentYear,
-                    $appConfig['default_paid_leave'],
-                    $appConfig['default_sick_leave'],
-                    $appConfig['default_casual_leave'],
-                    $appConfig['default_wfh_days']
-                ]
+            
+            // Check if leave balance already exists
+            $existingBalance = $db->fetchOne(
+                "SELECT id FROM leave_balances WHERE company_id = ? AND user_id = ? AND year = ?",
+                [$companyId, $userId, $currentYear]
             );
+            
+            if (!$existingBalance) {
+                $db->execute(
+                    "INSERT INTO leave_balances (company_id, user_id, year, paid_leave, sick_leave, casual_leave, wfh_days) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    [
+                        $companyId,
+                        $userId,
+                        $currentYear,
+                        $appConfig['default_paid_leave'],
+                        $appConfig['default_sick_leave'],
+                        $appConfig['default_casual_leave'],
+                        $appConfig['default_wfh_days']
+                    ]
+                );
+                error_log("Leave balance created for user ID: {$userId}");
+            } else {
+                error_log("Leave balance already exists for user ID: {$userId}, skipping creation");
+            }
             
             // Mark invitation as accepted
             Invitation::markAsAccepted($invitationToken, $userId);
@@ -165,10 +267,18 @@ class Auth {
                 'company_id' => $companyId
             ];
             
+        } catch (PDOException $e) {
+            $db->rollBack();
+            $errorMsg = "User Registration PDO Error: " . $e->getMessage();
+            $errorMsg .= " | Code: " . $e->getCode();
+            error_log($errorMsg);
+            error_log("User Registration Error Trace: " . $e->getTraceAsString());
+            return ['success' => false, 'message' => 'Registration failed: Database error - ' . $e->getMessage()];
         } catch (Exception $e) {
             $db->rollBack();
             error_log("User Registration Error: " . $e->getMessage());
-            return ['success' => false, 'message' => 'Registration failed'];
+            error_log("User Registration Error Trace: " . $e->getTraceAsString());
+            return ['success' => false, 'message' => 'Registration failed: ' . $e->getMessage()];
         }
     }
     
@@ -254,12 +364,18 @@ class Auth {
             return null;
         }
         
+        $profileImage = $_SESSION['profile_image'] ?? 'assets/images/default-avatar.png';
+        // Ensure profile image is never empty
+        if (empty($profileImage) || trim($profileImage) === '') {
+            $profileImage = 'assets/images/default-avatar.png';
+        }
+        
         return [
             'id' => $_SESSION['user_id'] ?? null,
             'email' => $_SESSION['email'] ?? '',
             'full_name' => $_SESSION['full_name'] ?? '',
             'role' => $_SESSION['role'] ?? 'employee',
-            'profile_image' => $_SESSION['profile_image'] ?? 'assets/images/default-avatar.png',
+            'profile_image' => $profileImage,
             'company_id' => $_SESSION['company_id'] ?? null
         ];
     }

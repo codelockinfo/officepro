@@ -7,7 +7,7 @@ return [
     'app_name' => 'OfficePro Attendance System',
     'app_url' => 'http://localhost/officepro',
     'base_path' => '/officepro',
-    'timezone' => 'America/New_York', // Change this to your timezone
+    'timezone' => 'Asia/Kolkata', // Kolkata, India timezone
     
     // Attendance settings
     'standard_work_hours' => 8,
@@ -28,10 +28,10 @@ return [
     
     // File upload
     'max_upload_size' => 2097152, // 2MB in bytes
-    'allowed_image_types' => ['jpg', 'jpeg', 'png'],
+    'allowed_image_types' => ['jpg', 'jpeg', 'png', 'webp'],
     'allowed_document_types' => ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
-    'profile_image_min_width' => 200,
-    'profile_image_min_height' => 200,
+    'profile_image_min_width' => 100,
+    'profile_image_min_height' => 100,
     
     // Session
     'session_lifetime' => 1800, // 30 minutes in seconds

@@ -115,8 +115,11 @@ class Validator {
     
     /**
      * Validate image upload
+     * @param array $file The uploaded file array
+     * @param string $fieldName The field name for error messages
+     * @param bool $checkDimensions Whether to check minimum dimensions (default: true)
      */
-    public function image($file, $fieldName = 'Image') {
+    public function image($file, $fieldName = 'Image', $checkDimensions = true) {
         $appConfig = require __DIR__ . '/../config/app.php';
         
         if (!isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
@@ -133,7 +136,8 @@ class Validator {
         // Check file type
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         if (!in_array($ext, $appConfig['allowed_image_types'])) {
-            $this->errors[$fieldName] = "{$fieldName} must be JPG or PNG";
+            $allowedTypes = implode(', ', array_map('strtoupper', $appConfig['allowed_image_types']));
+            $this->errors[$fieldName] = "{$fieldName} must be {$allowedTypes}";
             return false;
         }
         
@@ -144,8 +148,8 @@ class Validator {
             return false;
         }
         
-        // Check dimensions for profile images
-        if ($imageInfo[0] < $appConfig['profile_image_min_width'] || $imageInfo[1] < $appConfig['profile_image_min_height']) {
+        // Check dimensions for profile images (optional)
+        if ($checkDimensions && ($imageInfo[0] < $appConfig['profile_image_min_width'] || $imageInfo[1] < $appConfig['profile_image_min_height'])) {
             $this->errors[$fieldName] = "{$fieldName} must be at least {$appConfig['profile_image_min_width']}x{$appConfig['profile_image_min_height']} pixels";
             return false;
         }

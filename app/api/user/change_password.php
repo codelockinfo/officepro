@@ -50,7 +50,7 @@ try {
     $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
     
     $db->execute(
-        "UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?",
+        "UPDATE users SET password = ? WHERE id = ?",
         [$hashedPassword, $userId]
     );
     

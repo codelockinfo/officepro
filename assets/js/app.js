@@ -23,13 +23,39 @@ function ajaxRequest(url, method, data, callback, errorCallback) {
         }
     }
     
+    // Set a timeout for the fetch request
+    const timeoutId = setTimeout(() => {
+        hideLoader();
+        console.error('Request timeout after 30 seconds:', url);
+        if (errorCallback) {
+            errorCallback(new Error('Request timeout'));
+        } else {
+            showMessage('error', 'Request timed out. Please try again.');
+        }
+    }, 30000);
+    
     fetch(url, options)
-        .then(response => response.json())
+        .then(response => {
+            clearTimeout(timeoutId);
+            // Check if response is ok
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            // Check content type
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                return response.text().then(text => {
+                    throw new Error('Invalid JSON response: ' + text.substring(0, 100));
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             hideLoader();
             if (callback) callback(data);
         })
         .catch(error => {
+            clearTimeout(timeoutId);
             hideLoader();
             console.error('AJAX Error:', error);
             if (errorCallback) {
@@ -51,6 +77,13 @@ function showLoader() {
         document.body.appendChild(loader);
     }
     loader.style.display = 'flex';
+    
+    // Safety: Auto-hide after 30 seconds
+    clearTimeout(window.loaderTimeout);
+    window.loaderTimeout = setTimeout(() => {
+        hideLoader();
+        console.warn('Loader auto-hidden after timeout');
+    }, 30000);
 }
 
 // Hide loader
@@ -59,7 +92,17 @@ function hideLoader() {
     if (loader) {
         loader.style.display = 'none';
     }
+    // Clear any pending timeout
+    if (window.loaderTimeout) {
+        clearTimeout(window.loaderTimeout);
+        window.loaderTimeout = null;
+    }
 }
+
+// Ensure loader is hidden on page unload
+window.addEventListener('beforeunload', function() {
+    hideLoader();
+});
 
 // Show message (toast notification)
 function showMessage(type, text, duration = 3000) {
@@ -203,9 +246,34 @@ function updateTimerDisplay() {
     }
 }
 
-// Poll attendance status (for timer persistence)
+// Background fetch without loader (for polling)
+function backgroundFetch(url, callback, errorCallback) {
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (callback) callback(data);
+    })
+    .catch(error => {
+        console.error('Background fetch error:', error);
+        if (errorCallback) {
+            errorCallback(error);
+        }
+    });
+}
+
+// Poll attendance status (for timer persistence) - no loader
 function pollAttendanceStatus() {
-    ajaxRequest('/officepro/app/api/attendance/status.php', 'GET', null, (response) => {
+    backgroundFetch('/officepro/app/api/attendance/status.php', (response) => {
         if (response.success && response.data.status === 'in') {
             if (!timerInterval) {
                 console.log('Poll: Starting timer with:', response.data.check_in_time);
@@ -219,9 +287,9 @@ function pollAttendanceStatus() {
     });
 }
 
-// Notification polling
+// Notification polling - no loader
 function fetchNotifications() {
-    ajaxRequest('/officepro/app/api/notifications/fetch.php', 'GET', null, (response) => {
+    backgroundFetch('/officepro/app/api/notifications/fetch.php', (response) => {
         if (response.success) {
             updateNotificationBadge(response.data.unread_count);
             displayNotificationList(response.data.notifications);
@@ -315,19 +383,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Start notification polling if user is logged in (reduced frequency)
-    if (document.getElementById('notification-icon')) {
+    const notificationIcon = document.getElementById('notification-icon');
+    if (notificationIcon) {
+        // Initial fetch
         fetchNotifications();
         // Only poll every 2 minutes to reduce load
-        setInterval(fetchNotifications, 120000);
+        setInterval(() => {
+            fetchNotifications();
+        }, 120000);
     }
     
     // Start attendance status polling if on dashboard and timer exists
-    if (document.getElementById('timer-display')) {
+    const timerDisplay = document.getElementById('timer-display');
+    if (timerDisplay) {
+        // Initial poll
+        pollAttendanceStatus();
         // Only poll if timer is active and no modal is open
-        const pollInterval = setInterval(() => {
+        setInterval(() => {
             // Don't poll if modal is open (prevents interference)
             const hasActiveModal = document.querySelector('.modal-overlay.active');
-            if (!hasActiveModal) {
+            if (!hasActiveModal && timerDisplay) {
                 pollAttendanceStatus();
             }
         }, 30000); // Poll every 30 seconds only when no modal is open

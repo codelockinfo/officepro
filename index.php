@@ -18,10 +18,11 @@ if (isset($_SESSION['user_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OfficePro - Employee Attendance & Leave Management</title>
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
         .landing-hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: url('assets/images/first.gif') center center / cover no-repeat;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -29,26 +30,90 @@ if (isset($_SESSION['user_id'])) {
             text-align: center;
             color: white;
             padding: 20px;
+            position: relative;
+        }
+        .landing-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
+            z-index: 1;
         }
         .hero-content {
             max-width: 800px;
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.5);
+            animation: fadeInUp 0.8s ease-out;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .hero-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .hero-logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            animation: fadeInUp 0.8s ease-out 0.1s both, pulse 2s ease-in-out infinite 1s;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        .hero-logo-icon img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
         }
         .hero-title {
             font-size: 48px;
             font-weight: bold;
             margin-bottom: 20px;
-            color: white;
+            color: #667eea;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
         }
         .hero-subtitle {
             font-size: 20px;
             margin-bottom: 40px;
-            opacity: 0.9;
+            color: #555;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
         }
         .hero-buttons {
             display: flex;
             gap: 20px;
             justify-content: center;
             flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.6s both;
         }
         .hero-btn {
             padding: 15px 40px;
@@ -56,21 +121,46 @@ if (isset($_SESSION['user_id'])) {
             border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: all 0.3s ease;
             display: inline-block;
+            position: relative;
         }
         .hero-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .hero-btn:active {
+            transform: translateY(-1px);
         }
         .btn-register {
-            background: white;
-            color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-register:hover {
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+            background: linear-gradient(135deg, #5568d3 0%, #653a8f 100%);
+            color: white;
         }
         .btn-login {
-            background: transparent;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+        .btn-login:hover {
+            background: #667eea;
             color: white;
-            border: 2px solid white;
+            border-color: #667eea;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        @keyframes buttonShimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
         }
         .features {
             padding: 80px 20px;
@@ -101,7 +191,12 @@ if (isset($_SESSION['user_id'])) {
 <body>
     <div class="landing-hero">
         <div class="hero-content">
-            <h1 class="hero-title">🏢 OfficePro</h1>
+            <div class="hero-logo">
+                <div class="hero-logo-icon">
+                    <img src="assets/images/logo-icon.svg" alt="OfficePro Icon" onerror="this.style.display='none'; this.parentElement.innerHTML='🏢';">
+                </div>
+                <h1 class="hero-title">OfficePro</h1>
+            </div>
             <p class="hero-subtitle">
                 Complete Multi-Tenant Employee Attendance & Leave Management System
             </p>
