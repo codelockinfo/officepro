@@ -128,7 +128,7 @@ error_log("Company Settings - Company ID: $companyId, Logo from DB: " . ($compan
             <textarea id="address" name="address" class="form-control" rows="3"><?php echo htmlspecialchars($company['address'] ?? ''); ?></textarea>
         </div>
         
-        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="submit" class="btn btn-primary custom-btn-primary">Save Changes</button>
     </form>
 </div>
 

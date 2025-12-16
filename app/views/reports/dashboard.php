@@ -166,7 +166,7 @@ $totalEmployees = $db->fetchOne(
             </div>
             
             <div style="display: flex; gap: 10px;">
-                <button type="button" onclick="generateReport('view')" class="btn btn-primary">View Report</button>
+                <button type="button" onclick="generateReport('view')" class="btn btn-primary custom-btn-primary">View Report</button>
                 <button type="button" onclick="generateReport('csv')" class="btn btn-secondary">Export CSV</button>
                 <button type="button" onclick="generateReport('pdf')" class="btn btn-secondary">Export PDF</button>
             </div>

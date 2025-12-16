@@ -370,8 +370,51 @@ function validateForm(formId) {
     return isValid;
 }
 
+// Initialize blob button structure for .btn-primary buttons
+function initBlobButtons() {
+    const primaryButtons = document.querySelectorAll('.btn-primary');
+    
+    primaryButtons.forEach(button => {
+        // Skip if already initialized
+        if (button.querySelector('.blob-btn__inner')) {
+            return;
+        }
+        
+        // Wrap the button text in a span to keep it above blobs
+        const text = button.textContent.trim();
+        button.innerHTML = '';
+        
+        // Create text span
+        const textSpan = document.createElement('span');
+        textSpan.textContent = text;
+        textSpan.style.position = 'relative';
+        textSpan.style.zIndex = '10';
+        button.appendChild(textSpan);
+        
+        // Create blob structure
+        const inner = document.createElement('span');
+        inner.className = 'blob-btn__inner';
+        
+        const blobs = document.createElement('span');
+        blobs.className = 'blob-btn__blobs';
+        
+        // Create 4 blob elements
+        for (let i = 0; i < 4; i++) {
+            const blob = document.createElement('span');
+            blob.className = 'blob-btn__blob';
+            blobs.appendChild(blob);
+        }
+        
+        inner.appendChild(blobs);
+        button.appendChild(inner);
+    });
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize blob buttons
+    initBlobButtons();
+    
     // Toggle sidebar on mobile
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebar = document.querySelector('.sidebar');

@@ -29,7 +29,7 @@ $departments = $db->fetchAll(
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h1>🏢 Departments</h1>
-    <button onclick="openAddDepartmentModal()" class="btn btn-primary">+ Add Department</button>
+    <button onclick="openAddDepartmentModal()" class="btn btn-primary custom-btn-primary">+ Add Department</button>
 </div>
 
 <div class="card">

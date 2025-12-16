@@ -115,7 +115,7 @@ if ($nextMonth > 12) {
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h1>📆 Calendar</h1>
     <?php if (Auth::hasRole(['company_owner'])): ?>
-        <button onclick="openAddHolidayModal()" class="btn btn-primary">+ Add Holiday</button>
+        <button onclick="openAddHolidayModal()" class="btn btn-primary custom-btn-primary">+ Add Holiday</button>
     <?php endif; ?>
 </div>
 

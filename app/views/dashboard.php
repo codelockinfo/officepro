@@ -170,8 +170,8 @@ foreach ($todayHistory as $record) {
                 <a href="/officepro/app/views/leaves.php" class="btn btn-primary">Request Leave</a>
             <?php endif; ?>
             <?php if ($currentUser['role'] === 'company_owner'): ?>
-                <a href="/officepro/app/views/company/employees.php" class="btn btn-primary">Manage Employees</a>
-                <a href="/officepro/app/views/company/invitations.php" class="btn btn-primary">Invite Employees</a>
+                <a href="/officepro/app/views/company/employees.php" class="btn btn-primary custom-btn-primary">Manage Employees</a>
+                <a href="/officepro/app/views/company/invitations.php" class="btn btn-primary custom-btn-primary">Invite Employees</a>
                 <a href="/officepro/app/views/leave_approvals.php" class="btn btn-secondary">Leave Approvals</a>
                 <a href="/officepro/app/views/reports/dashboard.php" class="btn btn-secondary">View Reports</a>
             <?php else: ?>

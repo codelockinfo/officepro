@@ -19,7 +19,7 @@ $invitations = Invitation::getCompanyInvitations($companyId);
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h1>✉️ Employee Invitations</h1>
-    <button onclick="openInviteModal()" class="btn btn-primary">+ Invite Employee</button>
+    <button onclick="openInviteModal()" class="btn btn-primary custom-btn-primary">+ Invite Employee</button>
 </div>
 
 <div class="card">
