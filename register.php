@@ -42,6 +42,7 @@ if ($token) {
     <title>Employee Registration - OfficePro</title>
     <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             background: url('assets/images/first.gif') center center / cover no-repeat;
@@ -142,6 +143,54 @@ if ($token) {
         .form-control[readonly] {
             background: #f5f5f5;
             cursor: not-allowed;
+        }
+        .password-wrapper {
+            position: relative;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: color 0.3s ease;
+            width: 30px;
+            height: 30px;
+        }
+        .password-toggle:hover {
+            color: #667eea;
+        }
+        .password-toggle .eye-icon {
+            font-size: 15px;
+        }
+        .password-wrapper .form-control {
+            padding-right: 45px;
+        }
+        /* Hide browser default password reveal buttons */
+        .password-wrapper input[type="password"]::-ms-reveal,
+        .password-wrapper input[type="password"]::-ms-clear {
+            display: none;
+        }
+        .password-wrapper input[type="text"][name*="password"]::-ms-reveal,
+        .password-wrapper input[type="text"][name*="password"]::-ms-clear {
+            display: none;
+        }
+        input[type="password"]::-webkit-credentials-auto-fill-button {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            position: absolute !important;
+            right: 0 !important;
         }
         .file-upload-wrapper {
             position: relative;
@@ -279,7 +328,12 @@ if ($token) {
                 
                 <div class="form-group">
                     <label class="form-label" for="password">Password * (min. 8 characters)</label>
-                    <input type="password" id="password" name="password" class="form-control" minlength="8" required>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" name="password" class="form-control" minlength="8" required>
+                        <button type="button" class="password-toggle" id="password-toggle" onclick="togglePassword('password', this)" style="display: none;">
+                            <i class="fas fa-eye eye-icon"></i>
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="form-group">
@@ -354,6 +408,55 @@ if ($token) {
             nameDisplay.textContent = 'No file chosen';
             nameDisplay.style.color = '#666';
         }
+        
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('.eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+        
+        // Show password toggle when user starts typing
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('password');
+            const passwordToggle = document.getElementById('password-toggle');
+            
+            if (passwordInput && passwordToggle) {
+                // Show toggle on any keypress or input
+                passwordInput.addEventListener('keydown', function() {
+                    if (this.value.length >= 0) {
+                        passwordToggle.style.display = 'flex';
+                    }
+                });
+                
+                passwordInput.addEventListener('input', function() {
+                    if (this.value.length > 0) {
+                        passwordToggle.style.display = 'flex';
+                    } else {
+                        passwordToggle.style.display = 'none';
+                    }
+                });
+                
+                passwordInput.addEventListener('focus', function() {
+                    if (this.value.length > 0) {
+                        passwordToggle.style.display = 'flex';
+                    }
+                });
+                
+                passwordInput.addEventListener('blur', function() {
+                    if (this.value.length === 0) {
+                        passwordToggle.style.display = 'none';
+                    }
+                });
+            }
+        });
         
         function handleRegister(event) {
             event.preventDefault();
