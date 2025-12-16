@@ -9,7 +9,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
 <nav class="sidebar">
     <div class="sidebar-header">
         <div class="sidebar-logo">
-            <img src="/officepro/assets/images/logo.jpg" alt="OfficePro Logo" style="height: 40px; width: auto; margin-right: 10px;">
+            <img src="/officepro/assets/images/logo1.jpg" alt="OfficePro Logo" style="height: 40px; width: auto; margin-right: 10px;">
             <span>OfficePro</span>
         </div>
     </div>
