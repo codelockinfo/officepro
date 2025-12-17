@@ -52,14 +52,28 @@ if ($isManager) {
     );
 }
 
-// Get attendance for the month (user's own)
-$attendance = $db->fetchAll(
-    "SELECT DATE(date) as date_only, SUM(overtime_hours) as total_overtime 
-    FROM attendance 
-    WHERE company_id = ? AND user_id = ? AND MONTH(date) = ? AND YEAR(date) = ? AND status = 'out'
-    GROUP BY DATE(date)",
-    [$companyId, $userId, $month, $year]
-);
+// Get attendance for the month
+if ($isManager) {
+    // For owners/managers: get all company attendance
+    $attendance = $db->fetchAll(
+        "SELECT DATE(a.date) as date_only, a.user_id, u.full_name as employee_name, 
+                SUM(a.overtime_hours) as total_overtime 
+         FROM attendance a
+         JOIN users u ON a.user_id = u.id
+         WHERE a.company_id = ? AND MONTH(a.date) = ? AND YEAR(a.date) = ? AND a.status = 'out'
+         GROUP BY DATE(a.date), a.user_id",
+        [$companyId, $month, $year]
+    );
+} else {
+    // For employees: get own attendance
+    $attendance = $db->fetchAll(
+        "SELECT DATE(date) as date_only, SUM(overtime_hours) as total_overtime 
+        FROM attendance 
+        WHERE company_id = ? AND user_id = ? AND MONTH(date) = ? AND YEAR(date) = ? AND status = 'out'
+        GROUP BY DATE(date)",
+        [$companyId, $userId, $month, $year]
+    );
+}
 
 // Create arrays for easy lookup
 $holidayDates = [];
@@ -86,9 +100,15 @@ foreach ($leaves as $leave) {
 $attendanceDates = [];
 $overtimeDates = [];
 foreach ($attendance as $att) {
-    $attendanceDates[$att['date_only']] = true;
-    if ($att['total_overtime'] > 0) {
-        $overtimeDates[$att['date_only']] = $att['total_overtime'];
+    $dateKey = $att['date_only'];
+    $attendanceDates[$dateKey] = true;
+    if ($isManager && isset($att['total_overtime']) && $att['total_overtime'] > 0) {
+        if (!isset($overtimeDates[$dateKey])) {
+            $overtimeDates[$dateKey] = 0;
+        }
+        $overtimeDates[$dateKey] += $att['total_overtime'];
+    } elseif (!$isManager && isset($att['total_overtime']) && $att['total_overtime'] > 0) {
+        $overtimeDates[$dateKey] = $att['total_overtime'];
     }
 }
 
@@ -220,8 +240,18 @@ if ($nextMonth > 12) {
         }
         .calendar-day.today {
             background: linear-gradient(135deg, #e6f2ff 0%, #ffffff 100%);
+            border: 1px solid #e8e8e8;
+            box-shadow: none;
+        }
+        .calendar-day.today.selected {
+            background: white;
             border: 2px solid var(--primary-blue);
-            box-shadow: 0 0 0 2px rgba(77, 166, 255, 0.2);
+            box-shadow: none;
+        }
+        .calendar-day.selected:not(.today) {
+            background: white;
+            border: 2px solid var(--primary-blue);
+            box-shadow: none;
         }
         .calendar-day.today .day-number {
             color: var(--primary-blue);
@@ -232,6 +262,26 @@ if ($nextMonth > 12) {
             align-items: center;
             justify-content: center;
             font-weight: 900;
+        }
+        .calendar-day.sunday {
+            background: #ffe6e6;
+        }
+        .calendar-day.sunday:hover {
+            background: #ffcccc;
+        }
+        .calendar-day.sunday.today {
+            background: linear-gradient(135deg, #e6f2ff 0%, #ffffff 100%);
+            border: 1px solid #e8e8e8;
+        }
+        .calendar-day.sunday.today.selected {
+            background: white;
+            border: 2px solid var(--primary-blue);
+            box-shadow: none;
+        }
+        .calendar-day.sunday.selected:not(.today) {
+            background: #ffe6e6;
+            border: 2px solid var(--primary-blue);
+            box-shadow: none;
         }
         .day-number {
             font-weight: 600;
@@ -317,7 +367,16 @@ if ($nextMonth > 12) {
             $date = sprintf('%04d-%02d-%02d', $year, $month, $day);
             $isToday = ($date === $today);
             
-            echo '<div class="calendar-day' . ($isToday ? ' today' : '') . '" onclick="viewDayDetails(\'' . $date . '\')">';
+            // Check if this day is Sunday (0 = Sunday, 6 = Saturday)
+            $dayOfWeek = date('w', mktime(0, 0, 0, $month, $day, $year));
+            $isSunday = ($dayOfWeek == 0);
+            
+            $classes = 'calendar-day';
+            if ($isToday) $classes .= ' today';
+            if ($isSunday) $classes .= ' sunday';
+            if ($isToday && Auth::hasRole(['company_owner'])) $classes .= ' selected';
+            
+            echo '<div class="' . $classes . '" data-date="' . $date . '" onclick="selectCalendarDay(\'' . $date . '\')">';
             echo '<div class="day-number">' . $day . '</div>';
             echo '<div class="day-events">';
             
@@ -355,6 +414,119 @@ if ($nextMonth > 12) {
         ?>
     </div>
 </div>
+
+<?php if (Auth::hasRole(['company_owner'])): ?>
+<!-- Employee Filter Tabs (Company Owner Only) -->
+<div id="filter-section-card" class="card" style="margin-bottom: 25px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); scroll-margin-top: 20px;">
+    <div style="padding: 20px;">
+        <h3 style="margin: 0 0 20px 0; color: var(--primary-blue); font-size: 16px; font-weight: 600;">
+            <i class="fas fa-filter"></i> Filter Employees
+        </h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+            <button onclick="showEmployeeList('attendance')" id="tab-attendance" class="calendar-tab active">
+                <i class="fas fa-check-circle"></i> Attendance
+            </button>
+            <button onclick="showEmployeeList('leave')" id="tab-leave" class="calendar-tab">
+                <i class="fas fa-calendar-alt"></i> Leave
+            </button>
+            <button onclick="showEmployeeList('overtime')" id="tab-overtime" class="calendar-tab">
+                <i class="fas fa-clock"></i> Overtime
+            </button>
+        </div>
+        
+        <!-- Employee Lists Container -->
+        <div id="employee-list-container" style="display: block;">
+            <div id="employee-list-content"><div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading...</div></div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .calendar-tab {
+        padding: 12px 24px;
+        border: 2px solid #e0e0e0;
+        background: white;
+        color: #666;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .calendar-tab:hover {
+        border-color: var(--primary-blue);
+        color: var(--primary-blue);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .calendar-tab.active {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, #3d8ce6 100%);
+        color: white;
+        border-color: var(--primary-blue);
+    }
+    .employee-list-item {
+        padding: 12px 15px;
+        border-bottom: 1px solid #e8e8e8;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: background 0.2s ease;
+    }
+    .employee-list-item:hover {
+        background: #f8f9fa;
+    }
+    .employee-list-item:last-child {
+        border-bottom: none;
+    }
+    .employee-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .employee-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #e0e0e0;
+    }
+    .employee-details {
+        display: flex;
+        flex-direction: column;
+    }
+    .employee-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 15px;
+    }
+    .employee-meta {
+        font-size: 12px;
+        color: #666;
+        margin-top: 2px;
+    }
+    .employee-status {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .status-present {
+        background: #d4edda;
+        color: #155724;
+    }
+    .status-leave {
+        background: #cce5ff;
+        color: #004085;
+    }
+    .status-overtime {
+        background: #ffe6cc;
+        color: #856404;
+    }
+</style>
+<?php endif; ?>
 
 <!-- Add Holiday Modal (Company Owner Only) -->
 <?php if (Auth::hasRole(['company_owner'])): ?>
@@ -427,6 +599,138 @@ if ($nextMonth > 12) {
         console.log('View details for:', formattedDate);
         // You can add a modal here to show day details
     }
+    
+    <?php if (Auth::hasRole(['company_owner'])): ?>
+    // Employee list functionality for company owners
+    let selectedDate = '<?php echo date('Y-m-d'); ?>';
+    
+    // Auto-load attendance list on page load
+    window.addEventListener('DOMContentLoaded', function() {
+        showEmployeeList('attendance');
+    });
+    
+    function selectCalendarDay(date) {
+        // Remove selected class from all days
+        document.querySelectorAll('.calendar-day').forEach(day => {
+            day.classList.remove('selected');
+        });
+        
+        // Add selected class to clicked day
+        const clickedDay = document.querySelector(`[data-date="${date}"]`);
+        if (clickedDay) {
+            clickedDay.classList.add('selected');
+        }
+        
+        // Update selected date
+        selectedDate = date;
+        
+        // Refresh employee list if a tab is active
+        const activeTab = document.querySelector('.calendar-tab.active');
+        if (activeTab) {
+            const tabType = activeTab.id.replace('tab-', '');
+            fetchEmployeeList(tabType, selectedDate);
+        }
+        
+        // Smooth scroll to filter section with animation
+        const filterCard = document.getElementById('filter-section-card');
+        if (filterCard) {
+            // Ensure filter section is visible
+            document.getElementById('employee-list-container').style.display = 'block';
+            
+            // Scroll to filter card with smooth animation
+            setTimeout(() => {
+                filterCard.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start',
+                    inline: 'nearest'
+                });
+            }, 150);
+        }
+    }
+    
+    function showEmployeeList(type) {
+        // Update active tab
+        document.querySelectorAll('.calendar-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.getElementById('tab-' + type).classList.add('active');
+        
+        // Show container
+        document.getElementById('employee-list-container').style.display = 'block';
+        document.getElementById('employee-list-content').innerHTML = '<div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+        
+        // Fetch employee list
+        fetchEmployeeList(type, selectedDate);
+    }
+    
+    function fetchEmployeeList(type, date) {
+        const url = `/officepro/app/api/calendar/employee_list.php?type=${type}&date=${date}`;
+        
+        ajaxRequest(url, 'GET', {}, (response) => {
+            if (response.success) {
+                displayEmployeeList(type, response.data);
+            } else {
+                document.getElementById('employee-list-content').innerHTML = 
+                    '<div style="text-align: center; padding: 20px; color: #dc3545;">' + 
+                    (response.message || 'Failed to load employee list') + '</div>';
+            }
+        }, (error) => {
+            document.getElementById('employee-list-content').innerHTML = 
+                '<div style="text-align: center; padding: 20px; color: #dc3545;">Error loading employee list</div>';
+        });
+    }
+    
+    function displayEmployeeList(type, employees) {
+        const container = document.getElementById('employee-list-content');
+        
+        if (!employees || employees.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">No employees found</div>';
+            return;
+        }
+        
+        let html = '<div style="max-height: 400px; overflow-y: auto;">';
+        
+        employees.forEach(emp => {
+            let statusClass = '';
+            let statusText = '';
+            let metaText = '';
+            
+            if (type === 'attendance') {
+                statusClass = 'status-present';
+                statusText = 'Present';
+                metaText = `Checked in: ${emp.check_in_time || 'N/A'}`;
+            } else if (type === 'leave') {
+                statusClass = 'status-leave';
+                statusText = 'On Leave';
+                metaText = `${emp.leave_type || 'Leave'} - ${emp.days_count || 0} day(s)`;
+            } else if (type === 'overtime') {
+                statusClass = 'status-overtime';
+                statusText = 'Overtime';
+                metaText = `${emp.overtime_hours || '0.00'}h overtime`;
+            }
+            
+            html += `
+                <div class="employee-list-item">
+                    <div class="employee-info">
+                        <img src="/officepro/${emp.profile_image || 'assets/images/default-avatar.png'}" 
+                             alt="${emp.full_name}" 
+                             class="employee-avatar"
+                             onerror="this.src='/officepro/assets/images/default-avatar.png'">
+                        <div class="employee-details">
+                            <div class="employee-name">${emp.full_name || emp.employee_name}</div>
+                            <div class="employee-meta">${metaText}</div>
+                        </div>
+                    </div>
+                    <span class="employee-status ${statusClass}">${statusText}</span>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        container.innerHTML = html;
+    }
+    
+    <?php endif; ?>
 </script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

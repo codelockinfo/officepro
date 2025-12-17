@@ -49,12 +49,15 @@ function formatHoursToTime($decimalHours) {
     return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
 }
 
-// Calculate today's totals
+// Calculate today's totals - only count completed check-outs (status = 'out')
 $totalRegularHours = 0;
 $totalOvertimeHours = 0;
 foreach ($todayHistory as $record) {
-    $totalRegularHours += $record['regular_hours'];
-    $totalOvertimeHours += $record['overtime_hours'];
+    // Only count hours for completed check-outs
+    if ($record['status'] === 'out' && $record['check_out'] !== null) {
+        $totalRegularHours += floatval($record['regular_hours'] ?? 0);
+        $totalOvertimeHours += floatval($record['overtime_hours'] ?? 0);
+    }
 }
 ?>
 
@@ -136,13 +139,27 @@ foreach ($todayHistory as $record) {
                 [$companyId]
             );
             
-            // Count employees present today (checked in OR checked out today)
+            // Count employees present today
+            // Count distinct employees who have attendance records for today
+            // Exclude employees who are on approved leave today
             $presentToday = $db->fetchOne(
-                "SELECT COUNT(DISTINCT user_id) as count 
-                 FROM attendance 
-                 WHERE company_id = ? AND date = ?",
-                [$companyId, $today]
+                "SELECT COUNT(DISTINCT a.user_id) as count 
+                 FROM attendance a
+                 JOIN users u ON a.user_id = u.id
+                 WHERE a.company_id = ? 
+                 AND a.date = ? 
+                 AND u.status = 'active'
+                 AND a.user_id NOT IN (
+                     SELECT DISTINCT l.user_id 
+                     FROM leaves l
+                     WHERE l.company_id = ? 
+                     AND l.status = 'approved' 
+                     AND ? BETWEEN l.start_date AND l.end_date
+                 )",
+                [$companyId, $today, $companyId, $today]
             );
+            
+            $presentCount = $presentToday['count'] ?? 0;
             
             // Count employees on leave today (approved leaves where today falls between start_date and end_date)
             $onLeaveToday = $db->fetchOne(
@@ -167,37 +184,11 @@ foreach ($todayHistory as $record) {
             </div>
             <div style="margin-bottom: 15px;">
                 <span style="font-weight: 600;">Present Today:</span>
-                <span style="float: right; color: var(--success-green); font-weight: bold;"><?php echo $presentToday['count']; ?></span>
+                <span style="float: right; color: var(--success-green); font-weight: bold;"><?php echo $presentCount; ?></span>
             </div>
             <div style="margin-bottom: 15px;">
                 <span style="font-weight: 600;">On Leave Today:</span>
                 <span style="float: right; color:rgb(236, 9, 32); font-weight: bold;"><?php echo $onLeaveToday['count']; ?></span>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Quick Stats for Owner -->
-    <div class="card">
-        <h2 class="card-title">This Month</h2>
-        <div style="padding: 20px;">
-            <?php
-            $currentMonth = date('Y-m');
-            $monthStats = $db->fetchOne(
-                "SELECT 
-                    SUM(overtime_hours) as total_overtime,
-                    COUNT(DISTINCT user_id) as active_employees
-                FROM attendance 
-                WHERE company_id = ? AND DATE_FORMAT(date, '%Y-%m') = ?",
-                [$companyId, $currentMonth]
-            );
-            ?>
-            <div style="margin-bottom: 15px;">
-                <span style="font-weight: 600;">Active Employees:</span>
-                <span style="float: right; color: var(--primary-blue); font-weight: bold;"><?php echo $monthStats['active_employees'] ?? 0; ?></span>
-            </div>
-            <div>
-                <span style="font-weight: 600;">Total Overtime:</span>
-                <span style="float: right; color: var(--overtime-orange); font-weight: bold;"><?php echo number_format($monthStats['total_overtime'] ?? 0, 1); ?>h</span>
             </div>
         </div>
     </div>
@@ -213,8 +204,8 @@ foreach ($todayHistory as $record) {
             <?php if ($currentUser['role'] === 'company_owner'): ?>
                 <a href="/officepro/app/views/company/employees.php" class="btn btn-primary custom-btn-primary">Manage Employees</a>
                 <a href="/officepro/app/views/company/invitations.php" class="btn btn-primary custom-btn-primary">Invite Employees</a>
-                <a href="/officepro/app/views/leave_approvals.php" class="btn btn-secondary ">Leave Approvals</a>
-                <a href="/officepro/app/views/reports/report_dashboard.php" class="btn btn-secondary">View Reports</a>
+                <a href="/officepro/app/views/leave_approvals.php" class="btn btn-secondary custom-btn-secondary">Leave Approvals</a>
+                <a href="/officepro/app/views/reports/report_dashboard.php" class="btn btn-secondary custom-btn-secondary">View Reports</a>
             <?php else: ?>
                 <a href="/officepro/app/views/employee/tasks.php" class="btn btn-secondary custom-btn-secondary">View My Tasks</a>
                 <a href="/officepro/app/views/employee/credentials.php" class="btn btn-secondary custom-btn-secondary">My Credentials</a>

@@ -33,12 +33,10 @@ class AttendanceCalculator {
         $checkIn = new DateTime($checkInTime);
         $checkOut = new DateTime($checkOutTime);
         
-        // Calculate total hours worked
+        // Calculate total hours worked using total seconds for accuracy
         $interval = $checkIn->diff($checkOut);
-        $totalHours = $interval->h + ($interval->i / 60) + ($interval->s / 3600);
-        if ($interval->days > 0) {
-            $totalHours += $interval->days * 24;
-        }
+        $totalSeconds = ($interval->days * 86400) + ($interval->h * 3600) + ($interval->i * 60) + $interval->s;
+        $totalHours = $totalSeconds / 3600; // Convert total seconds to decimal hours
         
         // Calculate regular and overtime hours
         // Regular hours = min(total hours, standard working hours)
