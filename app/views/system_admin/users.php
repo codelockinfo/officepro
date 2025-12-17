@@ -192,7 +192,7 @@ $users = $db->fetchAll(
                 
                 const footer = `<button type="button" class="btn btn-primary" onclick="closeModal(this.closest('.modal-overlay').id)">Close</button>`;
                 
-                createModal('👤 User Details', content, footer);
+                createModal('<i class="fas fa-user"></i> User Details', content, footer);
             } else {
                 showMessage('error', response.message || 'Failed to load user details');
             }
@@ -207,7 +207,7 @@ $users = $db->fetchAll(
             },
             null,
             'Suspend User',
-            '⚠️'
+            '<i class="fas fa-exclamation-triangle"></i>'
         );
     }
     
@@ -219,7 +219,7 @@ $users = $db->fetchAll(
             },
             null,
             'Activate User',
-            '✓'
+            '<i class="fas fa-check-circle"></i>'
         );
     }
 </script>

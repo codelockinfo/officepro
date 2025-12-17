@@ -38,7 +38,7 @@ $allLeaves = $db->fetchAll(
 );
 ?>
 
-<h1>✓ Leave Approvals</h1>
+<h1><i class="fas fa-check-circle"></i> Leave Approvals</h1>
 
 <!-- Pending Approvals -->
 <div class="card" style="margin-top: 20px;">
@@ -255,7 +255,7 @@ $allLeaves = $db->fetchAll(
             : 'The employee will be notified of the decline.';
         
         const title = action === 'approve' ? 'Approve Leave Request' : 'Decline Leave Request';
-        const icon = action === 'approve' ? '✓' : '✗';
+        const icon = action === 'approve' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>';
         
         confirmDialog(
             message,

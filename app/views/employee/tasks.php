@@ -41,17 +41,17 @@ $createdTasks = $db->fetchAll(
 ?>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <h1>✓ My Tasks</h1>
-    <button onclick="openCreateTaskModal()" class="btn btn-primary">+ Create Task</button>
+    <h1><i class="fas fa-tasks"></i> My Tasks</h1>
+    <button onclick="openCreateTaskModal()" class="btn btn-primary custom-btn-primary">+ Create Task</button>
 </div>
 
 <!-- Tabs -->
 <div class="card" style="margin-bottom: 20px;">
     <div style="display: flex; gap: 20px; padding: 15px; border-bottom: 1px solid #ddd;">
-        <button onclick="showTab('my-tasks')" id="tab-my-tasks" class="btn btn-secondary" style="background: var(--primary-blue); color: white;">
+        <button onclick="showTab('my-tasks')" id="tab-my-tasks" class="btn btn-secondary custom-btn-secondary" style="background: var(--primary-blue); color: white;">
             My Tasks (<?php echo count($myTasks); ?>)
         </button>
-        <button onclick="showTab('created-tasks')" id="tab-created-tasks" class="btn btn-secondary">
+        <button onclick="showTab('created-tasks')" id="tab-created-tasks" class="btn btn-secondary custom-btn-secondary">
             Created by Me (<?php echo count($createdTasks); ?>)
         </button>
     </div>
@@ -336,7 +336,7 @@ $createdTasks = $db->fetchAll(
             },
             null,
             'Delete Task',
-            '✓'
+            '<i class="fas fa-trash-alt"></i>'
         );
     }
 </script>

@@ -183,7 +183,7 @@ $companies = $db->fetchAll(
             },
             null,
             'Suspend Company',
-            '⚠️'
+            '<i class="fas fa-exclamation-triangle"></i>'
         );
     }
     
