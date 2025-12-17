@@ -112,82 +112,188 @@ if ($nextMonth > 12) {
 }
 ?>
 
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <h1>📆 Calendar</h1>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <h1 style="display: flex; align-items: center; gap: 10px; margin: 0;">
+        <i class="fas fa-calendar-alt" style="color: var(--primary-blue);"></i> Calendar
+    </h1>
     <?php if (Auth::hasRole(['company_owner'])): ?>
         <button onclick="openAddHolidayModal()" class="btn btn-primary custom-btn-primary">+ Add Holiday</button>
+
     <?php endif; ?>
 </div>
 
 <!-- Month Navigation -->
-<div class="card" style="margin-bottom: 20px;">
-    <div style="padding: 20px; display: flex; justify-content: space-between; align-items: center;">
-        <a href="?month=<?php echo $prevMonth; ?>&year=<?php echo $prevYear; ?>" class="btn btn-secondary">← Previous</a>
-        <h2 style="margin: 0;"><?php echo date('F Y', $firstDay); ?></h2>
-        <a href="?month=<?php echo $nextMonth; ?>&year=<?php echo $nextYear; ?>" class="btn btn-secondary">Next →</a>
+<div class="card" style="margin-bottom: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="padding: 25px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--primary-blue) 0%, #3d8ce6 100%); border-radius: 12px;">
+        <a href="?month=<?php echo $prevMonth; ?>&year=<?php echo $prevYear; ?>" 
+           class="btn btn-secondary" 
+           style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 10px 20px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-chevron-left"></i> Previous
+        </a>
+        <h2 style="margin: 0; color: white; font-size: 28px; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+            <?php echo date('F Y', $firstDay); ?>
+        </h2>
+        <a href="?month=<?php echo $nextMonth; ?>&year=<?php echo $nextYear; ?>" 
+           class="btn btn-secondary" 
+           style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 10px 20px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; gap: 8px;">
+            Next <i class="fas fa-chevron-right"></i>
+        </a>
     </div>
 </div>
 
 <!-- Legend -->
-<div class="card" style="margin-bottom: 20px;">
-    <div style="padding: 15px; display: flex; gap: 20px; flex-wrap: wrap;">
-        <div><span style="display: inline-block; width: 15px; height: 15px; background: #28a745; border-radius: 3px;"></span> Attendance</div>
-        <div><span style="display: inline-block; width: 15px; height: 15px; background: #4da6ff; border-radius: 3px;"></span> Leave</div>
-        <div><span style="display: inline-block; width: 15px; height: 15px; background: #dc3545; border-radius: 3px;"></span> Holiday</div>
-        <div><span style="display: inline-block; width: 15px; height: 15px; background: #ff9933; border-radius: 3px;"></span> Overtime</div>
+<div class="card" style="margin-bottom: 25px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.08);">
+    <div style="padding: 20px;">
+        <h3 style="margin: 0 0 15px 0; color: var(--primary-blue); font-size: 16px; font-weight: 600;">
+            <i class="fas fa-info-circle"></i> Legend
+        </h3>
+        <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="display: inline-block; width: 20px; height: 20px; background: #28a745; border-radius: 5px; box-shadow: 0 2px 4px rgba(40,167,69,0.3);"></span>
+                <span style="font-weight: 500;">Attendance</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="display: inline-block; width: 20px; height: 20px; background: #4da6ff; border-radius: 5px; box-shadow: 0 2px 4px rgba(77,166,255,0.3);"></span>
+                <span style="font-weight: 500;">Leave</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="display: inline-block; width: 20px; height: 20px; background: #dc3545; border-radius: 5px; box-shadow: 0 2px 4px rgba(220,53,69,0.3);"></span>
+                <span style="font-weight: 500;">Holiday</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="display: inline-block; width: 20px; height: 20px; background: #ff9933; border-radius: 5px; box-shadow: 0 2px 4px rgba(255,153,51,0.3);"></span>
+                <span style="font-weight: 500;">Overtime</span>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- Calendar Grid -->
-<div class="card">
+<div class="card" style="border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; padding: 0;">
     <style>
         .calendar {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 1px;
-            background: #ddd;
+            gap: 0;
+            background: #e8e8e8;
+            border-radius: 12px;
+            overflow: hidden;
         }
         .calendar-day-header {
-            background: var(--primary-blue);
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #3d8ce6 100%);
             color: white;
-            padding: 10px;
+            padding: 15px 10px;
             text-align: center;
             font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+        .calendar-day-header:last-child {
+            border-right: none;
         }
         .calendar-day {
             background: white;
-            min-height: 100px;
-            padding: 5px;
+            min-height: 120px;
+            padding: 10px 8px;
             position: relative;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            border-right: 1px solid #e8e8e8;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            flex-direction: column;
         }
         .calendar-day:hover {
             background: var(--light-blue);
+            transform: scale(1.01);
+            z-index: 1;
+            box-shadow: 0 0 2px rgba(0,0,0,0.15);
         }
         .calendar-day.other-month {
-            background: #f5f5f5;
+            background: #f8f9fa;
+            color: #adb5bd;
+        }
+        .calendar-day.other-month:hover {
+            background: #e9ecef;
         }
         .calendar-day.today {
+            background: linear-gradient(135deg, #e6f2ff 0%, #ffffff 100%);
             border: 2px solid var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(77, 166, 255, 0.2);
+        }
+        .calendar-day.today .day-number {
+            color: var(--primary-blue);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
         }
         .day-number {
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-size: 15px;
+            color: #333;
+            width: fit-content;
+        }
+        .day-events {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow-y: auto;
         }
         .day-event {
-            font-size: 10px;
-            padding: 2px 4px;
-            margin: 2px 0;
-            border-radius: 3px;
+            font-size: 11px;
+            padding: 4px 6px;
+            margin: 0;
+            border-radius: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
-        .event-holiday { background: #dc3545; color: white; }
-        .event-leave { background: #4da6ff; color: white; }
-        .event-attendance { background: #28a745; color: white; }
-        .event-overtime { background: #ff9933; color: white; }
+        .day-event i {
+            font-size: 10px;
+        }
+        .event-holiday { 
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); 
+            color: white; 
+        }
+        .event-leave { 
+            background: linear-gradient(135deg, #4da6ff 0%, #3d8ce6 100%); 
+            color: white; 
+        }
+        .event-attendance { 
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%); 
+            color: white; 
+        }
+        .event-overtime { 
+            background: linear-gradient(135deg, #ff9933 0%, #ff8800 100%); 
+            color: white; 
+        }
+        @media (max-width: 768px) {
+            .calendar-day {
+                min-height: 80px;
+                padding: 6px 4px;
+            }
+            .day-event {
+                font-size: 9px;
+                padding: 3px 4px;
+            }
+            .calendar-day-header {
+                padding: 10px 5px;
+                font-size: 12px;
+            }
+        }
     </style>
     
     <div class="calendar">
@@ -213,31 +319,32 @@ if ($nextMonth > 12) {
             
             echo '<div class="calendar-day' . ($isToday ? ' today' : '') . '" onclick="viewDayDetails(\'' . $date . '\')">';
             echo '<div class="day-number">' . $day . '</div>';
+            echo '<div class="day-events">';
             
             // Show holiday
             if (isset($holidayDates[$date])) {
-                echo '<div class="day-event event-holiday">🎉 ' . htmlspecialchars($holidayDates[$date]) . '</div>';
+                echo '<div class="day-event event-holiday"><i class="fas fa-gift"></i> ' . htmlspecialchars($holidayDates[$date]) . '</div>';
             }
             
             // Show leave
             if (isset($leaveDates[$date])) {
                 foreach ($leaveDates[$date] as $leave) {
                     $name = $isManager ? $leave['employee_name'] : 'Leave';
-                    echo '<div class="day-event event-leave">📅 ' . htmlspecialchars($name) . '</div>';
+                    echo '<div class="day-event event-leave"><i class="fas fa-calendar-alt"></i> ' . htmlspecialchars($name) . '</div>';
                 }
             }
             
             // Show attendance
             if (isset($attendanceDates[$date])) {
-                echo '<div class="day-event event-attendance">✓ Present</div>';
+                echo '<div class="day-event event-attendance"><i class="fas fa-check-circle"></i> Present</div>';
             }
             
             // Show overtime
             if (isset($overtimeDates[$date])) {
-                echo '<div class="day-event event-overtime">⏰ OT: ' . number_format($overtimeDates[$date], 1) . 'h</div>';
+                echo '<div class="day-event event-overtime"><i class="fas fa-clock"></i> OT: ' . number_format($overtimeDates[$date], 1) . 'h</div>';
             }
             
-            echo '</div>';
+            echo '</div></div>';
         }
         
         // Fill remaining days
@@ -313,8 +420,12 @@ if ($nextMonth > 12) {
     }
     
     function viewDayDetails(date) {
-        // This could be expanded to show more details
-        console.log('View details for:', date);
+        // This could be expanded to show more details in a modal
+        const dateObj = new Date(date);
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const formattedDate = dateObj.toLocaleDateString('en-US', options);
+        console.log('View details for:', formattedDate);
+        // You can add a modal here to show day details
     }
 </script>
 

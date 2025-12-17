@@ -173,7 +173,7 @@ foreach ($todayHistory as $record) {
                 <a href="/officepro/app/views/company/employees.php" class="btn btn-primary custom-btn-primary">Manage Employees</a>
                 <a href="/officepro/app/views/company/invitations.php" class="btn btn-primary custom-btn-primary">Invite Employees</a>
                 <a href="/officepro/app/views/leave_approvals.php" class="btn btn-secondary">Leave Approvals</a>
-                <a href="/officepro/app/views/reports/dashboard.php" class="btn btn-secondary">View Reports</a>
+                <a href="/officepro/app/views/reports/report_dashboard.php" class="btn btn-secondary">View Reports</a>
             <?php else: ?>
                 <a href="/officepro/app/views/employee/tasks.php" class="btn btn-secondary">View My Tasks</a>
                 <a href="/officepro/app/views/employee/credentials.php" class="btn btn-secondary">My Credentials</a>
