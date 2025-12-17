@@ -69,7 +69,7 @@ if (empty($profileImage) || trim($profileImage) === '') {
         <div class="content-wrapper">
             <header class="header">
                 <div class="header-left">
-                    <button id="sidebar-toggle" class="btn btn-secondary" style="display: none;">☰</button>
+                    <button id="sidebar-toggle" class="btn btn-secondary" style="display: none;"><i class="fas fa-bars"></i></button>
                     <?php if ($companyLogo && !empty(trim($companyLogo))): ?>
                         <img src="/officepro/<?php echo htmlspecialchars($companyLogo); ?>" 
                              alt="Company Logo" 
@@ -84,7 +84,7 @@ if (empty($profileImage) || trim($profileImage) === '') {
                 
                 <div class="header-right">
                     <div class="notification-icon" id="notification-icon">
-                        🔔
+                        <i class="fas fa-bell"></i>
                         <span id="notification-badge" class="notification-badge" style="display: none;">0</span>
                     </div>
                     
@@ -95,7 +95,7 @@ if (empty($profileImage) || trim($profileImage) === '') {
                              onerror="this.onerror=null; this.src='/officepro/assets/images/default-avatar.png'"
                              loading="lazy">
                         <span class="user-name"><?php echo htmlspecialchars($currentUser['full_name']); ?></span>
-                        <span>▼</span>
+                        <i class="fas fa-chevron-down"></i>
                     </div>
                     
                     <div id="user-menu" class="user-menu" style="display: none; position: absolute; right: 20px; top: 60px; background: white; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); min-width: 200px;">

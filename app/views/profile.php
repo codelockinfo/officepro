@@ -43,7 +43,7 @@ $leaveBalance = $db->fetchOne(
 );
 ?>
 
-<h1>👤 My Profile</h1>
+<h1><i class="fas fa-user"></i> My Profile</h1>
 
 <!-- Profile Information Card -->
 <div class="card" style="margin-top: 20px;">
@@ -55,7 +55,7 @@ $leaveBalance = $db->fetchOne(
                  alt="Profile" 
                  style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-blue);"
                  onerror="this.src='/officepro/assets/images/default-avatar.png'">
-            <button onclick="openChangePhotoModal()" class="btn btn-sm btn-secondary" style="margin-top: 15px; width: 100%;">
+            <button onclick="openChangePhotoModal()" class="btn btn-sm btn-secondary custom-btn-secondary" style="margin-top: 15px; width: 100%;">
                 Change Photo
             </button>
         </div>
@@ -99,7 +99,7 @@ $leaveBalance = $db->fetchOne(
             </table>
             
             <div style="margin-top: 20px;">
-                <button onclick="openChangePasswordModal()" class="btn btn-primary">Change Password</button>
+                <button onclick="openChangePasswordModal()" class="btn btn-primary custom-btn-primary">Change Password</button>
             </div>
         </div>
     </div>

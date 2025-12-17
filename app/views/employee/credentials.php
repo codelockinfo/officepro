@@ -14,12 +14,12 @@ $userId = $currentUser['id'];
 ?>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <h1>🔑 My Credentials</h1>
-    <button onclick="openAddCredentialModal()" class="btn btn-primary">+ Add Credential</button>
+    <h1><i class="fas fa-key"></i> My Credentials</h1>
+    <button onclick="openAddCredentialModal()" class="btn btn-primary custom-btn-primary"><i class="fas fa-plus"></i> Add Credential</button>
 </div>
 
 <div class="alert alert-warning">
-    <strong>⚠️ Security Warning:</strong> Passwords are stored in plain text. Only save credentials you're comfortable sharing within your organization.
+    <strong><i class="fas fa-exclamation-triangle"></i> Security Warning:</strong> Passwords are stored in plain text. Only save credentials you're comfortable sharing within your organization.
 </div>
 
 <div class="card">
@@ -264,7 +264,7 @@ $userId = $currentUser['id'];
             },
             null,
             'Delete Credential',
-            '🔑'
+            '<i class="fas fa-key"></i>'
         );
     }
     

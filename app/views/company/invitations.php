@@ -18,8 +18,8 @@ $invitations = Invitation::getCompanyInvitations($companyId);
 ?>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <h1>✉️ Employee Invitations</h1>
-    <button onclick="openInviteModal()" class="btn btn-primary custom-btn-primary">+ Invite Employee</button>
+    <h1><i class="fas fa-envelope"></i> Employee Invitations</h1>
+    <button onclick="openInviteModal()" class="btn btn-primary custom-btn-primary"><i class="fas fa-plus"></i> Invite Employee</button>
 </div>
 
 <div class="card">
@@ -166,7 +166,7 @@ $invitations = Invitation::getCompanyInvitations($companyId);
             },
             null,
             'Cancel Invitation',
-            '✉️'
+            '<i class="fas fa-envelope"></i>'
         );
     }
 </script>

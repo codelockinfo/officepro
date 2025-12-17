@@ -26,7 +26,7 @@ $workingHours = Tenant::getCompanySetting('working_hours', '8');
 error_log("Company Settings - Company ID: $companyId, Logo from DB: " . ($company['logo'] ?? 'NULL'));
 ?>
 
-<h1>⚙️ Company Settings</h1>
+<h1><i class="fas fa-cog"></i> Company Settings</h1>
 
 <div class="card" style="margin-top: 20px;">
     <h2 class="card-title">Company Information</h2>

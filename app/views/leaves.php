@@ -32,8 +32,8 @@ $leaves = $db->fetchAll(
 ?>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <h1>📅 My Leaves</h1>
-    <button onclick="openRequestLeaveModal()" class="btn btn-primary">+ Request Leave</button>
+    <h1><i class="fas fa-calendar-alt"></i> My Leaves</h1>
+    <button onclick="openRequestLeaveModal()" class="btn btn-primary custom-btn-primary"><i class="fas fa-plus"></i> Request Leave</button>
 </div>
 
 <!-- Leave Balance Cards -->
@@ -290,7 +290,7 @@ $leaves = $db->fetchAll(
             },
             null,
             'Cancel Leave Request',
-            '📅'
+            '<i class="fas fa-calendar-alt"></i>'
         );
     }
 </script>

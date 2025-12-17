@@ -238,7 +238,7 @@ function updateTimerDisplay() {
                 overtimeBadge.style.display = 'inline-block';
                 const overtimeHours = hours - 8;
                 const overtimeMinutes = minutes;
-                overtimeBadge.textContent = `⏰ Overtime: ${overtimeHours}h ${overtimeMinutes}m`;
+                overtimeBadge.innerHTML = `<i class="fas fa-clock"></i> Overtime: ${overtimeHours}h ${overtimeMinutes}m`;
             } else {
                 overtimeBadge.style.display = 'none';
             }
@@ -410,12 +410,93 @@ function initBlobButtons() {
     });
 }
 
+// Initialize blob button structure for .btn-secondary buttons
+function initBlobButtonsSecondary() {
+    const secondaryButtons = document.querySelectorAll('.btn-secondary');
+    
+    secondaryButtons.forEach(button => {
+        // Skip if already initialized
+        if (button.querySelector('.blob-btn__inner')) {
+            return;
+        }
+        
+        // Wrap the button text in a span to keep it above blobs
+        const text = button.textContent.trim();
+        button.innerHTML = '';
+        
+        // Create text span
+        const textSpan = document.createElement('span');
+        textSpan.textContent = text;
+        textSpan.style.position = 'relative';
+        textSpan.style.zIndex = '10';
+        button.appendChild(textSpan);
+        
+        // Create blob structure
+        const inner = document.createElement('span');
+        inner.className = 'blob-btn__inner';
+        
+        const blobs = document.createElement('span');
+        blobs.className = 'blob-btn__blobs';
+        
+        // Create 4 blob elements
+        for (let i = 0; i < 4; i++) {
+            const blob = document.createElement('span');
+            blob.className = 'blob-btn__blob';
+            blobs.appendChild(blob);
+        }
+        
+        inner.appendChild(blobs);
+        button.appendChild(inner);
+    });
+}
+
+// Initialize blob button structure for .btn-successbuttons
+function initBlobButtonsSuccess() {
+    const successButtons = document.querySelectorAll('.btn-success');
+    
+    successButtons.forEach(button => {
+        // Skip if already initialized
+        if (button.querySelector('.blob-btn__inner')) {
+            return;
+        }
+        
+        // Wrap the button text in a span to keep it above blobs
+        const text = button.textContent.trim();
+        button.innerHTML = '';
+        
+        // Create text span
+        const textSpan = document.createElement('span');
+        textSpan.textContent = text;
+        textSpan.style.position = 'relative';
+        textSpan.style.zIndex = '10';
+        button.appendChild(textSpan);
+        
+        // Create blob structure
+        const inner = document.createElement('span');
+        inner.className = 'blob-btn__inner';
+        
+        const blobs = document.createElement('span');
+        blobs.className = 'blob-btn__blobs';
+        
+        // Create 4 blob elements
+        for (let i = 0; i < 4; i++) {
+            const blob = document.createElement('span');
+            blob.className = 'blob-btn__blob';
+            blobs.appendChild(blob);
+        }
+        
+        inner.appendChild(blobs);
+        button.appendChild(inner);
+    });
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize blob buttons
     initBlobButtons();
-    
-    // Toggle sidebar on mobile
+    initBlobButtonsSecondary();
+    initBlobButtonsSuccess();
+    // Toggle sidebar on mobile 
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebar = document.querySelector('.sidebar');
     

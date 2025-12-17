@@ -58,7 +58,7 @@ foreach ($todayHistory as $record) {
 }
 ?>
 
-<h1>Welcome, <?php echo htmlspecialchars($currentUser['full_name']); ?>! 👋</h1>
+<h1>Welcome, <?php echo htmlspecialchars($currentUser['full_name']); ?>! </h1>
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px;">
     <?php if ($currentUser['role'] !== 'company_owner'): ?>
@@ -68,7 +68,7 @@ foreach ($todayHistory as $record) {
         
         <?php if ($currentAttendance): ?>
             <div style="text-align: center; padding: 20px;">
-                <div style="font-size: 48px; color: var(--success-green); margin-bottom: 20px;">✓</div>
+                <div style="font-size: 48px; color: var(--success-green); margin-bottom: 20px;"><i class="fas fa-check-circle"></i></div>
                 <p style="font-size: 18px; font-weight: 600; color: var(--success-green); margin-bottom: 10px;">Checked In</p>
                 <p>Check-in time: <?php 
                     // Parse database timestamp directly (already in correct timezone)
@@ -97,9 +97,9 @@ foreach ($todayHistory as $record) {
             </script>
         <?php else: ?>
             <div style="text-align: center; padding: 20px;">
-                <div style="font-size: 48px; color: var(--dark-gray); margin-bottom: 20px;">⏰</div>
+                <div style="font-size: 48px; color: var(--dark-gray); margin-bottom: 20px;"><i class="fas fa-clock"></i></div>
                 <p style="font-size: 18px; margin-bottom: 20px;">You haven't checked in today</p>
-                <button onclick="checkIn()" class="btn btn-success btn-lg">Check In</button>
+                <button onclick="checkIn()" class="btn btn-success custom-btn-success">Check In</button>
             </div>
         <?php endif; ?>
     </div>
@@ -208,7 +208,7 @@ foreach ($todayHistory as $record) {
         <h2 class="card-title">Quick Actions</h2>
         <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px;">
             <?php if ($currentUser['role'] !== 'company_owner'): ?>
-                <a href="/officepro/app/views/leaves.php" class="btn btn-primary custom-btn-primary ">Request Leave</a>
+                <a href="/officepro/app/views/leaves.php" class="btn btn-primary custom-btn-primary">Request Leave</a>
             <?php endif; ?>
             <?php if ($currentUser['role'] === 'company_owner'): ?>
                 <a href="/officepro/app/views/company/employees.php" class="btn btn-primary custom-btn-primary">Manage Employees</a>
@@ -216,10 +216,10 @@ foreach ($todayHistory as $record) {
                 <a href="/officepro/app/views/leave_approvals.php" class="btn btn-secondary ">Leave Approvals</a>
                 <a href="/officepro/app/views/reports/report_dashboard.php" class="btn btn-secondary">View Reports</a>
             <?php else: ?>
-                <a href="/officepro/app/views/employee/tasks.php" class="btn btn-primary custom-btn-primary">View My Tasks</a>
-                <a href="/officepro/app/views/employee/credentials.php" class="btn btn-secondary">My Credentials</a>    
+                <a href="/officepro/app/views/employee/tasks.php" class="btn btn-secondary custom-btn-secondary">View My Tasks</a>
+                <a href="/officepro/app/views/employee/credentials.php" class="btn btn-secondary custom-btn-secondary">My Credentials</a>
             <?php endif; ?>
-            <a href="/officepro/app/views/calendar.php" class="btn btn-secondary">View Calendar</a>
+            <a href="/officepro/app/views/calendar.php" class="btn btn-secondary custom-btn-secondary">View Calendar</a>
         </div>
     </div>
 </div>
@@ -303,7 +303,7 @@ foreach ($todayHistory as $record) {
         // Custom checkout confirmation modal
         const modalContent = `
             <div style="text-align: center; padding: 30px 20px;">
-                <div style="font-size: 64px; margin-bottom: 20px;">⏰</div>
+                <div style="font-size: 64px; margin-bottom: 20px; color: var(--primary-blue);"><i class="fas fa-clock"></i></div>
                 <h3 style="color: #333; margin-bottom: 15px;">Confirm Check Out</h3>
                 <p style="color: #666; font-size: 16px;">Are you sure you want to check out?</p>
                 <p style="color: #999; font-size: 14px; margin-top: 10px;">Your work hours will be calculated.</p>

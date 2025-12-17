@@ -222,7 +222,7 @@ $employees = $db->fetchAll(
                     ${emp.role !== 'company_owner' ? `<button type="button" class="btn btn-primary" onclick="closeModal(this.closest('.modal-overlay').id); editEmployee(${id});">Edit Employee</button>` : ''}
                 `;
                 
-                createModal('👤 Employee Details', content, footer, 'modal-lg');
+                createModal('<i class="fas fa-user"></i> Employee Details', content, footer, 'modal-lg');
             } else {
                 showMessage('error', response.message || 'Failed to load employee details');
             }

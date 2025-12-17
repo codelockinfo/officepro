@@ -39,7 +39,7 @@ foreach ($attendance as $record) {
 }
 ?>
 
-<h1>⏰ Attendance History</h1>
+<h1><i class="fas fa-clock"></i> Attendance History</h1>
 
 <!-- Filter Card -->
 <div class="card" style="margin: 20px 0;">
@@ -55,7 +55,7 @@ foreach ($attendance as $record) {
                 <input type="date" id="end_date" name="end_date" class="form-control" value="<?php echo $endDate; ?>">
             </div>
             
-            <button type="submit" class="btn btn-primary">Filter</button>
+            <button type="submit" class="btn btn-secondary custom-btn-secondary">Filter</button>
         </form>
     </div>
 </div>
