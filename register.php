@@ -340,10 +340,10 @@ if ($token) {
                     <label class="form-label" for="profile_image">Profile Image *</label>
                     <div class="file-upload-wrapper">
                         <label for="profile_image" class="file-upload-btn">Choose File</label>
-                        <input type="file" id="profile_image" name="profile_image" class="file-input-hidden" accept="image/jpeg,image/png,image/jpg" onchange="handleFileSelect(this, 'profile-preview', 'profile-name')" required>
+                        <input type="file" id="profile_image" name="profile_image" class="file-input-hidden" accept="image/jpeg,image/png,image/jpg,image/webp" onchange="handleFileSelect(this, 'profile-preview', 'profile-name')" required>
                         <div id="profile-name" class="file-name">No file chosen</div>
                     </div>
-                    <small class="text-muted">JPG or PNG, minimum 100x100 pixels, max 2MB</small>
+                    <small class="text-muted">JPG, PNG, or WebP, minimum 100x100 pixels, max 2MB</small>
                     <div id="profile-preview" class="image-preview">
                         <span class="preview-placeholder">No image selected</span>
                         <button type="button" class="remove-image" onclick="removeImage('profile_image', 'profile-preview', 'profile-name')" title="Remove">×</button>
@@ -371,9 +371,9 @@ if ($token) {
                 }
                 
                 // Validate file type
-                const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
                 if (!validTypes.includes(file.type)) {
-                    alert('Please select a valid image file (JPG or PNG)');
+                    alert('Please select a valid image file (JPG, PNG, or WebP)');
                     input.value = '';
                     return;
                 }

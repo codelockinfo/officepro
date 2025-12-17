@@ -196,6 +196,83 @@ if (isset($_SESSION['user_id'])) {
             margin-bottom: 15px;
             display: none;
         }
+        .success-message {
+            background: #efe;
+            border: 1px solid #cfc;
+            color: #3c3;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .forgot-password-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .forgot-password-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 450px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .forgot-password-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .forgot-password-header h2 {
+            color: #667eea;
+            margin: 0;
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s ease;
+        }
+        .close-modal:hover {
+            color: #333;
+        }
+        .forgot-password-step p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .btn-secondary {
+            padding: 15px 20px;
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
     </style>
 </head>
 <body>
@@ -230,8 +307,72 @@ if (isset($_SESSION['user_id'])) {
         </form>
         
         <div class="login-links">
+            <p><a href="#" onclick="openForgotPasswordModal(); return false;">Forgot Password?</a></p>
             <p>Don't have an account? <a href="company_register.php">Register your company</a></p>
             <p><a href="index.php">← Back to home</a></p>
+        </div>
+    </div>
+    
+    <!-- Forgot Password Modal -->
+    <div id="forgot-password-modal" class="forgot-password-modal" style="display: none;">
+        <div class="forgot-password-content">
+            <div class="forgot-password-header">
+                <h2>Reset Password</h2>
+                <button type="button" class="close-modal" onclick="closeForgotPasswordModal()">&times;</button>
+            </div>
+            
+            <div id="forgot-password-error" class="error-message" style="display: none;"></div>
+            <div id="forgot-password-success" class="success-message" style="display: none;"></div>
+            
+            <!-- Step 1: Enter Email -->
+            <div id="step1" class="forgot-password-step">
+                <p>Enter your email address and we'll send you a verification code.</p>
+                <div class="form-group">
+                    <label class="form-label" for="reset-email">Email Address</label>
+                    <input type="email" id="reset-email" class="form-control" placeholder="Enter your email">
+                </div>
+                <button type="button" class="btn-login" onclick="sendResetCode()">Send Reset Code</button>
+            </div>
+            
+            <!-- Step 2: Enter Reset Code -->
+            <div id="step2" class="forgot-password-step" style="display: none;">
+                <p>Enter the 6-digit code sent to your email.</p>
+                <div class="form-group">
+                    <label class="form-label" for="reset-code">Verification Code</label>
+                    <input type="text" id="reset-code" class="form-control" placeholder="000000" maxlength="6" pattern="[0-9]{6}" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn-login" style="flex: 1;" onclick="verifyResetCode()">Verify Code</button>
+                    <button type="button" class="btn-secondary" onclick="goToStep(1)">Back</button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Set New Password -->
+            <div id="step3" class="forgot-password-step" style="display: none;">
+                <p>Enter your new password.</p>
+                <div class="form-group">
+                    <label class="form-label" for="new-password">New Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="new-password" class="form-control" placeholder="Enter new password (min. 8 characters)" minlength="8">
+                        <button type="button" class="password-toggle" onclick="togglePassword('new-password', this)" style="display: flex;">
+                            <i class="fas fa-eye eye-icon"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="confirm-password">Confirm Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="confirm-password" class="form-control" placeholder="Confirm new password" minlength="8">
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirm-password', this)" style="display: flex;">
+                            <i class="fas fa-eye eye-icon"></i>
+                        </button>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn-login" style="flex: 1;" onclick="resetPassword()">Reset Password</button>
+                    <button type="button" class="btn-secondary" onclick="goToStep(2)">Back</button>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -305,6 +446,168 @@ if (isset($_SESSION['user_id'])) {
                 }
             });
         }
+        
+        // Forgot Password Functions
+        let currentStep = 1;
+        let resetEmail = '';
+        
+        function openForgotPasswordModal() {
+            document.getElementById('forgot-password-modal').style.display = 'flex';
+            resetForgotPasswordForm();
+        }
+        
+        function closeForgotPasswordModal() {
+            document.getElementById('forgot-password-modal').style.display = 'none';
+            resetForgotPasswordForm();
+        }
+        
+        function resetForgotPasswordForm() {
+            currentStep = 1;
+            resetEmail = '';
+            goToStep(1);
+            document.getElementById('reset-email').value = '';
+            document.getElementById('reset-code').value = '';
+            document.getElementById('new-password').value = '';
+            document.getElementById('confirm-password').value = '';
+            hideMessages();
+        }
+        
+        function goToStep(step) {
+            // Hide all steps
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('step3').style.display = 'none';
+            
+            // Show selected step
+            document.getElementById('step' + step).style.display = 'block';
+            currentStep = step;
+            hideMessages();
+        }
+        
+        function hideMessages() {
+            document.getElementById('forgot-password-error').style.display = 'none';
+            document.getElementById('forgot-password-success').style.display = 'none';
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('forgot-password-error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('forgot-password-success').style.display = 'none';
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('forgot-password-success');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            document.getElementById('forgot-password-error').style.display = 'none';
+        }
+        
+        function sendResetCode() {
+            const email = document.getElementById('reset-email').value.trim();
+            
+            if (!email) {
+                showError('Please enter your email address');
+                return;
+            }
+            
+            hideMessages();
+            showLoader();
+            
+            ajaxRequest('/officepro/app/api/auth/forgot_password.php', 'POST', { email }, (response) => {
+                hideLoader();
+                if (response.success) {
+                    resetEmail = email;
+                    showSuccess(response.message || 'Reset code sent successfully!');
+                    setTimeout(() => {
+                        goToStep(2);
+                    }, 1500);
+                } else {
+                    showError(response.message || 'Failed to send reset code');
+                }
+            }, (error) => {
+                hideLoader();
+                showError('An error occurred. Please try again.');
+            });
+        }
+        
+        function verifyResetCode() {
+            const code = document.getElementById('reset-code').value.trim();
+            
+            if (!code || code.length !== 6) {
+                showError('Please enter a valid 6-digit code');
+                return;
+            }
+            
+            if (!resetEmail) {
+                resetEmail = document.getElementById('reset-email').value.trim();
+            }
+            
+            hideMessages();
+            showLoader();
+            
+            ajaxRequest('/officepro/app/api/auth/verify_reset_code.php', 'POST', { 
+                email: resetEmail, 
+                reset_code: code 
+            }, (response) => {
+                hideLoader();
+                if (response.success) {
+                    showSuccess(response.message || 'Code verified successfully!');
+                    setTimeout(() => {
+                        goToStep(3);
+                    }, 1500);
+                } else {
+                    showError(response.message || 'Invalid or expired code');
+                }
+            }, (error) => {
+                hideLoader();
+                showError('An error occurred. Please try again.');
+            });
+        }
+        
+        function resetPassword() {
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            if (!newPassword || newPassword.length < 8) {
+                showError('Password must be at least 8 characters long');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showError('Passwords do not match');
+                return;
+            }
+            
+            hideMessages();
+            showLoader();
+            
+            ajaxRequest('/officepro/app/api/auth/reset_password.php', 'POST', { 
+                new_password: newPassword,
+                confirm_password: confirmPassword
+            }, (response) => {
+                hideLoader();
+                if (response.success) {
+                    showSuccess(response.message || 'Password reset successfully!');
+                    setTimeout(() => {
+                        closeForgotPasswordModal();
+                        showMessage('success', 'Password reset successfully! You can now login.');
+                    }, 2000);
+                } else {
+                    showError(response.message || 'Failed to reset password');
+                }
+            }, (error) => {
+                hideLoader();
+                showError('An error occurred. Please try again.');
+            });
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('forgot-password-modal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeForgotPasswordModal();
+            }
+        });
     </script>
 </body>
 </html>

@@ -9,6 +9,7 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../../helpers/Database.php';
 require_once __DIR__ . '/../../helpers/Auth.php';
 require_once __DIR__ . '/../../helpers/Tenant.php';
+require_once __DIR__ . '/../../helpers/AttendanceCalculator.php';
 
 // Check authentication
 if (!Auth::isLoggedIn()) {
@@ -45,30 +46,40 @@ if (!$attendance) {
 }
 
 try {
-    // Calculate hours worked
-    $checkInTime = new DateTime($attendance['check_in']);
-    $checkOutTime = new DateTime($now);
-    $interval = $checkInTime->diff($checkOutTime);
+    // Store original check_in time to ensure it's not modified
+    $originalCheckIn = $attendance['check_in'];
     
-    $totalHours = $interval->h + ($interval->i / 60) + ($interval->s / 3600);
-    if ($interval->days > 0) {
-        $totalHours += $interval->days * 24;
-    }
+    error_log("Checkout: Original check_in time: {$originalCheckIn}");
+    error_log("Checkout: Checkout time: {$now}");
+    error_log("Checkout: Attendance ID: {$attendance['id']}");
     
-    // Get standard work hours from config
-    $appConfig = require __DIR__ . '/../../config/app.php';
-    $standardWorkHours = $appConfig['standard_work_hours'];
+    // Calculate hours worked using AttendanceCalculator (based on office hours)
+    $hoursCalculation = AttendanceCalculator::calculateHours($originalCheckIn, $now, $companyId);
+    $regularHours = $hoursCalculation['regular_hours'];
+    $overtimeHours = $hoursCalculation['overtime_hours'];
+    $totalHours = $hoursCalculation['total_hours'];
     
-    // Calculate regular and overtime hours
-    $regularHours = min($totalHours, $standardWorkHours);
-    $overtimeHours = max(0, $totalHours - $standardWorkHours);
+    error_log("Checkout: Calculated hours - Regular: $regularHours, Overtime: $overtimeHours, Total: $totalHours");
     
-    // Update attendance record
+    // Update attendance record - explicitly preserve check_in time by including it in SET clause
     $db->execute(
-        "UPDATE attendance SET check_out = ?, status = 'out', regular_hours = ?, overtime_hours = ?, updated_at = NOW() 
+        "UPDATE attendance SET check_in = ?, check_out = ?, status = 'out', regular_hours = ?, overtime_hours = ?, updated_at = NOW() 
         WHERE id = ?",
-        [$now, $regularHours, $overtimeHours, $attendance['id']]
+        [$originalCheckIn, $now, $regularHours, $overtimeHours, $attendance['id']]
     );
+    
+    // Verify check_in was not modified
+    $verify = $db->fetchOne("SELECT check_in, check_out FROM attendance WHERE id = ?", [$attendance['id']]);
+    error_log("Checkout: After update - check_in: {$verify['check_in']}, check_out: {$verify['check_out']}");
+    
+    if ($verify['check_in'] != $originalCheckIn) {
+        // If check_in was modified, restore it
+        error_log("Checkout: WARNING - check_in was modified! Restoring original value.");
+        $db->execute(
+            "UPDATE attendance SET check_in = ? WHERE id = ?",
+            [$originalCheckIn, $attendance['id']]
+        );
+    }
     
     echo json_encode([
         'success' => true,

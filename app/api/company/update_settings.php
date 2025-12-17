@@ -240,6 +240,24 @@ try {
     
     error_log("Update Settings - Database update executed with logo: " . ($logoPath ?? 'NULL'));
     
+    // Save working hours setting
+    $workingHours = floatval($_POST['working_hours'] ?? 8);
+    
+    // Validate working hours (between 1 and 24)
+    if ($workingHours < 1 || $workingHours > 24) {
+        $workingHours = 8; // Default to 8 hours
+    }
+    
+    // Save working hours to company_settings table
+    $db->execute(
+        "INSERT INTO company_settings (company_id, setting_key, setting_value, updated_at) 
+         VALUES (?, 'working_hours', ?, NOW())
+         ON DUPLICATE KEY UPDATE setting_value = ?, updated_at = NOW()",
+        [$companyId, $workingHours, $workingHours]
+    );
+    
+    error_log("Update Settings - Working hours saved: $workingHours hours per day");
+    
     $db->commit();
     
     // Verify the logo was saved

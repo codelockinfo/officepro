@@ -18,6 +18,10 @@ $db = Database::getInstance();
 // Get company data - explicitly select logo to ensure it's loaded
 $company = $db->fetchOne("SELECT * FROM companies WHERE id = ?", [$companyId]);
 
+// Get working hours from company_settings
+require_once __DIR__ . '/../../helpers/Tenant.php';
+$workingHours = Tenant::getCompanySetting('working_hours', '8');
+
 // Debug: Log what we got from database
 error_log("Company Settings - Company ID: $companyId, Logo from DB: " . ($company['logo'] ?? 'NULL'));
 ?>
@@ -126,6 +130,21 @@ error_log("Company Settings - Company ID: $companyId, Logo from DB: " . ($compan
         <div class="form-group">
             <label class="form-label" for="address">Address</label>
             <textarea id="address" name="address" class="form-control" rows="3"><?php echo htmlspecialchars($company['address'] ?? ''); ?></textarea>
+        </div>
+        
+        <hr style="margin: 30px 0; border: none; border-top: 2px solid #e0e0e0;">
+        
+        <h3 style="margin-bottom: 20px; color: var(--primary-blue);">Working Hours Configuration</h3>
+        <p style="color: #666; margin-bottom: 20px; font-size: 14px;">
+            Set the standard working hours per day for your company. Any time worked beyond these hours will be counted as overtime.
+        </p>
+        
+        <div class="form-group" style="max-width: 300px;">
+            <label class="form-label" for="working_hours">Standard Working Hours per Day *</label>
+            <input type="number" id="working_hours" name="working_hours" class="form-control" 
+                   value="<?php echo htmlspecialchars($workingHours); ?>" 
+                   min="1" max="24" step="0.5" required>
+            <small class="text-muted">Example: 8 hours. If employee works 9 hours, 1 hour will be overtime.</small>
         </div>
         
         <button type="submit" class="btn btn-primary custom-btn-primary">Save Changes</button>

@@ -228,6 +228,35 @@ class Email {
         
         return $emailer->send($employeeEmail, $subject, $body);
     }
+    
+    /**
+     * Send password reset code
+     */
+    public static function sendPasswordResetCode($email, $resetCode, $userName = '') {
+        $emailer = new self();
+        $appConfig = require __DIR__ . '/../config/app.php';
+        
+        $subject = "Password Reset Code - {$appConfig['app_name']}";
+        $greeting = !empty($userName) ? "Hi {$userName}," : "Hello,";
+        
+        $body = "
+            <div style='font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;'>
+                <h2 style='color:#667eea;'>Password Reset Request</h2>
+                <p>{$greeting}</p>
+                <p>You have requested to reset your password for your {$appConfig['app_name']} account.</p>
+                <p>Please use the following verification code to reset your password:</p>
+                <div style='background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;padding:20px;border-radius:8px;text-align:center;margin:30px 0;'>
+                    <h1 style='margin:0;font-size:36px;letter-spacing:5px;'>{$resetCode}</h1>
+                </div>
+                <p style='color:#666;font-size:14px;'><strong>This code will expire in 15 minutes.</strong></p>
+                <p style='color:#999;font-size:12px;'>If you did not request this password reset, please ignore this email. Your password will remain unchanged.</p>
+                <hr style='border:none;border-top:1px solid #eee;margin:30px 0;'>
+                <p style='margin-top:30px;'>Best regards,<br><strong>{$appConfig['app_name']} Team</strong></p>
+            </div>
+        ";
+        
+        return $emailer->send($email, $subject, $body);
+    }
 }
 
 

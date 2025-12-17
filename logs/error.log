@@ -207,3 +207,55 @@
 [17-Dec-2025 12:17:08 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_69413aeddac85_1765882605.png
 [17-Dec-2025 12:21:27 Asia/Kolkata] Company Settings - Company ID: 15, Logo from DB: uploads/logos/logo_69413aeddac85_1765882605.png
 [17-Dec-2025 12:21:27 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_69413aeddac85_1765882605.png
+[17-Dec-2025 16:51:33 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 16:51:33 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:12:51 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:12:51 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:13:12 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:13:12 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:13:12 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:13:12 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:13:13 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:13:13 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:13:17 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:13:17 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:13:40 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:13:40 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:13:41 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:13:41 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:37:01 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:37:01 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:37:16 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:37:16 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:37:16 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:37:16 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:37:18 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:37:18 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:37:18 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:37:18 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:39:11 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\views\attendance.php on line 76
+[17-Dec-2025 17:40:11 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:40:11 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:48:36 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\views\attendance.php on line 76
+[17-Dec-2025 17:48:59 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\views\attendance.php on line 76
+[17-Dec-2025 17:50:29 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\views\attendance.php on line 76
+[17-Dec-2025 17:53:37 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:53:37 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:55:13 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:55:13 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:55:43 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 17:55:43 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 18:17:31 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
+[17-Dec-2025 18:17:31 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp

@@ -73,25 +73,25 @@ foreach ($attendance as $record) {
     <div class="card" style="text-align: center;">
         <h3 style="color: var(--primary-blue); margin-bottom: 10px;">Regular Hours</h3>
         <div style="font-size: 36px; font-weight: bold; color: var(--primary-blue);">
-            <?php echo number_format($totalRegular, 1); ?>
+            <?php echo formatHoursToTime($totalRegular); ?>
         </div>
-        <p style="color: #666;">hours</p>
+        <p style="color: #666;">HH:MM:SS</p>
     </div>
     
     <div class="card" style="text-align: center;">
         <h3 style="color: var(--overtime-orange); margin-bottom: 10px;">Overtime Hours</h3>
         <div style="font-size: 36px; font-weight: bold; color: var(--overtime-orange);">
-            <?php echo number_format($totalOvertime, 1); ?>
+            <?php echo formatHoursToTime($totalOvertime); ?>
         </div>
-        <p style="color: #666;">hours</p>
+        <p style="color: #666;">HH:MM:SS</p>
     </div>
     
     <div class="card" style="text-align: center;">
         <h3 style="color: var(--success-green); margin-bottom: 10px;">Total Hours</h3>
         <div style="font-size: 36px; font-weight: bold; color: var(--success-green);">
-            <?php echo number_format($totalRegular + $totalOvertime, 1); ?>
+            <?php echo formatHoursToTime($totalRegular + $totalOvertime); ?>
         </div>
-        <p style="color: #666;">hours</p>
+        <p style="color: #666;">HH:MM:SS</p>
     </div>
 </div>
 
@@ -128,14 +128,14 @@ foreach ($attendance as $record) {
                         }
                         ?>
                     </td>
-                    <td><?php echo number_format($record['regular_hours'], 2); ?>h</td>
+                    <td><?php echo formatHoursToTime($record['regular_hours']); ?></td>
                     <td style="color: var(--overtime-orange); font-weight: <?php echo $record['overtime_hours'] > 0 ? 'bold' : 'normal'; ?>;">
-                        <?php echo number_format($record['overtime_hours'], 2); ?>h
+                        <?php echo formatHoursToTime($record['overtime_hours']); ?>
                         <?php if ($record['overtime_hours'] > 0): ?>
                             <span class="badge badge-overtime">OT</span>
                         <?php endif; ?>
                     </td>
-                    <td><strong><?php echo number_format($record['regular_hours'] + $record['overtime_hours'], 2); ?>h</strong></td>
+                    <td><strong><?php echo formatHoursToTime($record['regular_hours'] + $record['overtime_hours']); ?></strong></td>
                     <td>
                         <?php if ($record['status'] === 'in'): ?>
                             <span class="badge badge-success">Checked In</span>
@@ -149,9 +149,9 @@ foreach ($attendance as $record) {
             <tfoot>
                 <tr style="font-weight: bold; background: var(--light-blue);">
                     <td colspan="3">TOTAL</td>
-                    <td><?php echo number_format($totalRegular, 2); ?>h</td>
-                    <td style="color: var(--overtime-orange);"><?php echo number_format($totalOvertime, 2); ?>h</td>
-                    <td><?php echo number_format($totalRegular + $totalOvertime, 2); ?>h</td>
+                    <td><?php echo formatHoursToTime($totalRegular); ?></td>
+                    <td style="color: var(--overtime-orange);"><?php echo formatHoursToTime($totalOvertime); ?></td>
+                    <td><?php echo formatHoursToTime($totalRegular + $totalOvertime); ?></td>
                     <td></td>
                 </tr>
             </tfoot>

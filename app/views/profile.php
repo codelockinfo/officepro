@@ -115,20 +115,33 @@ $leaveBalance = $db->fetchOne(
         <p style="color: #666;">this month</p>
     </div>
     
+    <?php
+    // Helper function to convert decimal hours to HH:MM:SS format
+    function formatHoursToTime($decimalHours) {
+        if ($decimalHours <= 0) {
+            return '00:00:00';
+        }
+        $totalSeconds = round($decimalHours * 3600);
+        $hours = floor($totalSeconds / 3600);
+        $minutes = floor(($totalSeconds % 3600) / 60);
+        $seconds = $totalSeconds % 60;
+        return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+    }
+    ?>
     <div class="card" style="text-align: center;">
         <h3 style="color: var(--primary-blue); margin-bottom: 10px;">Regular Hours</h3>
         <div style="font-size: 36px; font-weight: bold; color: var(--primary-blue);">
-            <?php echo number_format($attendanceSummary['total_regular'] ?? 0, 1); ?>
+            <?php echo formatHoursToTime($attendanceSummary['total_regular'] ?? 0); ?>
         </div>
-        <p style="color: #666;">hours this month</p>
+        <p style="color: #666;">HH:MM:SS this month</p>
     </div>
     
     <div class="card" style="text-align: center;">
         <h3 style="color: var(--overtime-orange); margin-bottom: 10px;">Overtime Hours</h3>
         <div style="font-size: 36px; font-weight: bold; color: var(--overtime-orange);">
-            <?php echo number_format($attendanceSummary['total_overtime'] ?? 0, 1); ?>
+            <?php echo formatHoursToTime($attendanceSummary['total_overtime'] ?? 0); ?>
         </div>
-        <p style="color: #666;">hours this month</p>
+        <p style="color: #666;">HH:MM:SS this month</p>
     </div>
 </div>
 
