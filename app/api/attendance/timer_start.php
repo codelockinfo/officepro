@@ -33,18 +33,7 @@ date_default_timezone_set($appConfig['timezone']);
 $today = date('Y-m-d');
 $now = date('Y-m-d H:i:s');
 
-// Get current check-in record
-$attendance = $db->fetchOne(
-    "SELECT * FROM attendance WHERE company_id = ? AND user_id = ? AND date = ? AND status = 'in' ORDER BY check_in DESC LIMIT 1",
-    [$companyId, $userId, $today]
-);
-
-if (!$attendance) {
-    echo json_encode(['success' => false, 'message' => 'Please check in first']);
-    exit;
-}
-
-// Check if timer_sessions table exists, if not return helpful error
+// Check if timer_sessions table exists
 try {
     $db->fetchOne("SELECT 1 FROM timer_sessions LIMIT 1");
 } catch (Exception $e) {
@@ -56,10 +45,10 @@ try {
     exit;
 }
 
-// Check if there's already a running timer session
+// Check if there's already a running timer session for today
 $runningSession = $db->fetchOne(
-    "SELECT * FROM timer_sessions WHERE attendance_id = ? AND status = 'running' ORDER BY start_time DESC LIMIT 1",
-    [$attendance['id']]
+    "SELECT * FROM timer_sessions WHERE company_id = ? AND user_id = ? AND date = ? AND status = 'running' ORDER BY start_time DESC LIMIT 1",
+    [$companyId, $userId, $today]
 );
 
 if ($runningSession) {
@@ -70,14 +59,35 @@ if ($runningSession) {
 try {
     $db->beginTransaction();
     
-    // Create new timer session
+    // Create new timer session (no attendance_id required)
     $db->execute(
-        "INSERT INTO timer_sessions (company_id, user_id, attendance_id, start_time, status, created_at) 
+        "INSERT INTO timer_sessions (company_id, user_id, date, start_time, status, created_at) 
         VALUES (?, ?, ?, ?, 'running', NOW())",
-        [$companyId, $userId, $attendance['id'], $now]
+        [$companyId, $userId, $today, $now]
     );
     
     $sessionId = $db->lastInsertId();
+    
+    // Mark user as present for today (create or update attendance record)
+    $attendance = $db->fetchOne(
+        "SELECT * FROM attendance WHERE company_id = ? AND user_id = ? AND date = ? LIMIT 1",
+        [$companyId, $userId, $today]
+    );
+    
+    if ($attendance) {
+        // Update is_present to 1
+        $db->execute(
+            "UPDATE attendance SET is_present = 1, updated_at = NOW() WHERE id = ?",
+            [$attendance['id']]
+        );
+    } else {
+        // Create new attendance record with is_present = 1
+        $db->execute(
+            "INSERT INTO attendance (company_id, user_id, date, is_present, regular_hours, overtime_hours, created_at) 
+            VALUES (?, ?, ?, 1, 0.00, 0.00, NOW())",
+            [$companyId, $userId, $today]
+        );
+    }
     
     $db->commit();
     

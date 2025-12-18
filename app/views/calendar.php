@@ -60,7 +60,7 @@ if ($isManager) {
                 SUM(a.overtime_hours) as total_overtime 
          FROM attendance a
          JOIN users u ON a.user_id = u.id
-         WHERE a.company_id = ? AND MONTH(a.date) = ? AND YEAR(a.date) = ? AND a.status = 'out'
+         WHERE a.company_id = ? AND MONTH(a.date) = ? AND YEAR(a.date) = ? AND a.is_present = 1
          GROUP BY DATE(a.date), a.user_id",
         [$companyId, $month, $year]
     );
@@ -69,7 +69,7 @@ if ($isManager) {
     $attendance = $db->fetchAll(
         "SELECT DATE(date) as date_only, SUM(overtime_hours) as total_overtime 
         FROM attendance 
-        WHERE company_id = ? AND user_id = ? AND MONTH(date) = ? AND YEAR(date) = ? AND status = 'out'
+        WHERE company_id = ? AND user_id = ? AND MONTH(date) = ? AND YEAR(date) = ? AND is_present = 1
         GROUP BY DATE(date)",
         [$companyId, $userId, $month, $year]
     );
@@ -698,7 +698,7 @@ if ($nextMonth > 12) {
             if (type === 'attendance') {
                 statusClass = 'status-present';
                 statusText = 'Present';
-                metaText = `Checked in: ${emp.check_in_time || 'N/A'}`;
+                metaText = `First session: ${emp.check_in_time || 'N/A'}`;
             } else if (type === 'leave') {
                 statusClass = 'status-leave';
                 statusText = 'On Leave';

@@ -113,10 +113,8 @@ CREATE TABLE `attendance` (
     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `company_id` INT UNSIGNED NOT NULL,
     `user_id` INT UNSIGNED NOT NULL,
-    `check_in` TIMESTAMP NOT NULL,
-    `check_out` TIMESTAMP NULL,
     `date` DATE NOT NULL,
-    `status` ENUM('in', 'out') DEFAULT 'in',
+    `is_present` TINYINT(1) DEFAULT 0 COMMENT '1 if at least one timer session exists for this day',
     `regular_hours` DECIMAL(5,2) DEFAULT 0.00,
     `overtime_hours` DECIMAL(5,2) DEFAULT 0.00,
     `notes` TEXT,
@@ -124,9 +122,33 @@ CREATE TABLE `attendance` (
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX `idx_company_user` (`company_id`, `user_id`),
     INDEX `idx_company_date` (`company_id`, `date`),
-    INDEX `idx_status` (`status`),
+    INDEX `idx_is_present` (`is_present`),
     FOREIGN KEY (`company_id`) REFERENCES `companies`(`id`) ON DELETE CASCADE,
     FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `timer_sessions` (
+    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `company_id` INT UNSIGNED NOT NULL,
+    `user_id` INT UNSIGNED NOT NULL,
+    `date` DATE NOT NULL,
+    `attendance_id` INT UNSIGNED NULL,
+    `start_time` TIMESTAMP NOT NULL,
+    `stop_time` TIMESTAMP NULL,
+    `end_time` TIMESTAMP NULL,
+    `duration_seconds` INT DEFAULT 0,
+    `status` ENUM('running', 'stopped', 'ended') DEFAULT 'running',
+    `regular_hours` DECIMAL(5,2) DEFAULT 0.00,
+    `overtime_hours` DECIMAL(5,2) DEFAULT 0.00,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX `idx_attendance` (`attendance_id`),
+    INDEX `idx_user_date` (`company_id`, `user_id`, `date`),
+    INDEX `idx_date` (`date`),
+    INDEX `idx_status` (`status`),
+    FOREIGN KEY (`company_id`) REFERENCES `companies`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`attendance_id`) REFERENCES `attendance`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `leaves` (

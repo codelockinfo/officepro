@@ -58,38 +58,50 @@ if (!$runningSession) {
 try {
     $db->beginTransaction();
     
-    // Calculate duration using timestamps for accuracy
+    // Calculate duration from adjusted start_time to current time
+    // IMPORTANT: start_time may have been adjusted during resume to account for previous work
     $startTime = new DateTime($runningSession['start_time']);
     $stopTime = new DateTime($now);
     $startTimestamp = $startTime->getTimestamp();
     $stopTimestamp = $stopTime->getTimestamp();
-    $durationSeconds = $stopTimestamp - $startTimestamp;
+    
+    // Calculate the duration for this running period
+    $currentPeriodDuration = $stopTimestamp - $startTimestamp;
+    
+    // Get any previously accumulated duration (from previous pause/resume cycles)
+    $accumulatedDuration = intval($runningSession['duration_seconds'] ?? 0);
+    
+    // Total duration = accumulated duration + current period duration
+    $totalDurationSeconds = $accumulatedDuration + $currentPeriodDuration;
     
     // Ensure positive duration
-    if ($durationSeconds < 0) {
-        error_log("Stop Timer Warning: Negative duration calculated. Start: {$startTimestamp}, Stop: {$stopTimestamp}");
-        $durationSeconds = 0;
+    if ($totalDurationSeconds < 0) {
+        error_log("Stop Timer Warning: Negative duration calculated. Accumulated: {$accumulatedDuration}, Current: {$currentPeriodDuration}");
+        $totalDurationSeconds = max(0, $currentPeriodDuration);
     }
     
-    error_log("Stop Timer - Session ID: {$runningSession['id']}, Start: {$runningSession['start_time']}, Stop: {$now}, Duration: {$durationSeconds} seconds");
+    error_log("Stop Timer - Session ID: {$runningSession['id']}, Start: {$runningSession['start_time']}, Stop: {$now}, Accumulated: {$accumulatedDuration}s, Current period: {$currentPeriodDuration}s, Total: {$totalDurationSeconds}s");
     
     // Update timer session to stopped
+    // Store the TOTAL duration_seconds (accumulated + current period)
     $db->execute(
         "UPDATE timer_sessions SET stop_time = ?, duration_seconds = ?, status = 'stopped', updated_at = NOW() 
         WHERE id = ?",
-        [$now, $durationSeconds, $runningSession['id']]
+        [$now, $totalDurationSeconds, $runningSession['id']]
     );
     
     $db->commit();
     
-    error_log("Stop Timer - Successfully stopped session {$runningSession['id']} with duration: {$durationSeconds}s");
+    error_log("Stop Timer - Successfully stopped session {$runningSession['id']} with total duration: {$totalDurationSeconds}s");
     
     echo json_encode([
         'success' => true,
         'message' => 'Timer stopped successfully',
         'data' => [
             'session_id' => $runningSession['id'],
-            'duration_seconds' => $durationSeconds
+            'duration_seconds' => $totalDurationSeconds,
+            'accumulated_duration' => $accumulatedDuration,
+            'current_period_duration' => $currentPeriodDuration
         ]
     ]);
     
