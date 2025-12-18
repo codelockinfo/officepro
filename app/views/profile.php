@@ -75,10 +75,6 @@ $leaveBalance = $db->fetchOne(
                     <td style="padding: 12px;"><?php echo htmlspecialchars($user['company_name']); ?></td>
                 </tr>
                 <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 12px; font-weight: 600;">Department:</td>
-                    <td style="padding: 12px;"><?php echo htmlspecialchars($user['department_name'] ?? 'Not assigned'); ?></td>
-                </tr>
-                <tr style="border-bottom: 1px solid #ddd;">
                     <td style="padding: 12px; font-weight: 600;">Role:</td>
                     <td style="padding: 12px;">
                         <span class="badge badge-primary">

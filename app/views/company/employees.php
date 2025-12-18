@@ -15,13 +15,14 @@ Auth::checkRole(['company_owner', 'manager'], 'Only company owners and managers 
 $companyId = Tenant::getCurrentCompanyId();
 $db = Database::getInstance();
 
-// Get all employees
+// Get all employees (exclude company owners)
 $employees = $db->fetchAll(
-    "SELECT u.*, d.name as department_name 
+    "SELECT u.* 
     FROM users u 
-    LEFT JOIN departments d ON u.department_id = d.id 
-    WHERE u.company_id = ? 
-    ORDER BY u.full_name ASC",
+    WHERE u.company_id = ? AND u.role != 'company_owner'
+    ORDER BY 
+        CASE WHEN u.status = 'active' THEN 1 ELSE 2 END,
+        u.full_name ASC",
     [$companyId]
 );
 ?>
@@ -32,62 +33,81 @@ $employees = $db->fetchAll(
     <div style="padding: 20px; border-bottom: 1px solid #ddd; display: flex; gap: 20px;">
         <input type="text" id="search-employees" placeholder="Search employees..." class="form-control" style="flex: 1;" onkeyup="searchEmployees()">
         <select id="filter-status" class="form-control" style="width: 150px;" onchange="filterEmployees()">
-            <option value="">All Status</option>
-            <option value="active">Active</option>
-            <option value="pending">Pending</option>
-            <option value="suspended">Suspended</option>
+            <option value="">All Employees</option>
+            <option value="current">Current</option>
+            <option value="past">Past</option>
         </select>
     </div>
     
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Employee</th>
-                <th>Email</th>
-                <th>Department</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Joined</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="employees-tbody">
-            <?php foreach ($employees as $emp): ?>
-            <tr class="employee-row" data-status="<?php echo $emp['status']; ?>">
-                <td>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <img src="/officepro/<?php echo htmlspecialchars($emp['profile_image']); ?>" 
-                             alt="Profile" 
-                             style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
-                        <strong><?php echo htmlspecialchars($emp['full_name']); ?></strong>
-                    </div>
-                </td>
-                <td><?php echo htmlspecialchars($emp['email']); ?></td>
-                <td><?php echo htmlspecialchars($emp['department_name'] ?? '-'); ?></td>
-                <td>
-                    <span class="badge badge-primary">
-                        <?php echo str_replace('_', ' ', ucwords($emp['role'], '_')); ?>
-                    </span>
-                </td>
-                <td>
-                    <?php
-                    $statusColors = ['active' => 'badge-success', 'pending' => 'badge-warning', 'suspended' => 'badge-danger'];
-                    ?>
-                    <span class="badge <?php echo $statusColors[$emp['status']]; ?>">
-                        <?php echo ucfirst($emp['status']); ?>
-                    </span>
-                </td>
-                <td><?php echo date('M d, Y', strtotime($emp['created_at'])); ?></td>
-                <td>
-                    <button onclick="viewEmployee(<?php echo $emp['id']; ?>)" class="btn btn-sm btn-primary">View</button>
-                    <?php if (Auth::hasRole(['company_owner'])): ?>
-                        <button onclick="editEmployee(<?php echo $emp['id']; ?>)" class="btn btn-sm btn-primary">Edit</button>
-                    <?php endif; ?>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+    <div id="employees-container" style="padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+        <?php foreach ($employees as $emp): 
+            // Determine if current or past
+            $isCurrent = $emp['status'] === 'active';
+            $statusType = $isCurrent ? 'current' : 'past';
+            $statusLabel = $isCurrent ? 'Current' : 'Past';
+            $statusBadgeClass = $isCurrent ? 'badge-success' : 'badge-danger';
+        ?>
+        <div class="employee-card" data-status="<?php echo $statusType; ?>" style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: relative; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
+            <!-- Status Badge -->
+            <div style="position: absolute; top: 15px; left: 15px;">
+                <span class="badge <?php echo $statusBadgeClass; ?>" style="font-size: 11px; padding: 5px 10px;">
+                    <?php echo $statusLabel; ?>
+                </span>
+            </div>
+            
+            <!-- Menu Button -->
+            <div style="position: absolute; top: 15px; right: 15px;">
+                <button onclick="showEmployeeMenu(<?php echo $emp['id']; ?>)" style="background: none; border: none; cursor: pointer; padding: 5px; color: #666;" onmouseover="this.style.color='#333'" onmouseout="this.style.color='#666'">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+            
+            <!-- Profile Picture -->
+            <div style="text-align: center; margin-top: 10px; margin-bottom: 15px;">
+                <img src="/officepro/<?php echo htmlspecialchars($emp['profile_image']); ?>" 
+                     alt="Profile" 
+                     style="width: 100px; height: 100px; border-radius: 12px; object-fit: cover; border: 2px solid #e0e0e0;"
+                     onerror="this.src='/officepro/assets/images/default-avatar.png'">
+            </div>
+            
+            <!-- Name -->
+            <h3 style="margin: 0 0 5px 0; text-align: center; color: #1a237e; font-size: 18px; font-weight: 600;">
+                <?php echo htmlspecialchars($emp['full_name']); ?>
+            </h3>
+            
+            <!-- Email -->
+            <div style="margin: 10px 0; display: flex; align-items: center; gap: 8px; color: #666; font-size: 14px;">
+                <i class="fas fa-envelope" style="color: #999; width: 16px;"></i>
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?php echo htmlspecialchars($emp['email']); ?></span>
+            </div>
+            
+            <!-- Hired Date -->
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0; color: #999; font-size: 13px; text-align: center;">
+                <i class="fas fa-calendar-alt" style="margin-right: 5px;"></i>
+                Hired: <?php echo date('d M Y', strtotime($emp['created_at'])); ?>
+            </div>
+            
+            <!-- Actions (hidden menu) -->
+            <div id="menu-<?php echo $emp['id']; ?>" style="display: none; position: absolute; top: 40px; right: 15px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10; min-width: 120px; padding: 5px 0;">
+                <button onclick="viewEmployee(<?php echo $emp['id']; ?>); hideEmployeeMenu(<?php echo $emp['id']; ?>);" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; cursor: pointer; color: #333; font-size: 14px;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='none'">
+                    <i class="fas fa-eye" style="margin-right: 8px;"></i> View
+                </button>
+                <?php if (Auth::hasRole(['company_owner'])): ?>
+                <button onclick="editEmployee(<?php echo $emp['id']; ?>); hideEmployeeMenu(<?php echo $emp['id']; ?>);" style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; cursor: pointer; color: #333; font-size: 14px;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='none'">
+                    <i class="fas fa-edit" style="margin-right: 8px;"></i> Edit
+                </button>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    
+    <?php if (count($employees) === 0): ?>
+    <div style="text-align: center; padding: 60px 20px; color: #666;">
+        <i class="fas fa-users" style="font-size: 48px; color: #ddd; margin-bottom: 15px;"></i>
+        <p>No employees found</p>
+    </div>
+    <?php endif; ?>
 </div>
 
 <script>
@@ -98,15 +118,45 @@ $employees = $db->fetchAll(
     function filterEmployees() {
         const search = document.getElementById('search-employees').value.toLowerCase();
         const statusFilter = document.getElementById('filter-status').value;
-        const rows = document.querySelectorAll('.employee-row');
+        const cards = document.querySelectorAll('.employee-card');
         
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
+        cards.forEach(card => {
+            const text = card.textContent.toLowerCase();
             const matchesSearch = search === '' || text.includes(search);
-            const matchesStatus = statusFilter === '' || row.dataset.status === statusFilter;
+            const matchesStatus = statusFilter === '' || card.dataset.status === statusFilter;
             
-            row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+            card.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
         });
+    }
+    
+    function showEmployeeMenu(id) {
+        // Hide all menus first
+        document.querySelectorAll('[id^="menu-"]').forEach(menu => {
+            menu.style.display = 'none';
+        });
+        
+        // Show the clicked menu
+        const menu = document.getElementById('menu-' + id);
+        if (menu) {
+            menu.style.display = 'block';
+        }
+        
+        // Close menu when clicking outside
+        setTimeout(() => {
+            document.addEventListener('click', function closeMenu(e) {
+                if (!e.target.closest('[id^="menu-"]') && !e.target.closest('button[onclick*="showEmployeeMenu"]')) {
+                    document.querySelectorAll('[id^="menu-"]').forEach(m => m.style.display = 'none');
+                    document.removeEventListener('click', closeMenu);
+                }
+            });
+        }, 10);
+    }
+    
+    function hideEmployeeMenu(id) {
+        const menu = document.getElementById('menu-' + id);
+        if (menu) {
+            menu.style.display = 'none';
+        }
     }
     
     function viewEmployee(id) {
@@ -146,19 +196,9 @@ $employees = $db->fetchAll(
                                 <td style="padding: 12px;">${emp.email}</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #ddd;">
-                                <td style="padding: 12px; font-weight: 600;">Department:</td>
-                                <td style="padding: 12px;">${emp.department_name || 'Not assigned'}</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #ddd;">
-                                <td style="padding: 12px; font-weight: 600;">Role:</td>
-                                <td style="padding: 12px;">
-                                    <span class="badge badge-primary">${roleLabels[emp.role] || emp.role}</span>
-                                </td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid #ddd;">
                                 <td style="padding: 12px; font-weight: 600;">Status:</td>
                                 <td style="padding: 12px;">
-                                    <span class="badge ${statusColors[emp.status]}">${emp.status.toUpperCase()}</span>
+                                    <span class="badge ${emp.status === 'active' ? 'badge-success' : 'badge-danger'}">${emp.status === 'active' ? 'Current' : 'Past'}</span>
                                 </td>
                             </tr>
                             <tr style="border-bottom: 1px solid #ddd;">
@@ -218,7 +258,71 @@ $employees = $db->fetchAll(
     }
     
     function editEmployee(id) {
-        showMessage('info', 'Edit employee feature will be available soon!');
+        // Fetch employee details
+        ajaxRequest(`/officepro/app/api/company/employee_details.php?id=${id}`, 'GET', null, (response) => {
+            if (response.success) {
+                const emp = response.data;
+                
+                // Format join date for date input (YYYY-MM-DD)
+                const joinDate = emp.created_at ? new Date(emp.created_at).toISOString().split('T')[0] : '';
+                
+                const content = `
+                    <form id="edit-employee-form" onsubmit="saveEmployee(event, ${id})">
+                        <div class="form-group">
+                            <label class="form-label" for="edit_full_name">Full Name *</label>
+                            <input type="text" id="edit_full_name" name="full_name" class="form-control" value="${emp.full_name}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="edit_email">Email *</label>
+                            <input type="email" id="edit_email" name="email" class="form-control" value="${emp.email}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="edit_join_date">Join Date *</label>
+                            <input type="date" id="edit_join_date" name="join_date" class="form-control" value="${joinDate}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="edit_status">Status *</label>
+                            <select id="edit_status" name="status" class="form-control" required>
+                                <option value="active" ${emp.status === 'active' ? 'selected' : ''}>Current</option>
+                                <option value="pending" ${emp.status === 'pending' ? 'selected' : ''}>Past (Pending)</option>
+                                <option value="suspended" ${emp.status === 'suspended' ? 'selected' : ''}>Past (Suspended)</option>
+                            </select>
+                        </div>
+                    </form>
+                `;
+                
+                const footer = `
+                    <button type="button" class="btn btn-secondary" onclick="closeModal(this.closest('.modal-overlay').id)">Cancel</button>
+                    <button type="submit" form="edit-employee-form" class="btn btn-primary">Save Changes</button>
+                `;
+                
+                createModal('<i class="fas fa-edit"></i> Edit Employee', content, footer, 'modal-md');
+            } else {
+                showMessage('error', response.message || 'Failed to load employee details');
+            }
+        });
+    }
+    
+    function saveEmployee(event, id) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const data = Object.fromEntries(formData);
+        
+        ajaxRequest(`/officepro/app/api/company/employees.php?action=update&id=${id}`, 'POST', data, (response) => {
+            if (response.success) {
+                showMessage('success', 'Employee updated successfully!');
+                closeModal(document.querySelector('.modal-overlay.active').id);
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showMessage('error', response.message || 'Failed to update employee');
+            }
+        }, (error) => {
+            console.error('Update employee error:', error);
+            showMessage('error', 'An error occurred while updating employee');
+        });
     }
 </script>
 

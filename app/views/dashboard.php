@@ -273,61 +273,15 @@ foreach ($todayHistory as $record) {
         [$companyId, $userId]
     );
     ?>
-    <div class="card" style="margin-top: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h2 class="card-title" style="margin: 0;"><i class="fas fa-tasks"></i> My Tasks</h2>
-            <a href="/officepro/app/views/employee/tasks.php" class="btn btn-sm btn-primary">View All</a>
-        </div>
-        <?php if (count($employeeTasks) === 0): ?>
-            <p style="text-align: center; padding: 20px; color: #666;">No tasks assigned to you</p>
-        <?php else: ?>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Task Name</th>
-                            <th>Description</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($employeeTasks as $task): ?>
-                        <tr>
-                            <td><strong><?php echo htmlspecialchars($task['title']); ?></strong></td>
-                            <td><?php echo htmlspecialchars(substr($task['description'] ?? '', 0, 40)) . (strlen($task['description'] ?? '') > 40 ? '...' : ''); ?></td>
-                            <td>
-                                <?php
-                                $statusColors = [
-                                    'todo' => 'badge-secondary',
-                                    'in_progress' => 'badge-warning',
-                                    'done' => 'badge-success'
-                                ];
-                                $statusLabels = [
-                                    'todo' => 'Pending',
-                                    'in_progress' => 'Processing',
-                                    'done' => 'Completed'
-                                ];
-                                ?>
-                                <span class="badge <?php echo $statusColors[$task['status']]; ?>">
-                                    <?php echo $statusLabels[$task['status']]; ?>
-                                </span>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php endif; ?>
-    </div>
     <?php else: ?>
     <!-- Company Overview for Owner -->
     <div class="card">
         <h2 class="card-title">Company Overview</h2>
         <div style="padding: 20px;">
             <?php
-            // Get company stats
+            // Get company stats (exclude company owners)
             $totalEmployees = $db->fetchOne(
-                "SELECT COUNT(*) as count FROM users WHERE company_id = ? AND status = 'active'",
+                "SELECT COUNT(*) as count FROM users WHERE company_id = ? AND status = 'active' AND role != 'company_owner'",
                 [$companyId]
             );
             
@@ -419,8 +373,8 @@ foreach ($todayHistory as $record) {
                             <th>Description</th>
                             <th>Assigned To</th>
                             <th>Status</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
+                            <th>Due Date</th>
+                            <th>Priority</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -446,8 +400,24 @@ foreach ($todayHistory as $record) {
                                     <?php echo $statusLabels[$task['status']]; ?>
                                 </span>
                             </td>
-                            <td><?php echo $task['start_time'] ? date('M d, Y H:i', strtotime($task['start_time'])) : '-'; ?></td>
-                            <td><?php echo $task['end_time'] ? date('M d, Y H:i', strtotime($task['end_time'])) : '-'; ?></td>
+                            <td><?php echo $task['due_date'] ? date('M d, Y', strtotime($task['due_date'])) : '-'; ?></td>
+                            <td>
+                                <?php
+                                $priorityColors = [
+                                    'low' => 'badge-info',
+                                    'medium' => 'badge-warning',
+                                    'high' => 'badge-danger'
+                                ];
+                                $priorityLabels = [
+                                    'low' => 'Low',
+                                    'medium' => 'Medium',
+                                    'high' => 'High'
+                                ];
+                                ?>
+                                <span class="badge <?php echo $priorityColors[$task['priority']] ?? 'badge-secondary'; ?>">
+                                    <?php echo $priorityLabels[$task['priority']] ?? ucfirst($task['priority']); ?>
+                                </span>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>

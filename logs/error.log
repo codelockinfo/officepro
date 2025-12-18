@@ -347,3 +347,11 @@ Stack trace:
 Stack trace:
 #0 {main}
   thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 17:41:09 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\New xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 17:43:21 Asia/Kolkata] Company Settings - Company ID: 29, Logo from DB: uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 17:43:21 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 17:44:59 Asia/Kolkata] Company Settings - Company ID: 29, Logo from DB: uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 17:44:59 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_6943e230a6718_1766056496.png

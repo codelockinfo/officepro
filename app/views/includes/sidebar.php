@@ -59,26 +59,21 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
         
         <?php if (in_array($currentRole, ['company_owner'])): ?>
         <hr style="border: none; border-top: 1px solid rgba(77, 166, 255, 0.3); margin: 10px 0;">
-        
-        <a href="/officepro/app/views/company/settings.php" class="nav-item <?php echo $currentPage === 'settings' ? 'active' : ''; ?>">
-            <i class="fas fa-cog icon-settings"></i> Company Settings
+        <a href="/officepro/app/views/company/tasks.php" class="nav-item <?php echo $currentPage === 'tasks' && strpos($_SERVER['PHP_SELF'], 'company') !== false ? 'active' : ''; ?>">
+            <i class="fas fa-tasks icon-tasks"></i> Task Management
         </a>
         
         <a href="/officepro/app/views/company/employees.php" class="nav-item <?php echo $currentPage === 'employees' ? 'active' : ''; ?>">
             <i class="fas fa-users icon-employees"></i> Employees
         </a>
         
-        <a href="/officepro/app/views/company/departments.php" class="nav-item <?php echo $currentPage === 'departments' ? 'active' : ''; ?>">
-            <i class="fas fa-building icon-departments"></i> Departments
+        <a href="/officepro/app/views/company/settings.php" class="nav-item <?php echo $currentPage === 'settings' ? 'active' : ''; ?>">
+            <i class="fas fa-cog icon-settings"></i> Company Settings
         </a>
-        
         <a href="/officepro/app/views/company/invitations.php" class="nav-item <?php echo $currentPage === 'invitations' ? 'active' : ''; ?>">
             <i class="fas fa-envelope icon-invitations"></i> Invitations
         </a>
         
-        <a href="/officepro/app/views/company/tasks.php" class="nav-item <?php echo $currentPage === 'tasks' && strpos($_SERVER['PHP_SELF'], 'company') !== false ? 'active' : ''; ?>">
-            <i class="fas fa-tasks icon-tasks"></i> Task Management
-        </a>
         <?php endif; ?>
         
         <?php if ($currentRole === 'system_admin'): ?>
