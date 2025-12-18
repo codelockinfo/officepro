@@ -95,10 +95,7 @@ try {
         // Format leave type
         foreach ($employees as &$emp) {
             $leaveTypeMap = [
-                'paid_leave' => 'Paid Leave',
-                'sick_leave' => 'Sick Leave',
-                'casual_leave' => 'Casual Leave',
-                'work_from_home' => 'Work From Home'
+                'paid_leave' => 'Paid Leave'
             ];
             $emp['leave_type'] = $leaveTypeMap[$emp['leave_type']] ?? $emp['leave_type'];
         }

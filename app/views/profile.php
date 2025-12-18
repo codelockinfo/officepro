@@ -156,27 +156,6 @@ $leaveBalance = $db->fetchOne(
             </div>
             <p style="margin: 0; color: #666;">Paid Leave</p>
         </div>
-        
-        <div style="text-align: center; padding: 15px; background: var(--light-blue); border-radius: 8px;">
-            <div style="font-size: 24px; font-weight: bold; color: var(--primary-blue);">
-                <?php echo $leaveBalance['sick_leave'] ?? 0; ?>
-            </div>
-            <p style="margin: 0; color: #666;">Sick Leave</p>
-        </div>
-        
-        <div style="text-align: center; padding: 15px; background: var(--light-blue); border-radius: 8px;">
-            <div style="font-size: 24px; font-weight: bold; color: var(--primary-blue);">
-                <?php echo $leaveBalance['casual_leave'] ?? 0; ?>
-            </div>
-            <p style="margin: 0; color: #666;">Casual Leave</p>
-        </div>
-        
-        <div style="text-align: center; padding: 15px; background: var(--light-blue); border-radius: 8px;">
-            <div style="font-size: 24px; font-weight: bold; color: var(--primary-blue);">
-                <?php echo $leaveBalance['wfh_days'] ?? 0; ?>
-            </div>
-            <p style="margin: 0; color: #666;">WFH Days</p>
-        </div>
     </div>
 </div>
 

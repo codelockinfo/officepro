@@ -33,21 +33,38 @@ $appConfig = require __DIR__ . '/../../config/app.php';
 date_default_timezone_set($appConfig['timezone']);
 
 // Get form data
-$leaveType = $_POST['leave_type'] ?? '';
+$leaveType = $_POST['leave_type'] ?? 'paid_leave'; // Default to paid_leave if not provided
+$leaveDuration = $_POST['leave_duration'] ?? 'full_day';
+$halfDayPeriod = $_POST['half_day_period'] ?? '';
 $startDate = $_POST['start_date'] ?? '';
 $endDate = $_POST['end_date'] ?? '';
 $reason = $validator->sanitize($_POST['reason'] ?? '');
 
 // Validate inputs
-$validator->required($leaveType, 'Leave Type');
 $validator->required($startDate, 'Start Date');
-$validator->required($endDate, 'End Date');
 $validator->required($reason, 'Reason');
 $validator->date($startDate, 'Start Date');
-$validator->date($endDate, 'End Date');
-$validator->dateRange($startDate, $endDate, 'Date Range');
 
-if (!in_array($leaveType, ['paid_leave', 'sick_leave', 'casual_leave', 'work_from_home'])) {
+// Validate leave duration
+if (!in_array($leaveDuration, ['full_day', 'half_day'])) {
+    echo json_encode(['success' => false, 'message' => 'Invalid leave duration']);
+    exit;
+}
+
+// For half day, end date should be same as start date
+if ($leaveDuration === 'half_day') {
+    $endDate = $startDate;
+    if (empty($halfDayPeriod) || !in_array($halfDayPeriod, ['morning', 'afternoon'])) {
+        echo json_encode(['success' => false, 'message' => 'Half day period is required']);
+        exit;
+    }
+} else {
+    $validator->required($endDate, 'End Date');
+    $validator->date($endDate, 'End Date');
+    $validator->dateRange($startDate, $endDate, 'Date Range');
+}
+
+if ($leaveType !== 'paid_leave') {
     echo json_encode(['success' => false, 'message' => 'Invalid leave type']);
     exit;
 }
@@ -58,10 +75,14 @@ if ($validator->hasErrors()) {
 }
 
 // Calculate days
-$start = new DateTime($startDate);
-$end = new DateTime($endDate);
-$interval = $start->diff($end);
-$daysCount = $interval->days + 1;
+if ($leaveDuration === 'half_day') {
+    $daysCount = 0.5;
+} else {
+    $start = new DateTime($startDate);
+    $end = new DateTime($endDate);
+    $interval = $start->diff($end);
+    $daysCount = $interval->days + 1;
+}
 
 // Check leave balance
 $currentYear = date('Y');
@@ -75,16 +96,10 @@ if (!$balance) {
     exit;
 }
 
-// Map leave types to balance columns
-$balanceField = [
-    'paid_leave' => 'paid_leave',
-    'sick_leave' => 'sick_leave',
-    'casual_leave' => 'casual_leave',
-    'work_from_home' => 'wfh_days'
-];
+// Get available paid leave balance
+$availableBalance = $balance['paid_leave'] ?? 0;
 
-$availableBalance = $balance[$balanceField[$leaveType]] ?? 0;
-
+// For half days, check if at least 0.5 days are available
 if ($daysCount > $availableBalance) {
     echo json_encode(['success' => false, 'message' => "Insufficient leave balance. You have {$availableBalance} days available."]);
     exit;
@@ -106,9 +121,9 @@ try {
     
     // Insert leave request
     $db->execute(
-        "INSERT INTO leaves (company_id, user_id, leave_type, start_date, end_date, days_count, reason, attachment, status, created_at) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())",
-        [$companyId, $userId, $leaveType, $startDate, $endDate, $daysCount, $reason, $attachment]
+        "INSERT INTO leaves (company_id, user_id, leave_type, leave_duration, half_day_period, start_date, end_date, days_count, reason, attachment, status, created_at) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())",
+        [$companyId, $userId, $leaveType, $leaveDuration, $leaveDuration === 'half_day' ? $halfDayPeriod : null, $startDate, $endDate, $daysCount, $reason, $attachment]
     );
     
     $leaveId = $db->lastInsertId();

@@ -68,17 +68,39 @@ $allLeaves = $db->fetchAll(
                     <td>
                         <?php
                         $typeLabels = [
-                            'paid_leave' => 'Paid Leave',
-                            'sick_leave' => 'Sick Leave',
-                            'casual_leave' => 'Casual Leave',
-                            'work_from_home' => 'Work From Home'
+                            'paid_leave' => 'Paid Leave'
                         ];
-                        echo $typeLabels[$leave['leave_type']] ?? $leave['leave_type'];
+                        $leaveTypeLabel = $typeLabels[$leave['leave_type']] ?? $leave['leave_type'];
+                        
+                        // Add half day information if applicable
+                        if (isset($leave['leave_duration']) && $leave['leave_duration'] === 'half_day') {
+                            $period = isset($leave['half_day_period']) ? ucfirst($leave['half_day_period']) : '';
+                            $leaveTypeLabel .= ' (Half Day';
+                            if ($period) {
+                                $leaveTypeLabel .= ' - ' . $period;
+                            }
+                            $leaveTypeLabel .= ')';
+                        }
+                        echo $leaveTypeLabel;
                         ?>
                     </td>
                     <td><?php echo date('M d, Y', strtotime($leave['start_date'])); ?></td>
-                    <td><?php echo date('M d, Y', strtotime($leave['end_date'])); ?></td>
-                    <td><?php echo $leave['days_count']; ?></td>
+                    <td><?php 
+                        // For half days, show same date or just show start date
+                        if (isset($leave['leave_duration']) && $leave['leave_duration'] === 'half_day') {
+                            echo date('M d, Y', strtotime($leave['start_date']));
+                        } else {
+                            echo date('M d, Y', strtotime($leave['end_date']));
+                        }
+                    ?></td>
+                    <td><?php 
+                        // Format days count - show 0.5 as "0.5"
+                        if ($leave['days_count'] == 0.5 || $leave['days_count'] == '0.5') {
+                            echo '0.5';
+                        } else {
+                            echo number_format($leave['days_count'], 1);
+                        }
+                    ?></td>
                     <td><?php echo date('M d, Y h:i A', strtotime($leave['created_at'])); ?></td>
                     <td>
                         <button onclick="viewLeaveForApproval(<?php echo $leave['id']; ?>)" class="btn btn-sm btn-primary">View & Approve</button>
@@ -123,11 +145,36 @@ $allLeaves = $db->fetchAll(
                             'casual_leave' => 'Casual Leave',
                             'work_from_home' => 'WFH'
                         ];
-                        echo $typeLabels[$leave['leave_type']] ?? $leave['leave_type'];
+                        $leaveTypeLabel = $typeLabels[$leave['leave_type']] ?? $leave['leave_type'];
+                        
+                        // Add half day information if applicable
+                        if (isset($leave['leave_duration']) && $leave['leave_duration'] === 'half_day') {
+                            $period = isset($leave['half_day_period']) ? ucfirst($leave['half_day_period']) : '';
+                            $leaveTypeLabel .= ' (Half Day';
+                            if ($period) {
+                                $leaveTypeLabel .= ' - ' . $period;
+                            }
+                            $leaveTypeLabel .= ')';
+                        }
+                        echo $leaveTypeLabel;
                         ?>
                     </td>
-                    <td><?php echo date('M d', strtotime($leave['start_date'])) . ' - ' . date('M d, Y', strtotime($leave['end_date'])); ?></td>
-                    <td><?php echo $leave['days_count']; ?></td>
+                    <td><?php 
+                        // For half days, show only start date
+                        if (isset($leave['leave_duration']) && $leave['leave_duration'] === 'half_day') {
+                            echo date('M d, Y', strtotime($leave['start_date']));
+                        } else {
+                            echo date('M d', strtotime($leave['start_date'])) . ' - ' . date('M d, Y', strtotime($leave['end_date']));
+                        }
+                    ?></td>
+                    <td><?php 
+                        // Format days count - show 0.5 as "0.5"
+                        if ($leave['days_count'] == 0.5 || $leave['days_count'] == '0.5') {
+                            echo '0.5';
+                        } else {
+                            echo number_format($leave['days_count'], 1);
+                        }
+                    ?></td>
                     <td>
                         <span class="badge badge-<?php echo $leave['status'] === 'approved' ? 'success' : 'danger'; ?>">
                             <?php echo ucfirst($leave['status']); ?>
@@ -179,19 +226,22 @@ $allLeaves = $db->fetchAll(
             if (response.success) {
                 const leave = response.data;
                 const typeLabels = {
-                    'paid_leave': 'Paid Leave',
-                    'sick_leave': 'Sick Leave',
-                    'casual_leave': 'Casual Leave',
-                    'work_from_home': 'Work From Home'
+                    'paid_leave': 'Paid Leave'
                 };
+                
+                let leaveTypeLabel = typeLabels[leave.leave_type] || leave.leave_type;
+                if (leave.leave_duration === 'half_day') {
+                    const period = leave.half_day_period ? ` - ${leave.half_day_period.charAt(0).toUpperCase() + leave.half_day_period.slice(1)}` : '';
+                    leaveTypeLabel += ` (Half Day${period})`;
+                }
                 
                 let details = `
                     <div style="background: #f5f5f5; padding: 15px; border-radius: 5px;">
                         <p><strong>Employee:</strong> ${leave.employee_name || 'N/A'}</p>
-                        <p><strong>Leave Type:</strong> ${typeLabels[leave.leave_type]}</p>
+                        <p><strong>Leave Type:</strong> ${leaveTypeLabel}</p>
                         <p><strong>Start Date:</strong> ${new Date(leave.start_date).toLocaleDateString()}</p>
-                        <p><strong>End Date:</strong> ${new Date(leave.end_date).toLocaleDateString()}</p>
-                        <p><strong>Total Days:</strong> ${leave.days_count}</p>
+                        ${leave.leave_duration === 'half_day' ? '' : `<p><strong>End Date:</strong> ${new Date(leave.end_date).toLocaleDateString()}</p>`}
+                        <p><strong>Total Days:</strong> ${parseFloat(leave.days_count) === 0.5 ? '0.5' : leave.days_count}</p>
                         <p><strong>Reason:</strong><br>${leave.reason}</p>
                 `;
                 
@@ -214,19 +264,22 @@ $allLeaves = $db->fetchAll(
             if (response.success) {
                 const leave = response.data;
                 const typeLabels = {
-                    'paid_leave': 'Paid Leave',
-                    'sick_leave': 'Sick Leave',
-                    'casual_leave': 'Casual Leave',
-                    'work_from_home': 'Work From Home'
+                    'paid_leave': 'Paid Leave'
                 };
+                
+                let leaveTypeLabel = typeLabels[leave.leave_type] || leave.leave_type;
+                if (leave.leave_duration === 'half_day') {
+                    const period = leave.half_day_period ? ` - ${leave.half_day_period.charAt(0).toUpperCase() + leave.half_day_period.slice(1)}` : '';
+                    leaveTypeLabel += ` (Half Day${period})`;
+                }
                 
                 let content = `
                     <div style="padding: 20px;">
                         <p><strong>Employee:</strong> ${leave.employee_name || 'N/A'}</p>
-                        <p><strong>Leave Type:</strong> ${typeLabels[leave.leave_type]}</p>
+                        <p><strong>Leave Type:</strong> ${leaveTypeLabel}</p>
                         <p><strong>Start Date:</strong> ${new Date(leave.start_date).toLocaleDateString()}</p>
-                        <p><strong>End Date:</strong> ${new Date(leave.end_date).toLocaleDateString()}</p>
-                        <p><strong>Days:</strong> ${leave.days_count}</p>
+                        ${leave.leave_duration === 'half_day' ? '' : `<p><strong>End Date:</strong> ${new Date(leave.end_date).toLocaleDateString()}</p>`}
+                        <p><strong>Days:</strong> ${parseFloat(leave.days_count) === 0.5 ? '0.5' : leave.days_count}</p>
                         <p><strong>Status:</strong> <span class="badge badge-${leave.status === 'approved' ? 'success' : 'danger'}">${leave.status.toUpperCase()}</span></p>
                         <p><strong>Reason:</strong><br>${leave.reason}</p>
                 `;

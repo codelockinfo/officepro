@@ -16,9 +16,6 @@ return [
     
     // Leave settings
     'default_paid_leave' => 20,
-    'default_sick_leave' => 10,
-    'default_casual_leave' => 5,
-    'default_wfh_days' => 12,
     
     // Invitation settings
     'invitation_expiry_days' => 7,

@@ -79,20 +79,12 @@ try {
     
     // If approved, deduct from leave balance
     if ($action === 'approve') {
-        $balanceField = [
-            'paid_leave' => 'paid_leave',
-            'sick_leave' => 'sick_leave',
-            'casual_leave' => 'casual_leave',
-            'work_from_home' => 'wfh_days'
-        ];
-        
-        $field = $balanceField[$leave['leave_type']] ?? null;
-        
-        if ($field) {
+        // Deduct from paid leave balance
+        if ($leave['leave_type'] === 'paid_leave') {
             $currentYear = date('Y');
             $db->execute(
                 "UPDATE leave_balances 
-                SET {$field} = {$field} - ? 
+                SET paid_leave = paid_leave - ? 
                 WHERE company_id = ? AND user_id = ? AND year = ?",
                 [$leave['days_count'], $companyId, $leave['user_id'], $currentYear]
             );
@@ -118,10 +110,7 @@ try {
     
     // Send email notification
     $leaveTypeLabels = [
-        'paid_leave' => 'Paid Leave',
-        'sick_leave' => 'Sick Leave',
-        'casual_leave' => 'Casual Leave',
-        'work_from_home' => 'Work From Home'
+        'paid_leave' => 'Paid Leave'
     ];
     
     Email::sendLeaveStatusUpdate(

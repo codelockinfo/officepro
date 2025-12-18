@@ -147,6 +147,24 @@ error_log("Company Settings - Company ID: $companyId, Logo from DB: " . ($compan
             <small class="text-muted">Example: 8 hours. If employee works 9 hours, 1 hour will be overtime.</small>
         </div>
         
+        <hr style="margin: 30px 0; border: none; border-top: 2px solid #e0e0e0;">
+        
+        <h3 style="margin-bottom: 20px; color: var(--primary-blue);">Leave Configuration</h3>
+        <p style="color: #666; margin-bottom: 20px; font-size: 14px;">
+            Set the yearly paid leave allocation for all employees in your company.
+        </p>
+        
+        <?php
+        $paidLeaveAllocation = Tenant::getCompanySetting('paid_leave_allocation', '12');
+        ?>
+        <div class="form-group" style="max-width: 300px;">
+            <label class="form-label" for="paid_leave_allocation">Yearly Paid Leave Allocation *</label>
+            <input type="number" id="paid_leave_allocation" name="paid_leave_allocation" class="form-control" 
+                   value="<?php echo htmlspecialchars($paidLeaveAllocation); ?>" 
+                   min="0" max="365" step="0.5" required>
+            <small class="text-muted">This is the total paid leave allocation for the entire year. Example: 12 days per year (2025 has 12 days, 2026 has 12 days, etc.).</small>
+        </div>
+        
         <button type="submit" class="btn btn-primary custom-btn-primary">Save Changes</button>
     </form>
 </div>

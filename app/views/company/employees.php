@@ -199,18 +199,6 @@ $employees = $db->fetchAll(
                                         <p style="margin: 0; color: #666;">Paid Leave</p>
                                         <p style="margin: 0; font-size: 20px; font-weight: bold;">${emp.leave_balance.paid_leave || 0} days</p>
                                     </div>
-                                    <div>
-                                        <p style="margin: 0; color: #666;">Sick Leave</p>
-                                        <p style="margin: 0; font-size: 20px; font-weight: bold;">${emp.leave_balance.sick_leave || 0} days</p>
-                                    </div>
-                                    <div>
-                                        <p style="margin: 0; color: #666;">Casual Leave</p>
-                                        <p style="margin: 0; font-size: 20px; font-weight: bold;">${emp.leave_balance.casual_leave || 0} days</p>
-                                    </div>
-                                    <div>
-                                        <p style="margin: 0; color: #666;">WFH Days</p>
-                                        <p style="margin: 0; font-size: 20px; font-weight: bold;">${emp.leave_balance.wfh_days || 0} days</p>
-                                    </div>
                                 </div>
                             </div>
                         ` : ''}

@@ -258,6 +258,25 @@ try {
     
     error_log("Update Settings - Working hours saved: $workingHours hours per day");
     
+    // Save paid leave allocation setting
+    if (isset($_POST['paid_leave_allocation'])) {
+        $paidLeaveAllocation = floatval($_POST['paid_leave_allocation']);
+        
+        // Validate paid leave allocation (between 0 and 31)
+        if ($paidLeaveAllocation < 0 || $paidLeaveAllocation > 31) {
+            $paidLeaveAllocation = 12; // Default to 12 days
+        }
+        
+        $db->execute(
+            "INSERT INTO company_settings (company_id, setting_key, setting_value, updated_at) 
+             VALUES (?, 'paid_leave_allocation', ?, NOW())
+             ON DUPLICATE KEY UPDATE setting_value = ?, updated_at = NOW()",
+            [$companyId, $paidLeaveAllocation, $paidLeaveAllocation]
+        );
+        
+        error_log("Update Settings - Paid leave allocation saved: $paidLeaveAllocation days per month");
+    }
+    
     $db->commit();
     
     // Verify the logo was saved

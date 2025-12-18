@@ -53,11 +53,25 @@ try {
     error_log("Checkout: Checkout time: {$now}");
     error_log("Checkout: Attendance ID: {$attendance['id']}");
     
-    // Calculate hours worked using AttendanceCalculator (based on office hours)
-    $hoursCalculation = AttendanceCalculator::calculateHours($originalCheckIn, $now, $companyId);
-    $regularHours = $hoursCalculation['regular_hours'];
-    $overtimeHours = $hoursCalculation['overtime_hours'];
-    $totalHours = $hoursCalculation['total_hours'];
+    // Calculate hours from ended timer sessions
+    $sessionTotals = $db->fetchOne(
+        "SELECT SUM(regular_hours) as total_regular, SUM(overtime_hours) as total_overtime 
+         FROM timer_sessions 
+         WHERE attendance_id = ? AND status = 'ended'",
+        [$attendance['id']]
+    );
+    
+    $regularHours = floatval($sessionTotals['total_regular'] ?? 0);
+    $overtimeHours = floatval($sessionTotals['total_overtime'] ?? 0);
+    $totalHours = $regularHours + $overtimeHours;
+    
+    // If no timer sessions, calculate from check-in to check-out (fallback)
+    if ($totalHours == 0) {
+        $hoursCalculation = AttendanceCalculator::calculateHours($originalCheckIn, $now, $companyId);
+        $regularHours = $hoursCalculation['regular_hours'];
+        $overtimeHours = $hoursCalculation['overtime_hours'];
+        $totalHours = $hoursCalculation['total_hours'];
+    }
     
     error_log("Checkout: Calculated hours - Regular: $regularHours, Overtime: $overtimeHours, Total: $totalHours");
     

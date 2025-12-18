@@ -64,16 +64,13 @@ class Auth {
             $currentYear = date('Y');
             $appConfig = require __DIR__ . '/../config/app.php';
             $db->execute(
-                "INSERT INTO leave_balances (company_id, user_id, year, paid_leave, sick_leave, casual_leave, wfh_days) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO leave_balances (company_id, user_id, year, paid_leave) 
+                VALUES (?, ?, ?, ?)",
                 [
                     $companyId,
                     $ownerId,
                     $currentYear,
-                    $appConfig['default_paid_leave'],
-                    $appConfig['default_sick_leave'],
-                    $appConfig['default_casual_leave'],
-                    $appConfig['default_wfh_days']
+                    $appConfig['default_paid_leave']
                 ]
             );
             
@@ -239,16 +236,13 @@ class Auth {
             
             if (!$existingBalance) {
                 $db->execute(
-                    "INSERT INTO leave_balances (company_id, user_id, year, paid_leave, sick_leave, casual_leave, wfh_days) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT INTO leave_balances (company_id, user_id, year, paid_leave) 
+                    VALUES (?, ?, ?, ?)",
                     [
                         $companyId,
                         $userId,
                         $currentYear,
-                        $appConfig['default_paid_leave'],
-                        $appConfig['default_sick_leave'],
-                        $appConfig['default_casual_leave'],
-                        $appConfig['default_wfh_days']
+                        $appConfig['default_paid_leave']
                     ]
                 );
                 error_log("Leave balance created for user ID: {$userId}");
