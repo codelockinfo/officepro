@@ -92,7 +92,7 @@ function createModal(title, content, footer, size = '') {
 }
 
 // Confirm dialog with custom styling
-function confirmDialog(message, onConfirm, onCancel, title = 'Confirm Action', icon = '<i class="fas fa-exclamation-triangle"></i>', iconColor = 'var(--warning-yellow)') {
+function confirmDialog(message, onConfirm, onCancel, title = 'Confirm Action', icon = '<i class="fas fa-exclamation-triangle"></i>', iconColor = 'var(--warning-yellow)', confirmButtonClass = 'btn-danger') {
     const content = `
         <div style="text-align: center; padding: 30px 20px;">
             <div style="font-size: 64px; margin-bottom: 20px; color: ${iconColor};">${icon}</div>
@@ -103,7 +103,7 @@ function confirmDialog(message, onConfirm, onCancel, title = 'Confirm Action', i
     
     const footer = `
         <button type="button" class="btn btn-secondary" onclick="confirmDialogCancel()">Cancel</button>
-        <button type="button" class="btn btn-danger" onclick="confirmDialogConfirm()">Confirm</button>
+        <button type="button" class="btn ${confirmButtonClass}" onclick="confirmDialogConfirm()">Confirm</button>
     `;
     
     const modalId = createModal('', content, footer, 'modal-sm');

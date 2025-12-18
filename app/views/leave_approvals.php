@@ -182,7 +182,7 @@ $allLeaves = $db->fetchAll(
                     </td>
                     <td><?php echo htmlspecialchars($leave['approved_by_name'] ?? '-'); ?></td>
                     <td>
-                        <button onclick="viewLeaveDetails(<?php echo $leave['id']; ?>)" class="btn btn-sm btn-secondary">View</button>
+                        <button onclick="viewLeaveDetails(<?php echo $leave['id']; ?>)" class="btn btn-sm btn-primary">View</button>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -308,7 +308,8 @@ $allLeaves = $db->fetchAll(
             : 'The employee will be notified of the decline.';
         
         const title = action === 'approve' ? 'Approve Leave Request' : 'Decline Leave Request';
-        const icon = action === 'approve' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>';
+        const icon = action === 'approve' ? '<i class="fas fa-check-circle" style="color: var(--success-green);"></i>' : '<i class="fas fa-times-circle" style="color: var(--danger-red);"></i>';
+        const confirmButtonClass = action === 'approve' ? 'btn-success' : 'btn-danger';
         
         confirmDialog(
             message,
@@ -317,7 +318,9 @@ $allLeaves = $db->fetchAll(
             },
             null,
             title,
-            icon
+            icon,
+            action === 'approve' ? 'var(--success-green)' : 'var(--danger-red)',
+            confirmButtonClass
         );
     }
     

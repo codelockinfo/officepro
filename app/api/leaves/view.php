@@ -22,9 +22,13 @@ $leaveId = $_GET['id'] ?? 0;
 $db = Database::getInstance();
 
 $leave = $db->fetchOne(
-    "SELECT l.*, u.full_name as approved_by_name 
+    "SELECT l.*, 
+     employee.full_name as employee_name,
+     employee.email as employee_email,
+     approver.full_name as approved_by_name 
     FROM leaves l 
-    LEFT JOIN users u ON l.approved_by = u.id 
+    LEFT JOIN users employee ON l.user_id = employee.id
+    LEFT JOIN users approver ON l.approved_by = approver.id 
     WHERE l.id = ? AND l.company_id = ?",
     [$leaveId, $companyId]
 );

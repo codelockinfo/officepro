@@ -357,74 +357,6 @@ foreach ($todayHistory as $record) {
         [$companyId]
     );
     ?>
-    <div class="card" style="margin-top: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h2 class="card-title" style="margin: 0;"><i class="fas fa-tasks"></i> Recent Tasks</h2>
-            <a href="/officepro/app/views/company/tasks.php" class="btn btn-sm btn-primary">View All</a>
-        </div>
-        <?php if (count($ownerTasks) === 0): ?>
-            <p style="text-align: center; padding: 20px; color: #666;">No tasks created yet</p>
-        <?php else: ?>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Task Name</th>
-                            <th>Description</th>
-                            <th>Assigned To</th>
-                            <th>Status</th>
-                            <th>Due Date</th>
-                            <th>Priority</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($ownerTasks as $task): ?>
-                        <tr>
-                            <td><strong><?php echo htmlspecialchars($task['title']); ?></strong></td>
-                            <td><?php echo htmlspecialchars(substr($task['description'] ?? '', 0, 30)) . (strlen($task['description'] ?? '') > 30 ? '...' : ''); ?></td>
-                            <td><?php echo htmlspecialchars($task['assigned_to_name'] ?? 'N/A'); ?></td>
-                            <td>
-                                <?php
-                                $statusColors = [
-                                    'todo' => 'badge-secondary',
-                                    'in_progress' => 'badge-warning',
-                                    'done' => 'badge-success'
-                                ];
-                                $statusLabels = [
-                                    'todo' => 'Pending',
-                                    'in_progress' => 'Processing',
-                                    'done' => 'Completed'
-                                ];
-                                ?>
-                                <span class="badge <?php echo $statusColors[$task['status']]; ?>">
-                                    <?php echo $statusLabels[$task['status']]; ?>
-                                </span>
-                            </td>
-                            <td><?php echo $task['due_date'] ? date('M d, Y', strtotime($task['due_date'])) : '-'; ?></td>
-                            <td>
-                                <?php
-                                $priorityColors = [
-                                    'low' => 'badge-info',
-                                    'medium' => 'badge-warning',
-                                    'high' => 'badge-danger'
-                                ];
-                                $priorityLabels = [
-                                    'low' => 'Low',
-                                    'medium' => 'Medium',
-                                    'high' => 'High'
-                                ];
-                                ?>
-                                <span class="badge <?php echo $priorityColors[$task['priority']] ?? 'badge-secondary'; ?>">
-                                    <?php echo $priorityLabels[$task['priority']] ?? ucfirst($task['priority']); ?>
-                                </span>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php endif; ?>
-    </div>
     <?php endif; ?>
     
     <!-- Quick Actions -->
@@ -533,7 +465,7 @@ foreach ($todayHistory as $record) {
         // Custom checkout confirmation modal
         const modalContent = `
             <div style="text-align: center; padding: 30px 20px;">
-                <div style="font-size: 64px; margin-bottom: 20px; color: var(--primary-blue);"><i class="fas fa-clock"></i></div>
+                <div style="font-size: 64px; margin-bottom: 20px; color: var(--danger-red);"><i class="fas fa-clock"></i></div>
                 <h3 style="color: #333; margin-bottom: 15px;">Confirm Check Out</h3>
                 <p style="color: #666; font-size: 16px;">Are you sure you want to check out?</p>
                 <p style="color: #999; font-size: 14px; margin-top: 10px;">Your work hours will be calculated.</p>

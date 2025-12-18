@@ -32,9 +32,9 @@ $allTasks = $db->fetchAll(
     [$companyId]
 );
 
-// Get employees for assignment
+// Get employees for assignment (exclude company owners)
 $employees = $db->fetchAll(
-    "SELECT id, full_name, email FROM users WHERE company_id = ? AND status = 'active' ORDER BY full_name",
+    "SELECT id, full_name, email FROM users WHERE company_id = ? AND status = 'active' AND role != 'company_owner' ORDER BY full_name",
     [$companyId]
 );
 ?>

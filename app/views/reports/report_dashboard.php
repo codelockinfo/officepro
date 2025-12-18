@@ -50,12 +50,12 @@ $lateArrivals = $db->fetchOne(
     [$companyId, $currentMonth]
 );
 
-// Top overtime employees this month
+// Top overtime employees this month (exclude company owners)
 $topOvertime = $db->fetchAll(
     "SELECT u.full_name, SUM(a.overtime_hours) as total_overtime 
     FROM attendance a 
     JOIN users u ON a.user_id = u.id 
-    WHERE a.company_id = ? AND DATE_FORMAT(a.date, '%Y-%m') = ? 
+    WHERE a.company_id = ? AND DATE_FORMAT(a.date, '%Y-%m') = ? AND u.role != 'company_owner'
     GROUP BY a.user_id, u.full_name 
     HAVING total_overtime > 0 
     ORDER BY total_overtime DESC 
@@ -63,9 +63,9 @@ $topOvertime = $db->fetchAll(
     [$companyId, $currentMonth]
 );
 
-// Total employees
+// Total employees (exclude company owners)
 $totalEmployees = $db->fetchOne(
-    "SELECT COUNT(*) as count FROM users WHERE company_id = ? AND status = 'active'",
+    "SELECT COUNT(*) as count FROM users WHERE company_id = ? AND status = 'active' AND role != 'company_owner'",
     [$companyId]
 );
 ?>
@@ -155,7 +155,7 @@ $totalEmployees = $db->fetchOne(
                     <option value="">All Employees</option>
                     <?php
                     $employees = $db->fetchAll(
-                        "SELECT id, full_name FROM users WHERE company_id = ? AND status = 'active' ORDER BY full_name",
+                        "SELECT id, full_name FROM users WHERE company_id = ? AND status = 'active' AND role != 'company_owner' ORDER BY full_name",
                         [$companyId]
                     );
                     foreach ($employees as $emp) {

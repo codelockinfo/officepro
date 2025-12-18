@@ -355,3 +355,61 @@ Stack trace:
 [18-Dec-2025 17:43:21 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_6943e230a6718_1766056496.png
 [18-Dec-2025 17:44:59 Asia/Kolkata] Company Settings - Company ID: 29, Logo from DB: uploads/logos/logo_6943e230a6718_1766056496.png
 [18-Dec-2025 17:44:59 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 18:38:40 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\New xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 18:38:50 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\New xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 18:40:29 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\New xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 18:46:13 Asia/Kolkata] Company Settings - Company ID: 29, Logo from DB: uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 18:46:13 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 18:47:19 Asia/Kolkata] Company Settings - Company ID: 29, Logo from DB: uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 18:47:19 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 18:49:50 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\New xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 18:50:05 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\New xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 18:50:08 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\New xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 18:52:15 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\New xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 18:52:27 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\New xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 18:52:27 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\New xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 18:52:37 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\New xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 18:54:23 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\New xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 18:55:42 Asia/Kolkata] Company Settings - Company ID: 29, Logo from DB: uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 18:55:42 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 18:55:57 Asia/Kolkata] Company Settings - Company ID: 29, Logo from DB: uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 18:55:57 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 18:55:57 Asia/Kolkata] Company Settings - Company ID: 29, Logo from DB: uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 18:55:57 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 19:05:23 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\New xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76

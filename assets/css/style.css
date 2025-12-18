@@ -537,8 +537,8 @@ a:hover {
     color: white;
 }
 .btn-success:hover {
-    background: #ffffff;
-    color: var(--success-green);
+    /* background: #ffffff; */
+    /* color: var(--success-green); */
 }
 
 /* Blob Button Effect for .btn-secondary
