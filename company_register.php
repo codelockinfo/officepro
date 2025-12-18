@@ -536,33 +536,131 @@ if (isset($_SESSION['user_id'])) {
             
             // Combine country code and phone number
             const countryCode = document.getElementById('country_code').value;
-            const phoneNumber = document.getElementById('phone').value;
+            const phoneNumber = document.getElementById('phone').value.trim();
+            
+            // Remove existing phone entry if any
+            formData.delete('phone');
             
             if (phoneNumber) {
-                formData.set('phone', countryCode + ' ' + phoneNumber);
+                // Combine country code and phone number with space
+                formData.append('phone', countryCode + ' ' + phoneNumber);
+            }
+            
+            // Validate required fields
+            const requiredFields = ['company_name', 'company_email', 'full_name', 'email', 'password', 'confirm_password'];
+            let isValid = true;
+            let missingField = '';
+            
+            requiredFields.forEach(field => {
+                const input = document.getElementById(field);
+                if (input && !input.value.trim()) {
+                    isValid = false;
+                    missingField = field;
+                    input.style.borderColor = '#dc3545';
+                } else if (input) {
+                    input.style.borderColor = '';
+                }
+            });
+            
+            // Check password match
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            if (password !== confirmPassword) {
+                showMessage('error', 'Passwords do not match');
+                document.getElementById('confirm_password').style.borderColor = '#dc3545';
+                return;
+            }
+            
+            // Check profile image
+            const profileImage = document.getElementById('profile_image');
+            if (!profileImage.files || !profileImage.files[0]) {
+                showMessage('error', 'Please upload a profile photo');
+                return;
+            }
+            
+            if (!isValid) {
+                showMessage('error', 'Please fill in all required fields');
+                return;
             }
             
             showLoader();
             
-            fetch('/officepro/app/api/auth/register_company.php', {
+            console.log('Submitting registration form...');
+            
+            // Log form data for debugging
+            console.log('Form Data:');
+            for (let [key, value] of formData.entries()) {
+                if (key === 'password' || key === 'confirm_password') {
+                    console.log(key + ': [HIDDEN]');
+                } else if (value instanceof File) {
+                    console.log(key + ': File - ' + value.name + ' (' + value.size + ' bytes)');
+                } else {
+                    console.log(key + ': ' + value);
+                }
+            }
+            
+            fetch('app/api/auth/register_company.php', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(async response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                // Check if response is ok
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('HTTP error:', response.status, errorText);
+                    throw new Error('HTTP error: ' + response.status + ' - ' + errorText);
+                }
+                
+                // Check content type
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const text = await response.text();
+                    console.error('Invalid JSON response:', text);
+                    throw new Error('Invalid response format: ' + text.substring(0, 100));
+                }
+                
+                return response.json();
+            })
             .then(data => {
                 hideLoader();
+                console.log('Registration response:', data);
+                
                 if (data.success) {
                     showMessage('success', 'Company registered successfully! Redirecting...');
                     setTimeout(() => {
-                        window.location.href = '/officepro/app/views/dashboard.php';
+                        window.location.href = 'app/views/dashboard.php';
                     }, 1500);
                 } else {
-                    showMessage('error', data.message || 'Registration failed');
+                    const errorMsg = data.message || 'Registration failed';
+                    const errors = data.errors ? ' Errors: ' + JSON.stringify(data.errors) : '';
+                    const errorDetails = data.error_details ? ' Details: ' + data.error_details : '';
+                    const errorType = data.error_type ? ' Type: ' + data.error_type : '';
+                    
+                    console.error('Registration failed:', {
+                        message: errorMsg,
+                        errors: data.errors,
+                        error_details: data.error_details,
+                        error_type: data.error_type,
+                        full_response: data
+                    });
+                    
+                    // Show user-friendly error message
+                    let displayMessage = errorMsg;
+                    if (errors) displayMessage += errors;
+                    if (errorDetails && !errorMsg.includes('Database error')) {
+                        displayMessage += errorDetails;
+                    }
+                    
+                    showMessage('error', displayMessage);
                 }
             })
             .catch(error => {
                 hideLoader();
-                showMessage('error', 'An error occurred. Please try again.');
+                console.error('Registration error:', error);
+                showMessage('error', 'An error occurred: ' + error.message + '. Please check the console for details.');
             });
         }
         

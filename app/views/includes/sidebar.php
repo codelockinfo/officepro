@@ -53,7 +53,7 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
         
         <?php if (in_array($currentRole, ['manager', 'company_owner'])): ?>
         <a href="/officepro/app/views/reports/report_dashboard.php" class="nav-item <?php echo $currentPage === 'report_dashboard' && strpos($_SERVER['PHP_SELF'], 'reports') !== false ? 'active' : ''; ?>">
-            <i class="fas fa-chart-bar icon-reports"></i> Reports
+            <i class="fas fa-chart-line icon-reports"></i> Reports
         </a>
         <?php endif; ?>
         
@@ -74,6 +74,10 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
         
         <a href="/officepro/app/views/company/invitations.php" class="nav-item <?php echo $currentPage === 'invitations' ? 'active' : ''; ?>">
             <i class="fas fa-envelope icon-invitations"></i> Invitations
+        </a>
+        
+        <a href="/officepro/app/views/company/tasks.php" class="nav-item <?php echo $currentPage === 'tasks' && strpos($_SERVER['PHP_SELF'], 'company') !== false ? 'active' : ''; ?>">
+            <i class="fas fa-tasks icon-tasks"></i> Task Management
         </a>
         <?php endif; ?>
         

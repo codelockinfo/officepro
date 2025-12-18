@@ -310,6 +310,7 @@ if ($nextMonth > 12) {
             align-items: center;
             gap: 4px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            width: fit-content;
         }
         .day-event i {
             font-size: 10px;

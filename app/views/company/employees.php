@@ -26,7 +26,7 @@ $employees = $db->fetchAll(
 );
 ?>
 
-<h1>👥 Employees</h1>
+<h1><i class="fas fa-users icon-employees"></i> Employees</h1>
 
 <div class="card" style="margin-top: 20px;">
     <div style="padding: 20px; border-bottom: 1px solid #ddd; display: flex; gap: 20px;">
@@ -81,7 +81,7 @@ $employees = $db->fetchAll(
                 <td>
                     <button onclick="viewEmployee(<?php echo $emp['id']; ?>)" class="btn btn-sm btn-primary">View</button>
                     <?php if (Auth::hasRole(['company_owner'])): ?>
-                        <button onclick="editEmployee(<?php echo $emp['id']; ?>)" class="btn btn-sm btn-secondary">Edit</button>
+                        <button onclick="editEmployee(<?php echo $emp['id']; ?>)" class="btn btn-sm btn-primary">Edit</button>
                     <?php endif; ?>
                 </td>
             </tr>

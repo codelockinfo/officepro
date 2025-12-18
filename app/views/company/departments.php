@@ -28,7 +28,7 @@ $departments = $db->fetchAll(
 ?>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <h1>🏢 Departments</h1>
+    <h1><i class="fas fa-building icon-departments"></i> Departments</h1>
     <button onclick="openAddDepartmentModal()" class="btn btn-primary custom-btn-primary">+ Add Department</button>
 </div>
 
@@ -56,7 +56,7 @@ $departments = $db->fetchAll(
                     <td><?php echo $dept['employee_count']; ?> employees</td>
                     <td><?php echo date('M d, Y', strtotime($dept['created_at'])); ?></td>
                     <td>
-                        <button onclick="editDepartment(<?php echo $dept['id']; ?>)" class="btn btn-sm btn-secondary">Edit</button>
+                        <button onclick="editDepartment(<?php echo $dept['id']; ?>)" class="btn btn-sm btn-primary">Edit</button>
                         <button onclick="deleteDepartment(<?php echo $dept['id']; ?>)" class="btn btn-sm btn-danger">Delete</button>
                     </td>
                 </tr>
@@ -136,7 +136,8 @@ $departments = $db->fetchAll(
             },
             null,
             'Delete Department',
-            '🏢'
+            '<i class="fas fa-trash-alt"></i>',
+            'var(--danger-red) !important'
         );
     }
 </script>

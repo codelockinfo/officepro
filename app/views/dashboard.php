@@ -254,6 +254,71 @@ foreach ($todayHistory as $record) {
             </div>
         </div>
     </div>
+    
+    <!-- Tasks Section for Employee -->
+    <?php
+    $employeeTasks = $db->fetchAll(
+        "SELECT t.*, creator.full_name as created_by_name
+         FROM tasks t
+         LEFT JOIN users creator ON t.created_by = creator.id
+         WHERE t.company_id = ? AND t.assigned_to = ?
+         ORDER BY 
+            CASE 
+                WHEN t.status = 'todo' THEN 1
+                WHEN t.status = 'in_progress' THEN 2
+                WHEN t.status = 'done' THEN 3
+            END,
+            t.created_at DESC
+         LIMIT 5",
+        [$companyId, $userId]
+    );
+    ?>
+    <div class="card" style="margin-top: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2 class="card-title" style="margin: 0;"><i class="fas fa-tasks"></i> My Tasks</h2>
+            <a href="/officepro/app/views/employee/tasks.php" class="btn btn-sm btn-primary">View All</a>
+        </div>
+        <?php if (count($employeeTasks) === 0): ?>
+            <p style="text-align: center; padding: 20px; color: #666;">No tasks assigned to you</p>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Task Name</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($employeeTasks as $task): ?>
+                        <tr>
+                            <td><strong><?php echo htmlspecialchars($task['title']); ?></strong></td>
+                            <td><?php echo htmlspecialchars(substr($task['description'] ?? '', 0, 40)) . (strlen($task['description'] ?? '') > 40 ? '...' : ''); ?></td>
+                            <td>
+                                <?php
+                                $statusColors = [
+                                    'todo' => 'badge-secondary',
+                                    'in_progress' => 'badge-warning',
+                                    'done' => 'badge-success'
+                                ];
+                                $statusLabels = [
+                                    'todo' => 'Pending',
+                                    'in_progress' => 'Processing',
+                                    'done' => 'Completed'
+                                ];
+                                ?>
+                                <span class="badge <?php echo $statusColors[$task['status']]; ?>">
+                                    <?php echo $statusLabels[$task['status']]; ?>
+                                </span>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
     <?php else: ?>
     <!-- Company Overview for Owner -->
     <div class="card">
@@ -318,6 +383,77 @@ foreach ($todayHistory as $record) {
                 <span style="float: right; color:rgb(236, 9, 32); font-weight: bold;"><?php echo $onLeaveToday['count']; ?></span>
             </div>
         </div>
+    </div>
+    
+    <!-- Tasks Section for Owner -->
+    <?php
+    $ownerTasks = $db->fetchAll(
+        "SELECT t.*, assignee.full_name as assigned_to_name
+         FROM tasks t
+         LEFT JOIN users assignee ON t.assigned_to = assignee.id
+         WHERE t.company_id = ?
+         ORDER BY 
+            CASE 
+                WHEN t.status = 'todo' THEN 1
+                WHEN t.status = 'in_progress' THEN 2
+                WHEN t.status = 'done' THEN 3
+            END,
+            t.created_at DESC
+         LIMIT 5",
+        [$companyId]
+    );
+    ?>
+    <div class="card" style="margin-top: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2 class="card-title" style="margin: 0;"><i class="fas fa-tasks"></i> Recent Tasks</h2>
+            <a href="/officepro/app/views/company/tasks.php" class="btn btn-sm btn-primary">View All</a>
+        </div>
+        <?php if (count($ownerTasks) === 0): ?>
+            <p style="text-align: center; padding: 20px; color: #666;">No tasks created yet</p>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Task Name</th>
+                            <th>Description</th>
+                            <th>Assigned To</th>
+                            <th>Status</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($ownerTasks as $task): ?>
+                        <tr>
+                            <td><strong><?php echo htmlspecialchars($task['title']); ?></strong></td>
+                            <td><?php echo htmlspecialchars(substr($task['description'] ?? '', 0, 30)) . (strlen($task['description'] ?? '') > 30 ? '...' : ''); ?></td>
+                            <td><?php echo htmlspecialchars($task['assigned_to_name'] ?? 'N/A'); ?></td>
+                            <td>
+                                <?php
+                                $statusColors = [
+                                    'todo' => 'badge-secondary',
+                                    'in_progress' => 'badge-warning',
+                                    'done' => 'badge-success'
+                                ];
+                                $statusLabels = [
+                                    'todo' => 'Pending',
+                                    'in_progress' => 'Processing',
+                                    'done' => 'Completed'
+                                ];
+                                ?>
+                                <span class="badge <?php echo $statusColors[$task['status']]; ?>">
+                                    <?php echo $statusLabels[$task['status']]; ?>
+                                </span>
+                            </td>
+                            <td><?php echo $task['start_time'] ? date('M d, Y H:i', strtotime($task['start_time'])) : '-'; ?></td>
+                            <td><?php echo $task['end_time'] ? date('M d, Y H:i', strtotime($task['end_time'])) : '-'; ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
     </div>
     <?php endif; ?>
     

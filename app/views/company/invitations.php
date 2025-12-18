@@ -61,7 +61,7 @@ $invitations = Invitation::getCompanyInvitations($companyId);
                     </td>
                     <td>
                         <?php if ($inv['status'] === 'pending'): ?>
-                            <button onclick="copyInviteLink('<?php echo htmlspecialchars($inv['token']); ?>')" class="btn btn-sm btn-secondary">Copy Link</button>
+                            <button onclick="copyInviteLink('<?php echo htmlspecialchars($inv['token']); ?>')" class="btn btn-sm btn-primary">Copy Link</button>
                             <button onclick="resendInvite(<?php echo $inv['id']; ?>)" class="btn btn-sm btn-primary">Resend</button>
                             <button onclick="cancelInvite(<?php echo $inv['id']; ?>)" class="btn btn-sm btn-danger">Cancel</button>
                         <?php endif; ?>

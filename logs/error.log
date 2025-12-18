@@ -327,3 +327,23 @@ Stack trace:
 Stack trace:
 #0 {main}
   thrown in C:\xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 16:29:13 Asia/Kolkata] Company Settings - Company ID: 29, Logo from DB: NULL
+[18-Dec-2025 16:29:13 Asia/Kolkata] Company Settings - Logo check: hasLogo=false, logo=NULL
+[18-Dec-2025 16:32:37 Asia/Kolkata] Company Settings - Company ID: 29, Logo from DB: NULL
+[18-Dec-2025 16:32:37 Asia/Kolkata] Company Settings - Logo check: hasLogo=false, logo=NULL
+[18-Dec-2025 16:44:02 Asia/Kolkata] Company Settings - Company ID: 29, Logo from DB: NULL
+[18-Dec-2025 16:44:02 Asia/Kolkata] Company Settings - Logo check: hasLogo=false, logo=NULL
+[18-Dec-2025 16:44:57 Asia/Kolkata] Company Settings - Company ID: 29, Logo from DB: uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 16:44:57 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 16:44:57 Asia/Kolkata] Company Settings - Company ID: 29, Logo from DB: uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 16:44:57 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 16:59:54 Asia/Kolkata] Company Settings - Company ID: 29, Logo from DB: uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 16:59:54 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_6943e230a6718_1766056496.png
+[18-Dec-2025 17:07:10 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\New xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 17:15:05 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\New xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76

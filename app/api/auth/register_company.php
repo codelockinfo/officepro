@@ -3,8 +3,19 @@
  * Company Registration API Endpoint
  */
 
+// Enable error reporting for debugging (remove in production)
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
 session_start();
 header('Content-Type: application/json');
+
+// Log the request
+error_log("Company Registration API - Request received");
+error_log("Company Registration API - Method: " . $_SERVER['REQUEST_METHOD']);
+error_log("Company Registration API - POST data: " . print_r($_POST, true));
+error_log("Company Registration API - FILES data: " . print_r($_FILES, true));
 
 require_once __DIR__ . '/../../helpers/Database.php';
 require_once __DIR__ . '/../../helpers/Auth.php';
@@ -12,7 +23,8 @@ require_once __DIR__ . '/../../helpers/Validator.php';
 require_once __DIR__ . '/../../helpers/Email.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+    error_log("Company Registration API - Invalid request method: " . $_SERVER['REQUEST_METHOD']);
+    echo json_encode(['success' => false, 'message' => 'Invalid request method. Expected POST.']);
     exit;
 }
 
@@ -113,31 +125,56 @@ if ($validator->hasErrors()) {
 }
 
 // Register company
-$result = Auth::registerCompany($companyData, $ownerData);
-
-if ($result['success']) {
-    // Send welcome email
-    Email::sendCompanyWelcome($ownerData['email'], $ownerData['full_name'], $companyData['company_name']);
+try {
+    $result = Auth::registerCompany($companyData, $ownerData);
     
-    // Auto-login - this sets the session including profile_image
-    $loginResult = Auth::login($ownerData['email'], $ownerData['password']);
-    
-    if ($loginResult['success']) {
-        error_log("Company registered and owner logged in. Profile image: " . $_SESSION['profile_image']);
-        echo json_encode([
-            'success' => true,
-            'message' => 'Company registered successfully',
-            'session_data' => [
-                'user_id' => $_SESSION['user_id'],
-                'profile_image' => $_SESSION['profile_image'],
-                'company_name' => $_SESSION['company_name']
-            ]
-        ]);
+    if ($result['success']) {
+        // Send welcome email (don't fail registration if email fails)
+        try {
+            Email::sendCompanyWelcome($ownerData['email'], $ownerData['full_name'], $companyData['company_name']);
+        } catch (Exception $e) {
+            error_log("Company Registration - Email send failed: " . $e->getMessage());
+            // Continue with registration even if email fails
+        }
+        
+        // Auto-login - this sets the session including profile_image
+        $loginResult = Auth::login($ownerData['email'], $ownerData['password']);
+        
+        if ($loginResult['success']) {
+            error_log("Company registered and owner logged in. Profile image: " . ($_SESSION['profile_image'] ?? 'not set'));
+            echo json_encode([
+                'success' => true,
+                'message' => 'Company registered successfully',
+                'session_data' => [
+                    'user_id' => $_SESSION['user_id'],
+                    'profile_image' => $_SESSION['profile_image'] ?? null,
+                    'company_name' => $_SESSION['company_name'] ?? null
+                ]
+            ]);
+        } else {
+            error_log("Company Registration - Login failed after registration: " . ($loginResult['message'] ?? 'Unknown error'));
+            echo json_encode([
+                'success' => true, 
+                'message' => 'Company registered successfully but login failed. Please login manually.',
+                'login_error' => $loginResult['message'] ?? 'Unknown error'
+            ]);
+        }
     } else {
-        echo json_encode(['success' => true, 'message' => 'Company registered but login failed. Please login manually.']);
+        error_log("Company Registration - Registration failed: " . ($result['message'] ?? 'Unknown error'));
+        echo json_encode([
+            'success' => false,
+            'message' => $result['message'] ?? 'Registration failed',
+            'errors' => $result['errors'] ?? []
+        ]);
     }
-} else {
-    echo json_encode($result);
+} catch (Exception $e) {
+    error_log("Company Registration - Exception: " . $e->getMessage());
+    error_log("Company Registration - Stack trace: " . $e->getTraceAsString());
+    echo json_encode([
+        'success' => false,
+        'message' => 'Registration failed: ' . $e->getMessage(),
+        'error_type' => get_class($e)
+    ]);
 }
 
 

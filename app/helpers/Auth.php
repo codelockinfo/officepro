@@ -85,7 +85,27 @@ class Auth {
         } catch (Exception $e) {
             $db->rollBack();
             error_log("Company Registration Error: " . $e->getMessage());
-            return ['success' => false, 'message' => 'Registration failed'];
+            error_log("Company Registration Stack Trace: " . $e->getTraceAsString());
+            
+            // Return more detailed error message
+            $errorMessage = 'Registration failed';
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                if (strpos($e->getMessage(), 'email') !== false) {
+                    $errorMessage = 'Email address already exists. Please use a different email.';
+                } elseif (strpos($e->getMessage(), 'company_email') !== false) {
+                    $errorMessage = 'Company email already exists. Please use a different company email.';
+                } else {
+                    $errorMessage = 'A record with this information already exists.';
+                }
+            } elseif (strpos($e->getMessage(), 'SQLSTATE') !== false) {
+                $errorMessage = 'Database error occurred. Please try again or contact support.';
+            }
+            
+            return [
+                'success' => false, 
+                'message' => $errorMessage,
+                'error_details' => $e->getMessage()
+            ];
         }
     }
     

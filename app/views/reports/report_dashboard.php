@@ -70,7 +70,7 @@ $totalEmployees = $db->fetchOne(
 );
 ?>
 
-<h1>📈 Reports Dashboard</h1>
+<h1><i class="fas fa-chart-line"></i> Reports Dashboard</h1>
 
 <!-- KPI Cards -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0;">
@@ -167,8 +167,8 @@ $totalEmployees = $db->fetchOne(
             
             <div style="display: flex; gap: 10px;">
                 <button type="button" onclick="generateReport('view')" class="btn btn-primary custom-btn-primary">View Report</button>
-                <button type="button" onclick="generateReport('csv')" class="btn btn-secondary">Export CSV</button>
-                <button type="button" onclick="generateReport('pdf')" class="btn btn-secondary">Export PDF</button>
+                <button type="button" onclick="generateReport('csv')" class="btn btn-secondary custom-btn-secondary">Export CSV</button>
+                <button type="button" onclick="generateReport('pdf')" class="btn btn-secondary custom-btn-secondary">Export PDF</button>
             </div>
         </form>
         
