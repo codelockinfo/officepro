@@ -64,10 +64,10 @@ $employees = $db->fetchAll(
             
             <!-- Profile Picture -->
             <div style="text-align: center; margin-top: 10px; margin-bottom: 15px;">
-                <img src="/public_html/<?php echo htmlspecialchars($emp['profile_image']); ?>" 
+                <img src="/officepro/<?php echo htmlspecialchars($emp['profile_image']); ?>" 
                      alt="Profile" 
                      style="width: 100px; height: 100px; border-radius: 12px; object-fit: cover; border: 2px solid #e0e0e0;"
-                     onerror="this.src='/public_html/assets/images/default-avatar.png'">
+                     onerror="this.src='/officepro/assets/images/default-avatar.png'">
             </div>
             
             <!-- Name -->
@@ -161,7 +161,7 @@ $employees = $db->fetchAll(
     
     function viewEmployee(id) {
         // Find employee data from table
-        ajaxRequest(`/public_html/app/api/company/employee_details.php?id=${id}`, 'GET', null, (response) => {
+        ajaxRequest(`/officepro/app/api/company/employee_details.php?id=${id}`, 'GET', null, (response) => {
             if (response.success) {
                 const emp = response.data;
                 
@@ -180,10 +180,10 @@ $employees = $db->fetchAll(
                 const content = `
                     <div style="padding: 20px;">
                         <div style="text-align: center; margin-bottom: 20px;">
-                            <img src="/public_html/${emp.profile_image}" 
+                            <img src="/officepro/${emp.profile_image}" 
                                  alt="Profile" 
                                  style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-blue);"
-                                 onerror="this.src='/public_html/assets/images/default-avatar.png'">
+                                 onerror="this.src='/officepro/assets/images/default-avatar.png'">
                         </div>
                         
                         <table style="width: 100%; border-collapse: collapse;">
@@ -259,7 +259,7 @@ $employees = $db->fetchAll(
     
     function editEmployee(id) {
         // Fetch employee details
-        ajaxRequest(`/public_html/app/api/company/employee_details.php?id=${id}`, 'GET', null, (response) => {
+        ajaxRequest(`/officepro/app/api/company/employee_details.php?id=${id}`, 'GET', null, (response) => {
             if (response.success) {
                 const emp = response.data;
                 
@@ -311,7 +311,7 @@ $employees = $db->fetchAll(
         const formData = new FormData(event.target);
         const data = Object.fromEntries(formData);
         
-        ajaxRequest(`/public_html/app/api/company/employees.php?action=update&id=${id}`, 'POST', data, (response) => {
+        ajaxRequest(`/officepro/app/api/company/employees.php?action=update&id=${id}`, 'POST', data, (response) => {
             if (response.success) {
                 showMessage('success', 'Employee updated successfully!');
                 closeModal(document.querySelector('.modal-overlay.active').id);

@@ -12,13 +12,13 @@ if (!defined('HEADER_LOADED')) {
     
     // Check if user is logged in
     if (!Auth::isLoggedIn()) {
-        header('Location: /public_html/login.php');
+        header('Location: /officepro/login.php');
         exit;
     }
     
     $currentUser = Auth::getCurrentUser();
     if (!$currentUser || !isset($currentUser['id'])) {
-        header('Location: /public_html/login.php');
+        header('Location: /officepro/login.php');
         exit;
     }
 }
@@ -49,8 +49,8 @@ if (empty($profileImage) || trim($profileImage) === '') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $pageTitle ?? 'Dashboard'; ?> - OfficePro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/public_html/assets/css/style.css">
-    <link rel="stylesheet" href="/public_html/assets/css/modal.css">
+    <link rel="stylesheet" href="/officepro/assets/css/style.css">
+    <link rel="stylesheet" href="/officepro/assets/css/modal.css">
 </head>
 <body>
     <!-- SVG Filter for Blob Button Gooey Effect -->
@@ -71,7 +71,7 @@ if (empty($profileImage) || trim($profileImage) === '') {
                 <div class="header-left">
                     <button id="sidebar-toggle" class="btn btn-secondary" style="display: none;"><i class="fas fa-bars"></i></button>
                     <?php if ($companyLogo && !empty(trim($companyLogo))): ?>
-                        <img src="/public_html/<?php echo htmlspecialchars($companyLogo); ?>" 
+                        <img src="/officepro/<?php echo htmlspecialchars($companyLogo); ?>" 
                              alt="Company Logo" 
                              class="company-logo" 
                              loading="lazy"
@@ -99,10 +99,10 @@ if (empty($profileImage) || trim($profileImage) === '') {
                     </div>
                     
                     <div class="user-profile" onclick="toggleUserMenu()">
-                        <img src="/public_html/<?php echo htmlspecialchars($profileImage); ?>" 
+                        <img src="/officepro/<?php echo htmlspecialchars($profileImage); ?>" 
                              alt="Profile" 
                              class="user-avatar"
-                             onerror="this.onerror=null; this.src='/public_html/assets/images/default-avatar.png'"
+                             onerror="this.onerror=null; this.src='/officepro/assets/images/default-avatar.png'"
                              loading="lazy">
                         <span class="user-name"><?php echo htmlspecialchars($currentUser['full_name']); ?></span>
                         <i class="fas fa-chevron-down"></i>
@@ -113,7 +113,7 @@ if (empty($profileImage) || trim($profileImage) === '') {
                             <strong><?php echo htmlspecialchars($currentUser['full_name']); ?></strong><br>
                             <small><?php echo htmlspecialchars($currentUser['role']); ?></small>
                         </div>
-                        <a href="/public_html/app/views/profile.php" style="display: block; padding: 10px; color: #333;">My Profile</a>
+                        <a href="/officepro/app/views/profile.php" style="display: block; padding: 10px; color: #333;">My Profile</a>
                         <a href="#" onclick="logout()" style="display: block; padding: 10px; color: #dc3545;">Logout</a>
                     </div>
                 </div>

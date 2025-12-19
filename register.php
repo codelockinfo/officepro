@@ -465,7 +465,7 @@ if ($token) {
             
             showLoader();
             
-            fetch('/public_html/app/api/auth/register.php', {
+            fetch('/officepro/app/api/auth/register.php', {
                 method: 'POST',
                 body: formData
             })
@@ -484,7 +484,7 @@ if ($token) {
                 if (data.success) {
                     showMessage('success', 'Registration successful! Redirecting...');
                     setTimeout(() => {
-                        window.location.href = '/public_html/app/views/dashboard.php';
+                        window.location.href = '/officepro/app/views/dashboard.php';
                     }, 1500);
                 } else {
                     const errorMsg = data.message || 'Registration failed';

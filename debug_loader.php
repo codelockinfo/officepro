@@ -111,7 +111,7 @@
             const resultDiv = document.getElementById('ajax-result');
             resultDiv.innerHTML = '<div class="status info">Testing AJAX...</div>';
             
-            ajaxRequest('/public_html/app/api/attendance/status.php', 'GET', null, 
+            ajaxRequest('/officepro/app/api/attendance/status.php', 'GET', null, 
                 (response) => {
                     resultDiv.innerHTML = '<div class="status success">AJAX Success: ' + JSON.stringify(response) + '</div>';
                 },

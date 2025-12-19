@@ -211,7 +211,7 @@ $completedTasks = array_filter($allTasks, function($task) {
     }
     
     function changeTaskStatus(id, status) {
-        ajaxRequest(`/public_html/app/api/employee/tasks.php?action=update_status&id=${id}`, 'POST', { status }, (response) => {
+        ajaxRequest(`/officepro/app/api/employee/tasks.php?action=update_status&id=${id}`, 'POST', { status }, (response) => {
             if (response.success) {
                 showMessage('success', 'Task status updated!');
                 setTimeout(() => location.reload(), 1000);

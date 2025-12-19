@@ -63,7 +63,7 @@ $users = $db->fetchAll(
             <tr class="user-row" data-company="<?php echo $user['company_id']; ?>" data-role="<?php echo $user['role']; ?>">
                 <td>
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <img src="/public_html/<?php echo htmlspecialchars($user['profile_image']); ?>" 
+                        <img src="/officepro/<?php echo htmlspecialchars($user['profile_image']); ?>" 
                              alt="Profile" 
                              style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                         <strong><?php echo htmlspecialchars($user['full_name']); ?></strong>
@@ -127,7 +127,7 @@ $users = $db->fetchAll(
     
     function viewUser(id) {
         // Get user details
-        ajaxRequest(`/public_html/app/api/system_admin/user_details.php?id=${id}`, 'GET', null, (response) => {
+        ajaxRequest(`/officepro/app/api/system_admin/user_details.php?id=${id}`, 'GET', null, (response) => {
             if (response.success) {
                 const user = response.data;
                 
@@ -147,10 +147,10 @@ $users = $db->fetchAll(
                 const content = `
                     <div style="padding: 20px;">
                         <div style="text-align: center; margin-bottom: 20px;">
-                            <img src="/public_html/${user.profile_image}" 
+                            <img src="/officepro/${user.profile_image}" 
                                  alt="Profile" 
                                  style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-blue);"
-                                 onerror="this.src='/public_html/assets/images/default-avatar.png'">
+                                 onerror="this.src='/officepro/assets/images/default-avatar.png'">
                         </div>
                         
                         <table style="width: 100%; border-collapse: collapse;">

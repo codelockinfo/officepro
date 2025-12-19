@@ -120,7 +120,7 @@ $invitations = Invitation::getCompanyInvitations($companyId);
         const formData = new FormData(event.target);
         const data = Object.fromEntries(formData);
         
-        ajaxRequest('/public_html/app/api/company/invite.php', 'POST', data, (response) => {
+        ajaxRequest('/officepro/app/api/company/invite.php', 'POST', data, (response) => {
             if (response.success) {
                 showMessage('success', 'Invitation sent successfully!');
                 closeModal('invite-modal');
@@ -141,7 +141,7 @@ $invitations = Invitation::getCompanyInvitations($companyId);
     }
     
     function resendInvite(id) {
-        ajaxRequest(`/public_html/app/api/company/invitations.php?action=resend&id=${id}`, 'POST', null, (response) => {
+        ajaxRequest(`/officepro/app/api/company/invitations.php?action=resend&id=${id}`, 'POST', null, (response) => {
             if (response.success) {
                 showMessage('success', 'Invitation resent successfully!');
                 setTimeout(() => location.reload(), 1000);
@@ -155,7 +155,7 @@ $invitations = Invitation::getCompanyInvitations($companyId);
         confirmDialog(
             'The employee will no longer be able to use this invitation link.',
             () => {
-                ajaxRequest(`/public_html/app/api/company/invitations.php?action=cancel&id=${id}`, 'POST', null, (response) => {
+                ajaxRequest(`/officepro/app/api/company/invitations.php?action=cancel&id=${id}`, 'POST', null, (response) => {
                     if (response.success) {
                         showMessage('success', 'Invitation cancelled');
                         setTimeout(() => location.reload(), 1000);

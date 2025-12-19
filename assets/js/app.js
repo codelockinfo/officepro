@@ -273,7 +273,7 @@ function backgroundFetch(url, callback, errorCallback) {
 
 // Poll attendance status (for timer persistence) - no loader
 function pollAttendanceStatus() {
-    backgroundFetch('/public_html/app/api/attendance/status.php', (response) => {
+    backgroundFetch('/officepro/app/api/attendance/status.php', (response) => {
         if (response.success && response.data.status === 'in') {
             if (!timerInterval) {
                 console.log('Poll: Starting timer with:', response.data.check_in_time);
@@ -289,7 +289,7 @@ function pollAttendanceStatus() {
 
 // Notification polling - no loader
 function fetchNotifications() {
-    backgroundFetch('/public_html/app/api/notifications/fetch.php', (response) => {
+    backgroundFetch('/officepro/app/api/notifications/fetch.php', (response) => {
         if (response.success) {
             updateNotificationBadge(response.data.unread_count);
             displayNotificationList(response.data.notifications);
@@ -352,7 +352,7 @@ function displayNotificationList(notifications) {
 }
 
 function markNotificationAsRead(notificationId) {
-    ajaxRequest('/public_html/app/api/notifications/mark_read.php', 'POST', { id: notificationId }, () => {
+    ajaxRequest('/officepro/app/api/notifications/mark_read.php', 'POST', { id: notificationId }, () => {
         fetchNotifications();
     });
 }

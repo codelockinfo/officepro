@@ -216,7 +216,7 @@ $totalEmployees = $db->fetchOne(
         });
         
         if (format === 'view') {
-            ajaxRequest(`/public_html/app/api/reports/attendance.php?${params}`, 'GET', null, (response) => {
+            ajaxRequest(`/officepro/app/api/reports/attendance.php?${params}`, 'GET', null, (response) => {
                 if (response.success) {
                     displayReport(response.data);
                 } else {
@@ -225,7 +225,7 @@ $totalEmployees = $db->fetchOne(
             });
         } else {
             // For CSV and PDF, open in new window
-            window.open(`/public_html/app/api/reports/export.php?${params}`, '_blank');
+            window.open(`/officepro/app/api/reports/export.php?${params}`, '_blank');
         }
     }
     

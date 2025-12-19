@@ -269,7 +269,7 @@ switch ($action) {
                 foreach ($newlyAdded as $employeeId) {
                     $db->execute(
                         "INSERT INTO notifications (company_id, user_id, type, message, link, created_at) 
-                        VALUES (?, ?, 'credential_shared', ?, '/public_html/app/views/employee/credentials.php', NOW())",
+                        VALUES (?, ?, 'credential_shared', ?, '/officepro/app/views/employee/credentials.php', NOW())",
                         [$companyId, $employeeId, $message]
                     );
                 }

@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if ($result['success']) {
         echo "<p style='color: green; font-weight: bold;'>✓ Login successful!</p>";
-        echo "<p><a href='/public_html/app/views/dashboard.php'>Go to Dashboard</a></p>";
+        echo "<p><a href='/officepro/app/views/dashboard.php'>Go to Dashboard</a></p>";
     } else {
         echo "<p style='color: red; font-weight: bold;'>✗ Login failed!</p>";
     }
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
     
     <hr>
-    <p><a href="/public_html/">Back to Home</a></p>
+    <p><a href="/officepro/">Back to Home</a></p>
     <?php
 }
 ?>

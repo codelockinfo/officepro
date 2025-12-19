@@ -30,7 +30,7 @@ $description = $_GET['message'] ?? $errorDescriptions[$errorCode] ?? 'An error o
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $title; ?> - OfficePro</title>
-    <link rel="stylesheet" href="/public_html/assets/css/style.css">
+    <link rel="stylesheet" href="/officepro/assets/css/style.css">
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -82,11 +82,11 @@ $description = $_GET['message'] ?? $errorDescriptions[$errorCode] ?? 'An error o
         
         <div class="error-actions">
             <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="/public_html/app/views/dashboard.php" class="btn btn-primary">Go to Dashboard</a>
+                <a href="/officepro/app/views/dashboard.php" class="btn btn-primary">Go to Dashboard</a>
                 <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a>
             <?php else: ?>
-                <a href="/public_html/login.php" class="btn btn-primary">Login</a>
-                <a href="/public_html/" class="btn btn-secondary">Go Home</a>
+                <a href="/officepro/login.php" class="btn btn-primary">Login</a>
+                <a href="/officepro/" class="btn btn-secondary">Go Home</a>
             <?php endif; ?>
         </div>
     </div>

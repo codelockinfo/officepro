@@ -5,8 +5,8 @@
 
 return [
     'app_name' => 'OfficePro Attendance System',
-    'app_url' => 'http://localhost/public_html',
-    'base_path' => '/public_html',
+    'app_url' => 'http://localhost/officepro',
+    'base_path' => '/officepro',
     'timezone' => 'Asia/Kolkata', // Kolkata, India timezone
     
     // Attendance settings

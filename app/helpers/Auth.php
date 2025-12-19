@@ -423,7 +423,7 @@ class Auth {
     public static function checkRole($roles, $errorMessage = null) {
         if (!self::hasRole($roles)) {
             $message = $errorMessage ?? 'You do not have permission to access this page.';
-            header("Location: /public_html/app/views/error.php?code=403&message=" . urlencode($message));
+            header("Location: /officepro/app/views/error.php?code=403&message=" . urlencode($message));
             exit;
         }
     }

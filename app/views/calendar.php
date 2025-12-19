@@ -594,7 +594,7 @@ if ($nextMonth > 12) {
             recurring: formData.get('recurring') ? 1 : 0
         };
         
-        ajaxRequest('/public_html/app/api/admin/holidays.php?action=create', 'POST', data, (response) => {
+        ajaxRequest('/officepro/app/api/admin/holidays.php?action=create', 'POST', data, (response) => {
             if (response.success) {
                 showMessage('success', 'Holiday added successfully!');
                 closeModal('add-holiday-modal');
@@ -678,7 +678,7 @@ if ($nextMonth > 12) {
     }
     
     function fetchEmployeeList(type, date) {
-        const url = `/public_html/app/api/calendar/employee_list.php?type=${type}&date=${date}`;
+        const url = `/officepro/app/api/calendar/employee_list.php?type=${type}&date=${date}`;
         
         ajaxRequest(url, 'GET', {}, (response) => {
             if (response.success) {
@@ -741,10 +741,10 @@ if ($nextMonth > 12) {
             html += `
                 <div class="employee-list-item">
                     <div class="employee-info">
-                        <img src="/public_html/${emp.profile_image || 'assets/images/default-avatar.png'}" 
+                        <img src="/officepro/${emp.profile_image || 'assets/images/default-avatar.png'}" 
                              alt="${emp.full_name}" 
                              class="employee-avatar"
-                             onerror="this.src='/public_html/assets/images/default-avatar.png'">
+                             onerror="this.src='/officepro/assets/images/default-avatar.png'">
                         <div class="employee-details">
                             <div class="employee-name">${emp.full_name || emp.employee_name}</div>
                             <div class="employee-meta">${metaText}</div>

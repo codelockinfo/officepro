@@ -100,7 +100,7 @@ $companies = $db->fetchAll(
     }
     
     function viewCompany(id) {
-        ajaxRequest(`/public_html/app/api/system_admin/company_details.php?id=${id}`, 'GET', null, (response) => {
+        ajaxRequest(`/officepro/app/api/system_admin/company_details.php?id=${id}`, 'GET', null, (response) => {
             if (response.success) {
                 const company = response.data;
                 
@@ -114,7 +114,7 @@ $companies = $db->fetchAll(
                     <div style="padding: 20px;">
                         ${company.logo ? `
                             <div style="text-align: center; margin-bottom: 20px;">
-                                <img src="/public_html/${company.logo}" 
+                                <img src="/officepro/${company.logo}" 
                                      alt="Company Logo" 
                                      style="max-height: 80px; max-width: 200px;">
                             </div>
@@ -172,7 +172,7 @@ $companies = $db->fetchAll(
         confirmDialog(
             'All employees of this company will be unable to access the system.',
             () => {
-                ajaxRequest(`/public_html/app/api/system_admin/companies.php?action=suspend&id=${id}`, 'POST', null, (response) => {
+                ajaxRequest(`/officepro/app/api/system_admin/companies.php?action=suspend&id=${id}`, 'POST', null, (response) => {
                     if (response.success) {
                         showMessage('success', 'Company suspended');
                         setTimeout(() => location.reload(), 1000);
@@ -188,7 +188,7 @@ $companies = $db->fetchAll(
     }
     
     function activateCompany(id) {
-        ajaxRequest(`/public_html/app/api/system_admin/companies.php?action=activate&id=${id}`, 'POST', null, (response) => {
+        ajaxRequest(`/officepro/app/api/system_admin/companies.php?action=activate&id=${id}`, 'POST', null, (response) => {
             if (response.success) {
                 showMessage('success', 'Company activated');
                 setTimeout(() => location.reload(), 1000);

@@ -25,16 +25,16 @@ if (isset($_SESSION['user_id'])) {
     
     echo "<hr>";
     echo "<h3>Try accessing real dashboard:</h3>";
-    echo "<a href='/public_html/app/views/dashboard.php' style='padding: 10px 20px; background: #4da6ff; color: white; text-decoration: none; border-radius: 5px; display: inline-block;'>Go to Dashboard</a>";
+    echo "<a href='/officepro/app/views/dashboard.php' style='padding: 10px 20px; background: #4da6ff; color: white; text-decoration: none; border-radius: 5px; display: inline-block;'>Go to Dashboard</a>";
 } else {
     echo "<p style='color: red; font-weight: bold;'>✗ You are NOT logged in!</p>";
-    echo "<p><a href='/public_html/login.php'>Go to Login</a></p>";
+    echo "<p><a href='/officepro/login.php'>Go to Login</a></p>";
 }
 
 echo "<hr>";
-echo "<a href='/public_html/debug_login.php'>Debug Login</a> | ";
-echo "<a href='/public_html/test_session.php'>Test Session</a> | ";
-echo "<a href='/public_html/'>Home</a>";
+echo "<a href='/officepro/debug_login.php'>Debug Login</a> | ";
+echo "<a href='/officepro/test_session.php'>Test Session</a> | ";
+echo "<a href='/officepro/'>Home</a>";
 ?>
 
 
