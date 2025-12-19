@@ -13,6 +13,18 @@ $companyId = Tenant::getCurrentCompanyId();
 $userId = $currentUser['id'];
 $db = Database::getInstance();
 
+// Helper function to convert decimal hours to HH:MM:SS format
+function formatHoursToTime($decimalHours) {
+    if ($decimalHours <= 0) {
+        return '00:00:00';
+    }
+    $totalSeconds = round($decimalHours * 3600);
+    $hours = floor($totalSeconds / 3600);
+    $minutes = floor(($totalSeconds % 3600) / 60);
+    $seconds = $totalSeconds % 60;
+    return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+}
+
 // Get current month/year or from query
 $month = $_GET['month'] ?? date('n');
 $year = $_GET['year'] ?? date('Y');
@@ -386,8 +398,9 @@ if ($nextMonth > 12) {
                 echo '<div class="day-event event-holiday"><i class="fas fa-gift"></i> ' . htmlspecialchars($holidayDates[$date]) . '</div>';
             }
             
-            // Show leave
-            if (isset($leaveDates[$date])) {
+            // Show leave (only if not a holiday and not Sunday)
+            $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1-6 = Monday-Saturday
+            if (!isset($holidayDates[$date]) && $dayOfWeek != 0 && isset($leaveDates[$date])) {
                 foreach ($leaveDates[$date] as $leave) {
                     $name = $isManager ? $leave['employee_name'] : 'Leave';
                     echo '<div class="day-event event-leave"><i class="fas fa-calendar-alt"></i> ' . htmlspecialchars($name) . '</div>';
@@ -399,9 +412,9 @@ if ($nextMonth > 12) {
                 echo '<div class="day-event event-attendance"><i class="fas fa-check-circle"></i> Present</div>';
             }
             
-            // Show overtime
+            // Show overtime (only show "OT" text, no time)
             if (isset($overtimeDates[$date])) {
-                echo '<div class="day-event event-overtime"><i class="fas fa-clock"></i> OT: ' . number_format($overtimeDates[$date], 1) . 'h</div>';
+                echo '<div class="day-event event-overtime"><i class="fas fa-clock"></i> OT</div>';
             }
             
             echo '</div></div>';
@@ -681,6 +694,19 @@ if ($nextMonth > 12) {
         });
     }
     
+    function formatHoursToTime(decimalHours) {
+        if (!decimalHours || decimalHours <= 0) {
+            return '00:00:00';
+        }
+        const totalSeconds = Math.round(parseFloat(decimalHours) * 3600);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        return String(hours).padStart(2, '0') + ':' + 
+               String(minutes).padStart(2, '0') + ':' + 
+               String(seconds).padStart(2, '0');
+    }
+    
     function displayEmployeeList(type, employees) {
         const container = document.getElementById('employee-list-content');
         
@@ -699,7 +725,9 @@ if ($nextMonth > 12) {
             if (type === 'attendance') {
                 statusClass = 'status-present';
                 statusText = 'Present';
-                metaText = `First session: ${emp.check_in_time || 'N/A'}`;
+                const checkIn = emp.check_in_time || 'N/A';
+                const checkOut = emp.check_out_time || 'N/A';
+                metaText = `Check-in: ${checkIn} | Check-out: ${checkOut}`;
             } else if (type === 'leave') {
                 statusClass = 'status-leave';
                 statusText = 'On Leave';
@@ -707,7 +735,7 @@ if ($nextMonth > 12) {
             } else if (type === 'overtime') {
                 statusClass = 'status-overtime';
                 statusText = 'Overtime';
-                metaText = `${emp.overtime_hours || '0.00'}h overtime`;
+                metaText = formatHoursToTime(emp.overtime_hours || 0);
             }
             
             html += `

@@ -102,7 +102,7 @@ try {
     
     $db->execute(
         "INSERT INTO notifications (company_id, user_id, type, message, link, created_at) 
-        VALUES (?, ?, 'leave_status', ?, '/app/views/leaves.php', NOW())",
+        VALUES (?, ?, 'leave_status', ?, '/officepro/app/views/leaves.php', NOW())",
         [$companyId, $leave['user_id'], $message]
     );
     

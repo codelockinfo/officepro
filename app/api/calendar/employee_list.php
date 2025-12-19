@@ -47,14 +47,17 @@ try {
     
     if ($type === 'attendance') {
         // Get employees who were present (have timer sessions) on this date
+        // Use created_at for first session start time (check-in) and end_time/updated_at for last session end time (check-out)
         $employees = $db->fetchAll(
             "SELECT DISTINCT u.id, u.full_name, u.profile_image, 
-                    MIN(ts.start_time) as check_in_time
+                    MIN(ts.created_at) as check_in_time,
+                    MAX(COALESCE(ts.end_time, ts.updated_at)) as check_out_time
              FROM attendance a
              JOIN users u ON a.user_id = u.id
              LEFT JOIN timer_sessions ts ON ts.company_id = a.company_id 
                  AND ts.user_id = a.user_id 
                  AND ts.date = a.date
+                 AND ts.status = 'ended'
              WHERE a.company_id = ? 
              AND a.date = ? 
              AND a.is_present = 1
@@ -71,12 +74,18 @@ try {
             [$companyId, $date, $companyId, $date]
         );
         
-        // Format first session start time
+        // Format check-in and check-out times
         foreach ($employees as &$emp) {
             if ($emp['check_in_time']) {
                 $checkInTime = DateTime::createFromFormat('Y-m-d H:i:s', $emp['check_in_time']);
                 if ($checkInTime) {
                     $emp['check_in_time'] = $checkInTime->format('h:i A');
+                }
+            }
+            if ($emp['check_out_time']) {
+                $checkOutTime = DateTime::createFromFormat('Y-m-d H:i:s', $emp['check_out_time']);
+                if ($checkOutTime) {
+                    $emp['check_out_time'] = $checkOutTime->format('h:i A');
                 }
             }
         }
@@ -122,10 +131,8 @@ try {
             [$companyId, $date]
         );
         
-        // Format overtime hours
-        foreach ($employees as &$emp) {
-            $emp['overtime_hours'] = number_format($emp['overtime_hours'], 2);
-        }
+        // Keep overtime_hours as decimal for frontend formatting (will be formatted to HH:MM)
+        // No formatting needed here - frontend will format to HH:MM
     }
     
     echo json_encode([

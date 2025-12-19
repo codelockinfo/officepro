@@ -78,19 +78,28 @@ try {
         [$now, $durationSeconds, $timerSession['id']]
     );
     
-    // Calculate total hours for today from all ended sessions
+    // Calculate total hours for today from all ended sessions (including the current one we're about to end)
+    // First, get all previously ended sessions
     $allSessions = $db->fetchAll(
         "SELECT SUM(duration_seconds) as total_seconds
          FROM timer_sessions 
-         WHERE company_id = ? AND user_id = ? AND date = ? AND status = 'ended'",
-        [$companyId, $userId, $today]
+         WHERE company_id = ? AND user_id = ? AND date = ? AND status = 'ended' AND id != ?",
+        [$companyId, $userId, $today, $timerSession['id']]
     );
     
-    $totalSeconds = intval($allSessions[0]['total_seconds'] ?? 0);
+    $previousSeconds = intval($allSessions[0]['total_seconds'] ?? 0);
+    // Add current session duration to get total
+    $totalSeconds = $previousSeconds + $durationSeconds;
     $totalHoursWorked = $totalSeconds / 3600;
     
     // Calculate regular and overtime based on TOTAL hours for the day
-    $standardWorkHours = floatval($appConfig['standard_work_hours'] ?? 8);
+    // Get working hours from company settings (office time), fallback to app config
+    $workingHoursSetting = Tenant::getCompanySetting('working_hours', null);
+    $standardWorkHours = floatval($workingHoursSetting ?? $appConfig['standard_work_hours'] ?? 8);
+    
+    // Overtime calculation: total_time - office_time = overtime
+    // regular_hours = min(total_hours, office_time)
+    // overtime_hours = max(0, total_hours - office_time)
     $totalRegular = min($totalHoursWorked, $standardWorkHours);
     $totalOvertime = max(0, $totalHoursWorked - $standardWorkHours);
     
@@ -98,7 +107,8 @@ try {
     $totalRegular = round($totalRegular, 2);
     $totalOvertime = round($totalOvertime, 2);
     
-    error_log("Timer Stop - Total hours worked today: {$totalHoursWorked}h, Regular: {$totalRegular}h, Overtime: {$totalOvertime}h (Standard: {$standardWorkHours}h)");
+    error_log("Timer Stop - Company ID: {$companyId}, Working hours setting: " . ($workingHoursSetting ?? 'NULL') . ", Standard: {$standardWorkHours}h");
+    error_log("Timer Stop - Total hours worked today: {$totalHoursWorked}h, Regular: {$totalRegular}h, Overtime: {$totalOvertime}h");
     
     // Update or create attendance record with totals and mark as present
     $attendance = $db->fetchOne(

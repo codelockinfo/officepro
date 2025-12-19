@@ -148,8 +148,8 @@ $userId = $currentUser['id'];
                     <td>
                         <button onclick="viewCredential(${cred.id})" class="btn btn-sm btn-primary">View</button>
                         ${cred.can_edit ? `
-                            <button onclick="editCredential(${cred.id})" class="btn btn-sm btn-secondary">Edit</button>
-                            <button onclick="shareCredential(${cred.id})" class="btn btn-sm btn-secondary">Share</button>
+                            <button onclick="editCredential(${cred.id})" class="btn btn-sm btn-primary">Edit</button>
+                            <button onclick="shareCredential(${cred.id})" class="btn btn-sm btn-primary">Share</button>
                             <button onclick="deleteCredential(${cred.id})" class="btn btn-sm btn-danger">Delete</button>
                         ` : ''}
                     </td>

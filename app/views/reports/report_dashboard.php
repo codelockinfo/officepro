@@ -21,7 +21,7 @@ $today = date('Y-m-d');
 $presentToday = $db->fetchOne(
     "SELECT COUNT(DISTINCT user_id) as count 
     FROM attendance 
-    WHERE company_id = ? AND date = ? AND status = 'out'",
+    WHERE company_id = ? AND date = ? AND is_present = 1",
     [$companyId, $today]
 );
 
@@ -41,14 +41,30 @@ $overtimeThisMonth = $db->fetchOne(
     [$companyId, $currentMonth]
 );
 
-// Late arrivals this month (after 9:15 AM)
+// Late arrivals this month (after 9:15 AM) - based on first timer session start time
 $lateArrivals = $db->fetchOne(
-    "SELECT COUNT(*) as count 
-    FROM attendance 
-    WHERE company_id = ? AND DATE_FORMAT(date, '%Y-%m') = ? 
-    AND TIME(check_in) > '09:15:00'",
+    "SELECT COUNT(DISTINCT CONCAT(user_id, '-', date)) as count 
+    FROM (
+        SELECT user_id, date, MIN(start_time) as first_start
+        FROM timer_sessions
+        WHERE company_id = ? AND DATE_FORMAT(date, '%Y-%m') = ?
+        GROUP BY user_id, date
+        HAVING TIME(first_start) > '09:15:00'
+    ) late_days",
     [$companyId, $currentMonth]
 );
+
+// Helper function to convert decimal hours to HH:MM:SS format
+function formatHoursToTime($decimalHours) {
+    if ($decimalHours <= 0) {
+        return '00:00:00';
+    }
+    $totalSeconds = round($decimalHours * 3600);
+    $hours = floor($totalSeconds / 3600);
+    $minutes = floor(($totalSeconds % 3600) / 60);
+    $seconds = $totalSeconds % 60;
+    return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+}
 
 // Top overtime employees this month (exclude company owners)
 $topOvertime = $db->fetchAll(
@@ -73,7 +89,7 @@ $totalEmployees = $db->fetchOne(
 <h1><i class="fas fa-chart-line"></i> Reports Dashboard</h1>
 
 <!-- KPI Cards -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0;">
+<!-- <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0;">
     <div class="card" style="text-align: center;">
         <h3 style="color: var(--success-green); margin-bottom: 10px;">Present Today</h3>
         <div style="font-size: 48px; font-weight: bold; color: var(--success-green);">
@@ -105,7 +121,7 @@ $totalEmployees = $db->fetchOne(
         </div>
         <p style="color: #666;">this month</p>
     </div>
-</div>
+</div> -->
 
 <!-- Top Overtime Employees -->
 <?php if (count($topOvertime) > 0): ?>
@@ -123,7 +139,7 @@ $totalEmployees = $db->fetchOne(
             <tr>
                 <td><?php echo htmlspecialchars($emp['full_name']); ?></td>
                 <td style="color: var(--overtime-orange); font-weight: bold;">
-                    <?php echo number_format($emp['total_overtime'], 2); ?> hours
+                    <?php echo formatHoursToTime($emp['total_overtime']); ?>
                 </td>
             </tr>
             <?php endforeach; ?>
@@ -150,9 +166,9 @@ $totalEmployees = $db->fetchOne(
             </div>
             
             <div class="form-group">
-                <label class="form-label" for="employee_id">Employee (Optional - leave blank for all)</label>
-                <select id="employee_id" name="employee_id" class="form-control">
-                    <option value="">All Employees</option>
+                <label class="form-label" for="employee_id">Employee *</label>
+                <select id="employee_id" name="employee_id" class="form-control" required>
+                    <option value="">Select Employee</option>
                     <?php
                     $employees = $db->fetchAll(
                         "SELECT id, full_name FROM users WHERE company_id = ? AND status = 'active' AND role != 'company_owner' ORDER BY full_name",
@@ -187,6 +203,11 @@ $totalEmployees = $db->fetchOne(
             return;
         }
         
+        if (!employeeId || employeeId === '') {
+            showMessage('error', 'Please select employee');
+            return;
+        }
+        
         const params = new URLSearchParams({
             start_date: startDate,
             end_date: endDate,
@@ -208,6 +229,19 @@ $totalEmployees = $db->fetchOne(
         }
     }
     
+    function formatHoursToTime(decimalHours) {
+        if (decimalHours <= 0) {
+            return '00:00:00';
+        }
+        const totalSeconds = Math.round(decimalHours * 3600);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        return String(hours).padStart(2, '0') + ':' + 
+               String(minutes).padStart(2, '0') + ':' + 
+               String(seconds).padStart(2, '0');
+    }
+    
     function displayReport(data) {
         if (data.length === 0) {
             document.getElementById('report-results').innerHTML = '<p style="text-align: center; padding: 40px;">No data found for selected period</p>';
@@ -222,8 +256,8 @@ $totalEmployees = $db->fetchOne(
         let totalOvertime = 0;
         
         data.forEach(row => {
-            const regular = parseFloat(row.regular_hours);
-            const overtime = parseFloat(row.overtime_hours);
+            const regular = parseFloat(row.regular_hours || 0);
+            const overtime = parseFloat(row.overtime_hours || 0);
             totalRegular += regular;
             totalOvertime += overtime;
             
@@ -232,16 +266,17 @@ $totalEmployees = $db->fetchOne(
             html += `<td>${row.date}</td>`;
             html += `<td>${row.check_in}</td>`;
             html += `<td>${row.check_out || '-'}</td>`;
-            html += `<td>${regular.toFixed(2)}</td>`;
-            html += `<td style="color: var(--overtime-orange);">${overtime.toFixed(2)}</td>`;
-            html += `<td>${(regular + overtime).toFixed(2)}</td>`;
+            html += `<td>${row.regular_hours_formatted || '00:00:00'}</td>`;
+            html += `<td style="color: var(--overtime-orange);">${row.overtime_hours_formatted || '00:00:00'}</td>`;
+            html += `<td>${row.total_hours_formatted || '00:00:00'}</td>`;
             html += '</tr>';
         });
         
+        const totalHours = totalRegular + totalOvertime;
         html += '<tr style="font-weight: bold; background: var(--light-blue);"><td colspan="4">TOTAL</td>';
-        html += `<td>${totalRegular.toFixed(2)}</td>`;
-        html += `<td style="color: var(--overtime-orange);">${totalOvertime.toFixed(2)}</td>`;
-        html += `<td>${(totalRegular + totalOvertime).toFixed(2)}</td></tr>`;
+        html += `<td>${formatHoursToTime(totalRegular)}</td>`;
+        html += `<td style="color: var(--overtime-orange);">${formatHoursToTime(totalOvertime)}</td>`;
+        html += `<td>${formatHoursToTime(totalHours)}</td></tr>`;
         html += '</tbody></table>';
         
         document.getElementById('report-results').innerHTML = html;

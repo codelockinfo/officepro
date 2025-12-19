@@ -85,7 +85,7 @@ switch ($action) {
                 $currentUser = Auth::getCurrentUser();
             $db->execute(
                 "INSERT INTO notifications (company_id, user_id, type, message, link, created_at) 
-                VALUES (?, ?, 'task_assigned', ?, 'app/views/employee/tasks.php', NOW())",
+                VALUES (?, ?, 'task_assigned', ?, '/officepro/app/views/employee/tasks.php', NOW())",
                 [$companyId, $assignedTo, "{$currentUser['full_name']} assigned you a task: {$title}"]
             );
             }
@@ -123,7 +123,10 @@ switch ($action) {
         
         // Check if task exists and user can update (must be assigned to them or be the creator/owner)
         $task = $db->fetchOne(
-            "SELECT assigned_to, created_by, status FROM tasks WHERE id = ? AND company_id = ?",
+            "SELECT t.assigned_to, t.created_by, t.status, t.title, u.role as user_role 
+             FROM tasks t 
+             JOIN users u ON t.assigned_to = u.id 
+             WHERE t.id = ? AND t.company_id = ?",
             [$id, $companyId]
         );
         
@@ -139,6 +142,10 @@ switch ($action) {
             echo json_encode(['success' => false, 'message' => 'Access denied']);
             exit;
         }
+        
+        // Get current user info
+        $currentUser = Auth::getCurrentUser();
+        $isEmployee = $currentUser['role'] === 'employee';
         
         try {
             $wasCompleted = $task['status'] === 'done';
@@ -162,6 +169,33 @@ switch ($action) {
                     WHERE id = ? AND company_id = ?",
                     [$status, $id, $companyId]
                 );
+            }
+            
+            // Notify company owner if employee updated the task status
+            if ($isEmployee && $task['status'] != $status) {
+                // Get company owner ID
+                $company = $db->fetchOne(
+                    "SELECT owner_id FROM companies WHERE id = ?",
+                    [$companyId]
+                );
+                
+                if ($company && $company['owner_id']) {
+                    $ownerId = $company['owner_id'];
+                    $statusLabels = [
+                        'todo' => 'To Do',
+                        'in_progress' => 'In Progress',
+                        'done' => 'Done'
+                    ];
+                    $statusLabel = $statusLabels[$status] ?? ucfirst($status);
+                    
+                    $message = "{$currentUser['full_name']} updated task '{$task['title']}' status to {$statusLabel}";
+                    
+                    $db->execute(
+                        "INSERT INTO notifications (company_id, user_id, type, message, link, created_at) 
+                        VALUES (?, ?, 'task_status', ?, '/officepro/app/views/company/tasks.php', NOW())",
+                        [$companyId, $ownerId, $message]
+                    );
+                }
             }
             
             echo json_encode(['success' => true, 'message' => 'Task status updated']);
@@ -326,7 +360,7 @@ switch ($action) {
                 $currentUser = Auth::getCurrentUser();
                 $db->execute(
                     "INSERT INTO notifications (company_id, user_id, type, message, link, created_at) 
-                    VALUES (?, ?, 'task_assigned', ?, 'app/views/employee/tasks.php', NOW())",
+                    VALUES (?, ?, 'task_assigned', ?, '/officepro/app/views/employee/tasks.php', NOW())",
                     [$companyId, $assignedTo, "{$currentUser['full_name']} assigned you a task: {$title}"]
                 );
             }

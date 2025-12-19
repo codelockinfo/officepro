@@ -324,23 +324,39 @@ $leaves = $db->fetchAll(
         const isHalfDay = document.getElementById('leave_duration_half').checked;
         
         if (startDate) {
-            let daysCount = 0;
-            
             if (isHalfDay) {
                 // Half day = 0.5 days
-                daysCount = 0.5;
-            } else if (endDate) {
-                // Full day calculation
-                const start = new Date(startDate);
-                const end = new Date(endDate);
-                const diffTime = Math.abs(end - start);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                daysCount = diffDays;
-            }
-            
-            if (daysCount > 0) {
-                document.getElementById('days-count').textContent = daysCount;
+                document.getElementById('days-count').textContent = '0.5';
                 document.getElementById('days-info').style.display = 'block';
+            } else if (endDate) {
+                // Call API to calculate days (excludes Sundays and holidays)
+                fetch(`/officepro/app/api/leaves/calculate_days.php?start_date=${startDate}&end_date=${endDate}&leave_duration=full_day`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('days-count').textContent = data.days_count;
+                            document.getElementById('days-info').style.display = 'block';
+                        } else {
+                            document.getElementById('days-info').style.display = 'none';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error calculating days:', error);
+                        // Fallback to client-side calculation (without holidays)
+                        const start = new Date(startDate + 'T00:00:00');
+                        const end = new Date(endDate + 'T00:00:00');
+                        let count = 0;
+                        const current = new Date(start);
+                        while (current <= end) {
+                            const dayOfWeek = current.getDay();
+                            if (dayOfWeek !== 0) {
+                                count++;
+                            }
+                            current.setDate(current.getDate() + 1);
+                        }
+                        document.getElementById('days-count').textContent = count;
+                        document.getElementById('days-info').style.display = 'block';
+                    });
             } else {
                 document.getElementById('days-info').style.display = 'none';
             }

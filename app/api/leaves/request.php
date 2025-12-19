@@ -74,14 +74,41 @@ if ($validator->hasErrors()) {
     exit;
 }
 
-// Calculate days
+// Calculate days (excluding Sunday and holidays, Saturday is counted)
 if ($leaveDuration === 'half_day') {
     $daysCount = 0.5;
 } else {
+    // Get holidays in the date range to exclude them
+    $holidays = $db->fetchAll(
+        "SELECT date FROM holidays 
+        WHERE company_id = ? AND date BETWEEN ? AND ?",
+        [$companyId, $startDate, $endDate]
+    );
+    
+    // Create lookup array for holiday dates
+    $holidayDates = [];
+    foreach ($holidays as $holiday) {
+        $holidayDates[$holiday['date']] = true;
+    }
+    
+    // Count all days except Sunday (Sunday=0) and holidays
     $start = new DateTime($startDate);
     $end = new DateTime($endDate);
-    $interval = $start->diff($end);
-    $daysCount = $interval->days + 1;
+    $end->modify('+1 day'); // Include end date in iteration
+    
+    $daysCount = 0;
+    $current = clone $start;
+    
+    while ($current < $end) {
+        $dayOfWeek = (int)$current->format('w'); // 0 = Sunday, 1-6 = Monday-Saturday
+        $dateStr = $current->format('Y-m-d');
+        
+        // Count all days except Sunday (0) and holidays
+        if ($dayOfWeek !== 0 && !isset($holidayDates[$dateStr])) {
+            $daysCount++;
+        }
+        $current->modify('+1 day');
+    }
 }
 
 // Check leave balance
@@ -140,7 +167,7 @@ try {
     foreach ($managers as $manager) {
         $db->execute(
             "INSERT INTO notifications (company_id, user_id, type, message, link, created_at) 
-            VALUES (?, ?, 'leave_request', ?, '/app/views/leave_approvals.php', NOW())",
+            VALUES (?, ?, 'leave_request', ?, '/officepro/app/views/leave_approvals.php', NOW())",
             [$companyId, $manager['id'], $message]
         );
     }

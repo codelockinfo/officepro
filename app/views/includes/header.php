@@ -83,9 +83,19 @@ if (empty($profileImage) || trim($profileImage) === '') {
                 </div>
                 
                 <div class="header-right">
-                    <div class="notification-icon" id="notification-icon">
-                        <i class="fas fa-bell"></i>
-                        <span id="notification-badge" class="notification-badge" style="display: none;">0</span>
+                    <div class="notification-wrapper" style="position: relative;">
+                        <div class="notification-icon" id="notification-icon" onclick="toggleNotificationDropdown()">
+                            <i class="fas fa-bell"></i>
+                            <span id="notification-badge" class="notification-badge" style="display: none;">0</span>
+                        </div>
+                        <div id="notification-dropdown" class="notification-dropdown" style="display: none;">
+                            <div class="notification-header">
+                                <h3>Notifications</h3>
+                            </div>
+                            <div id="notification-list" class="notification-list">
+                                <div class="notification-empty">Loading notifications...</div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="user-profile" onclick="toggleUserMenu()">

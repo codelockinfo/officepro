@@ -47,13 +47,21 @@
             });
         }
         
-        // Close user menu when clicking outside
+        // Close dropdowns when clicking outside
         document.addEventListener('click', (e) => {
             const userProfile = document.querySelector('.user-profile');
             const userMenu = document.getElementById('user-menu');
+            const notificationWrapper = document.querySelector('.notification-wrapper');
+            const notificationDropdown = document.getElementById('notification-dropdown');
             
+            // Close user menu if clicking outside
             if (userProfile && userMenu && !userProfile.contains(e.target) && !userMenu.contains(e.target)) {
                 userMenu.style.display = 'none';
+            }
+            
+            // Close notification dropdown if clicking outside
+            if (notificationWrapper && notificationDropdown && !notificationWrapper.contains(e.target)) {
+                notificationDropdown.style.display = 'none';
             }
         });
     </script>

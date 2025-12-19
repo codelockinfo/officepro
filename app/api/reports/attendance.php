@@ -35,11 +35,29 @@ if (!$startDate || !$endDate) {
     exit;
 }
 
-// Build query
-$sql = "SELECT a.*, u.full_name as employee_name, u.email as employee_email 
+// Helper function to convert decimal hours to HH:MM:SS format
+function formatHoursToTime($decimalHours) {
+    if ($decimalHours <= 0) {
+        return '00:00:00';
+    }
+    $totalSeconds = round($decimalHours * 3600);
+    $hours = floor($totalSeconds / 3600);
+    $minutes = floor(($totalSeconds % 3600) / 60);
+    $seconds = $totalSeconds % 60;
+    return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+}
+
+// Build query - get first session start (created_at) and last session end (end_time or updated_at) from timer_sessions
+$sql = "SELECT a.*, u.full_name as employee_name, u.email as employee_email,
+        MIN(ts.created_at) as first_session_start,
+        MAX(COALESCE(ts.end_time, ts.updated_at)) as last_session_end
         FROM attendance a 
         JOIN users u ON a.user_id = u.id 
-        WHERE a.company_id = ? AND a.date BETWEEN ? AND ? AND a.status = 'out'";
+        LEFT JOIN timer_sessions ts ON ts.company_id = a.company_id 
+            AND ts.user_id = a.user_id 
+            AND ts.date = a.date 
+            AND ts.status = 'ended'
+        WHERE a.company_id = ? AND a.date BETWEEN ? AND ? AND a.is_present = 1";
 $params = [$companyId, $startDate, $endDate];
 
 if ($employeeId) {
@@ -47,17 +65,22 @@ if ($employeeId) {
     $params[] = $employeeId;
 }
 
-$sql .= " ORDER BY a.date DESC, u.full_name ASC";
+$sql .= " GROUP BY a.id
+          ORDER BY a.date DESC, u.full_name ASC";
 
 try {
     $data = $db->fetchAll($sql, $params);
     
-    // Format times
+    // Format times from timer sessions and convert hours to HH:MM:SS
     foreach ($data as &$row) {
-        $row['check_in'] = date('h:i A', strtotime($row['check_in']));
-        if ($row['check_out']) {
-            $row['check_out'] = date('h:i A', strtotime($row['check_out']));
-        }
+        $row['check_in'] = $row['first_session_start'] ? date('h:i A', strtotime($row['first_session_start'])) : '-';
+        $row['check_out'] = $row['last_session_end'] ? date('h:i A', strtotime($row['last_session_end'])) : '-';
+        
+        // Convert hours to HH:MM:SS format
+        $row['regular_hours_formatted'] = formatHoursToTime($row['regular_hours'] ?? 0);
+        $row['overtime_hours_formatted'] = formatHoursToTime($row['overtime_hours'] ?? 0);
+        $totalHours = ($row['regular_hours'] ?? 0) + ($row['overtime_hours'] ?? 0);
+        $row['total_hours_formatted'] = formatHoursToTime($totalHours);
     }
     
     echo json_encode(['success' => true, 'data' => $data]);

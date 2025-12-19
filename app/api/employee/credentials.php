@@ -215,9 +215,9 @@ switch ($action) {
         $id = $input['id'] ?? 0;
         $sharedWith = $input['shared_with'] ?? [];
         
-        // Check ownership
+        // Get existing credential to check ownership and get current shared_with and website_name
         $existing = $db->fetchOne(
-            "SELECT user_id FROM saved_credentials WHERE id = ? AND company_id = ?",
+            "SELECT user_id, shared_with, website_name FROM saved_credentials WHERE id = ? AND company_id = ?",
             [$id, $companyId]
         );
         
@@ -226,6 +226,15 @@ switch ($action) {
             echo json_encode(['success' => false, 'message' => 'Access denied']);
             exit;
         }
+        
+        // Get current shared_with to compare
+        $currentSharedWith = json_decode($existing['shared_with'] ?? '[]', true);
+        if (!is_array($currentSharedWith)) {
+            $currentSharedWith = [];
+        }
+        
+        // Find newly added employees (those in new list but not in old list)
+        $newlyAdded = array_diff($sharedWith, $currentSharedWith);
         
         // Validate that all user IDs belong to the company
         if (count($sharedWith) > 0) {
@@ -250,6 +259,21 @@ switch ($action) {
                 WHERE id = ? AND company_id = ?",
                 [$isShared, $sharedWithJson, $id, $companyId]
             );
+            
+            // Notify newly added employees
+            if (count($newlyAdded) > 0) {
+                $currentUser = Auth::getCurrentUser();
+                $websiteName = $existing['website_name'];
+                $message = "{$currentUser['full_name']} shared credentials for \"{$websiteName}\" with you";
+                
+                foreach ($newlyAdded as $employeeId) {
+                    $db->execute(
+                        "INSERT INTO notifications (company_id, user_id, type, message, link, created_at) 
+                        VALUES (?, ?, 'credential_shared', ?, '/officepro/app/views/employee/credentials.php', NOW())",
+                        [$companyId, $employeeId, $message]
+                    );
+                }
+            }
             
             echo json_encode(['success' => true, 'message' => 'Sharing updated']);
         } catch (Exception $e) {

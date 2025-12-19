@@ -318,17 +318,35 @@ function displayNotificationList(notifications) {
         return;
     }
     
-    list.innerHTML = notifications.map(notif => `
-        <div class="notification-item ${notif.read_status ? '' : 'unread'}" data-id="${notif.id}">
-            <div class="notification-message">${notif.message}</div>
-            <div class="notification-time">${formatTimeAgo(notif.created_at)}</div>
+    list.innerHTML = notifications.map(notif => {
+        // Escape HTML to prevent XSS
+        const message = notif.message ? notif.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+        const timeAgo = formatTimeAgo(notif.created_at);
+        const isUnread = notif.read_status == 0 || notif.read_status === false;
+        const link = notif.link || '';
+        return `
+        <div class="notification-item ${isUnread ? 'unread' : ''}" data-id="${notif.id}" data-link="${link}">
+            <div class="notification-message">${message}</div>
+            <div class="notification-time">${timeAgo}</div>
         </div>
-    `).join('');
+    `;
+    }).join('');
     
     // Add click handlers
     list.querySelectorAll('.notification-item').forEach(item => {
         item.addEventListener('click', function() {
-            markNotificationAsRead(this.dataset.id);
+            const notificationId = this.dataset.id;
+            const link = this.dataset.link;
+            
+            // Mark as read
+            markNotificationAsRead(notificationId);
+            
+            // Navigate to link if provided
+            if (link) {
+                setTimeout(() => {
+                    window.location.href = link;
+                }, 200);
+            }
         });
     });
 }
@@ -338,6 +356,52 @@ function markNotificationAsRead(notificationId) {
         fetchNotifications();
     });
 }
+
+function toggleNotificationDropdown() {
+    const dropdown = document.getElementById('notification-dropdown');
+    const userMenu = document.getElementById('user-menu');
+    
+    if (!dropdown) return;
+    
+    // Close user menu if open
+    if (userMenu) {
+        userMenu.style.display = 'none';
+    }
+    
+    // Toggle notification dropdown
+    if (dropdown.style.display === 'none' || !dropdown.style.display) {
+        dropdown.style.display = 'block';
+        // Fetch latest notifications when opening
+        fetchNotifications();
+    } else {
+        dropdown.style.display = 'none';
+    }
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('click', function(event) {
+        const notificationWrapper = document.querySelector('.notification-wrapper');
+        const notificationDropdown = document.getElementById('notification-dropdown');
+        const userMenu = document.getElementById('user-menu');
+        const userProfile = document.querySelector('.user-profile');
+        const notificationIcon = document.getElementById('notification-icon');
+        
+        // Close notification dropdown if clicking outside
+        if (notificationDropdown && notificationIcon) {
+            if (!notificationWrapper.contains(event.target)) {
+                notificationDropdown.style.display = 'none';
+            }
+        }
+        
+        // Close user menu if clicking outside
+        if (userMenu && userProfile) {
+            if (!userProfile.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.style.display = 'none';
+            }
+        }
+    });
+});
 
 function formatTimeAgo(dateString) {
     const date = new Date(dateString);

@@ -85,15 +85,33 @@ class PDF {
                 </thead>
                 <tbody>";
         
-        $totalRegular = 0;
-        $totalOvertime = 0;
+        // Helper function to parse HH:MM:SS to seconds
+        $parseTimeToSeconds = function($timeStr) {
+            if (empty($timeStr) || $timeStr === '00:00:00') return 0;
+            $parts = explode(':', $timeStr);
+            if (count($parts) !== 3) return 0;
+            return intval($parts[0]) * 3600 + intval($parts[1]) * 60 + intval($parts[2]);
+        };
+        
+        // Helper function to convert seconds to HH:MM:SS
+        $formatSecondsToTime = function($seconds) {
+            if ($seconds <= 0) return '00:00:00';
+            $hours = floor($seconds / 3600);
+            $minutes = floor(($seconds % 3600) / 60);
+            $secs = $seconds % 60;
+            return sprintf('%02d:%02d:%02d', $hours, $minutes, $secs);
+        };
+        
+        $totalRegularSeconds = 0;
+        $totalOvertimeSeconds = 0;
         
         foreach ($reportData as $row) {
-            $totalHours = $row['regular_hours'] + $row['overtime_hours'];
-            $totalRegular += $row['regular_hours'];
-            $totalOvertime += $row['overtime_hours'];
+            $regularSeconds = $parseTimeToSeconds($row['regular_hours'] ?? '00:00:00');
+            $overtimeSeconds = $parseTimeToSeconds($row['overtime_hours'] ?? '00:00:00');
+            $totalRegularSeconds += $regularSeconds;
+            $totalOvertimeSeconds += $overtimeSeconds;
             
-            $overtimeClass = $row['overtime_hours'] > 0 ? 'overtime' : '';
+            $overtimeClass = $overtimeSeconds > 0 ? 'overtime' : '';
             
             $html .= "
                     <tr>
@@ -103,18 +121,18 @@ class PDF {
                         <td>{$row['check_out']}</td>
                         <td>{$row['regular_hours']}</td>
                         <td class='{$overtimeClass}'>{$row['overtime_hours']}</td>
-                        <td>" . number_format($totalHours, 2) . "</td>
+                        <td>{$row['total_hours']}</td>
                     </tr>";
         }
         
-        $grandTotal = $totalRegular + $totalOvertime;
+        $grandTotalSeconds = $totalRegularSeconds + $totalOvertimeSeconds;
         
         $html .= "
                     <tr style='font-weight: bold; background-color: #e6f2ff;'>
                         <td colspan='4'>TOTAL</td>
-                        <td>" . number_format($totalRegular, 2) . "</td>
-                        <td class='overtime'>" . number_format($totalOvertime, 2) . "</td>
-                        <td>" . number_format($grandTotal, 2) . "</td>
+                        <td>{$formatSecondsToTime($totalRegularSeconds)}</td>
+                        <td class='overtime'>{$formatSecondsToTime($totalOvertimeSeconds)}</td>
+                        <td>{$formatSecondsToTime($grandTotalSeconds)}</td>
                     </tr>
                 </tbody>
             </table>

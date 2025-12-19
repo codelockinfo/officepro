@@ -217,15 +217,15 @@ $employees = $db->fetchAll(
                                     </div>
                                     <div>
                                         <p style="margin: 0; color: #666;">Total Hours</p>
-                                        <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--primary-blue);">${emp.attendance_stats.total_hours || 0}h</p>
+                                        <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--primary-blue);">${emp.attendance_stats.total_hours || '00:00:00'}</p>
                                     </div>
                                     <div>
                                         <p style="margin: 0; color: #666;">Regular Hours</p>
-                                        <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--primary-blue);">${emp.attendance_stats.regular_hours || 0}h</p>
+                                        <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--primary-blue);">${emp.attendance_stats.regular_hours || '00:00:00'}</p>
                                     </div>
                                     <div>
                                         <p style="margin: 0; color: #666;">Overtime Hours</p>
-                                        <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--overtime-orange);">${emp.attendance_stats.overtime_hours || 0}h</p>
+                                        <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--overtime-orange);">${emp.attendance_stats.overtime_hours || '00:00:00'}</p>
                                     </div>
                                 </div>
                             </div>

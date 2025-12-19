@@ -33,11 +33,12 @@ $timerSession = $db->fetchOne(
     [$companyId, $userId, $today]
 );
 
-// Get all ended timer sessions for today
+// Get all ended timer sessions for today - include created_at and updated_at for accurate time display
 $todaySessions = $db->fetchAll(
-    "SELECT * FROM timer_sessions 
+    "SELECT id, start_time, end_time, stop_time, duration_seconds, status, created_at, updated_at
+     FROM timer_sessions 
      WHERE company_id = ? AND user_id = ? AND date = ? AND status = 'ended'
-     ORDER BY start_time ASC",
+     ORDER BY created_at ASC",
     [$companyId, $userId, $today]
 );
 
@@ -295,24 +296,22 @@ $totalHoursWorked = $totalRegularHours + $totalOvertimeHours;
             <tr>
                 <td><?php echo $index + 1; ?></td>
                 <td><?php 
-                    $startTime = DateTime::createFromFormat('Y-m-d H:i:s', $session['start_time']);
-                    echo $startTime ? $startTime->format('h:i A') : '-';
+                    // Use created_at as the actual start time (when timer session was created/started)
+                    if (!empty($session['created_at'])) {
+                        $actualStartTime = DateTime::createFromFormat('Y-m-d H:i:s', $session['created_at']);
+                        echo $actualStartTime ? $actualStartTime->format('h:i A') : '-';
+                    } else {
+                        echo '-';
+                    }
                 ?></td>
                 <td><?php 
-                    // Calculate end time from start_time + duration_seconds for accurate display
-                    if ($session['start_time'] && isset($session['duration_seconds']) && $session['duration_seconds'] > 0) {
-                        $startTime = DateTime::createFromFormat('Y-m-d H:i:s', $session['start_time']);
-                        if ($startTime) {
-                            $endTime = clone $startTime;
-                            $endTime->modify('+' . intval($session['duration_seconds']) . ' seconds');
-                            echo $endTime->format('h:i A');
-                        } else {
-                            echo '-';
-                        }
-                    } elseif ($session['end_time']) {
-                        // Fallback to stored end_time if duration not available
-                        $endTime = DateTime::createFromFormat('Y-m-d H:i:s', $session['end_time']);
-                        echo $endTime ? $endTime->format('h:i A') : '-';
+                    // Use end_time if available, otherwise use updated_at as the actual end time (when timer was stopped)
+                    if (!empty($session['end_time'])) {
+                        $actualEndTime = DateTime::createFromFormat('Y-m-d H:i:s', $session['end_time']);
+                        echo $actualEndTime ? $actualEndTime->format('h:i A') : '-';
+                    } elseif (!empty($session['updated_at'])) {
+                        $actualEndTime = DateTime::createFromFormat('Y-m-d H:i:s', $session['updated_at']);
+                        echo $actualEndTime ? $actualEndTime->format('h:i A') : '-';
                     } else {
                         echo '-';
                     }

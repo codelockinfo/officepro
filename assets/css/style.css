@@ -105,11 +105,21 @@ a:hover {
     gap: 20px;
 }
 
+.notification-wrapper {
+    position: relative;
+}
+
 .notification-icon {
     position: relative;
     cursor: pointer;
     font-size: 24px;
     color: var(--dark-gray);
+    padding: 5px;
+    transition: color 0.3s;
+}
+
+.notification-icon:hover {
+    color: var(--primary-blue);
 }
 
 .notification-badge {
@@ -125,6 +135,78 @@ a:hover {
     display: flex;
     align-items: center;
     justify-content: center;
+    font-weight: bold;
+}
+
+.notification-dropdown {
+    position: absolute;
+    right: 0;
+    top: 50px;
+    width: 350px;
+    max-height: 500px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 1000;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.notification-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    background: var(--light-blue);
+}
+
+.notification-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--dark-gray);
+}
+
+.notification-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.notification-item:hover {
+    background: var(--light-blue);
+}
+
+.notification-item.unread {
+    background: #f8f9ff;
+    font-weight: 500;
+}
+
+.notification-item.unread:hover {
+    background: #e8ebff;
+}
+
+.notification-message {
+    color: var(--dark-gray);
+    font-size: 14px;
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
+
+.notification-time {
+    color: #999;
+    font-size: 12px;
+}
+
+.notification-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
 }
 
 .user-profile {

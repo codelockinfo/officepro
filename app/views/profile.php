@@ -13,9 +13,9 @@ $companyId = Tenant::getCurrentCompanyId();
 $userId = $currentUser['id'];
 $db = Database::getInstance();
 
-// Get full user data with department
+// Get full user data with department and company details
 $user = $db->fetchOne(
-    "SELECT u.*, d.name as department_name, c.company_name 
+    "SELECT u.*, d.name as department_name, c.company_name, c.company_email, c.phone, c.address
     FROM users u 
     LEFT JOIN departments d ON u.department_id = d.id 
     JOIN companies c ON u.company_id = c.id 
@@ -23,24 +23,50 @@ $user = $db->fetchOne(
     [$userId, $companyId]
 );
 
-// Get this month's attendance summary
-$currentMonth = date('Y-m');
-$attendanceSummary = $db->fetchOne(
-    "SELECT 
-        COUNT(DISTINCT date) as days_worked,
-        SUM(regular_hours) as total_regular,
-        SUM(overtime_hours) as total_overtime
-    FROM attendance 
-    WHERE company_id = ? AND user_id = ? AND DATE_FORMAT(date, '%Y-%m') = ? AND status = 'out'",
-    [$companyId, $userId, $currentMonth]
-);
+// Get this month's attendance summary (only for non-company owners)
+$attendanceSummary = null;
+if ($user['role'] !== 'company_owner') {
+    $currentMonth = date('Y-m');
+    $attendanceSummary = $db->fetchOne(
+        "SELECT 
+            COUNT(DISTINCT date) as days_worked,
+            SUM(regular_hours) as total_regular,
+            SUM(overtime_hours) as total_overtime
+        FROM attendance 
+        WHERE company_id = ? AND user_id = ? AND DATE_FORMAT(date, '%Y-%m') = ? AND is_present = 1",
+        [$companyId, $userId, $currentMonth]
+    );
+}
 
-// Get leave balance
-$currentYear = date('Y');
-$leaveBalance = $db->fetchOne(
-    "SELECT * FROM leave_balances WHERE company_id = ? AND user_id = ? AND year = ?",
-    [$companyId, $userId, $currentYear]
-);
+// Get leave balance (only for non-company owners) - Calculate from allocation minus taken leaves
+$leaveBalance = null;
+if ($user['role'] !== 'company_owner') {
+    $currentYear = date('Y');
+    
+    // Get paid leave allocation from company_settings
+    $paidLeaveAllocation = floatval(Tenant::getCompanySetting('paid_leave_allocation', '12'));
+    
+    // Calculate total approved leaves taken for this year
+    $takenLeave = $db->fetchOne(
+        "SELECT COALESCE(SUM(days_count), 0) as total_days
+         FROM leaves 
+         WHERE company_id = ? AND user_id = ? 
+         AND status = 'approved'
+         AND leave_type = 'paid_leave'
+         AND YEAR(start_date) = ?",
+        [$companyId, $userId, $currentYear]
+    );
+    $takenLeaveDays = floatval($takenLeave['total_days'] ?? 0);
+    
+    // Calculate remaining balance
+    $remainingBalance = max(0, $paidLeaveAllocation - $takenLeaveDays);
+    
+    // Set leave balance with calculated value
+    $leaveBalance = [
+        'paid_leave' => $remainingBalance,
+        'year' => $currentYear
+    ];
+}
 ?>
 
 <h1><i class="fas fa-user"></i> My Profile</h1>
@@ -70,10 +96,22 @@ $leaveBalance = $db->fetchOne(
                     <td style="padding: 12px; font-weight: 600;">Email:</td>
                     <td style="padding: 12px;"><?php echo htmlspecialchars($user['email']); ?></td>
                 </tr>
+                <?php if ($user['role'] === 'company_owner'): ?>
+                    <tr style="border-bottom: 1px solid #ddd;">
+                        <td style="padding: 12px; font-weight: 600;">Contact No:</td>
+                        <td style="padding: 12px;"><?php echo htmlspecialchars($user['phone'] ?? 'Not provided'); ?></td>
+                    </tr>
+                <?php endif; ?>
                 <tr style="border-bottom: 1px solid #ddd;">
                     <td style="padding: 12px; font-weight: 600;">Company:</td>
                     <td style="padding: 12px;"><?php echo htmlspecialchars($user['company_name']); ?></td>
                 </tr>
+                <?php if ($user['role'] === 'company_owner'): ?>
+                    <tr style="border-bottom: 1px solid #ddd;">
+                        <td style="padding: 12px; font-weight: 600;">Company Address:</td>
+                        <td style="padding: 12px;"><?php echo htmlspecialchars($user['address'] ?? 'Not provided'); ?></td>
+                    </tr>  
+                <?php endif; ?>
                 <tr style="border-bottom: 1px solid #ddd;">
                     <td style="padding: 12px; font-weight: 600;">Role:</td>
                     <td style="padding: 12px;">
@@ -82,6 +120,7 @@ $leaveBalance = $db->fetchOne(
                         </span>
                     </td>
                 </tr>
+                <?php if ($user['role'] !== 'company_owner'): ?>
                 <tr style="border-bottom: 1px solid #ddd;">
                     <td style="padding: 12px; font-weight: 600;">Status:</td>
                     <td style="padding: 12px;">
@@ -92,6 +131,7 @@ $leaveBalance = $db->fetchOne(
                     <td style="padding: 12px; font-weight: 600;">Member Since:</td>
                     <td style="padding: 12px;"><?php echo date('F d, Y', strtotime($user['created_at'])); ?></td>
                 </tr>
+                <?php endif; ?>
             </table>
             
             <div style="margin-top: 20px;">
@@ -101,7 +141,21 @@ $leaveBalance = $db->fetchOne(
     </div>
 </div>
 
+<?php if ($user['role'] !== 'company_owner'): ?>
 <!-- This Month's Summary -->
+<?php
+// Helper function to convert decimal hours to HH:MM:SS format
+function formatHoursToTime($decimalHours) {
+    if ($decimalHours <= 0) {
+        return '00:00:00';
+    }
+    $totalSeconds = round($decimalHours * 3600);
+    $hours = floor($totalSeconds / 3600);
+    $minutes = floor(($totalSeconds % 3600) / 60);
+    $seconds = $totalSeconds % 60;
+    return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+}
+?>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
     <div class="card" style="text-align: center;">
         <h3 style="color: var(--primary-blue); margin-bottom: 10px;">Days Worked</h3>
@@ -111,19 +165,6 @@ $leaveBalance = $db->fetchOne(
         <p style="color: #666;">this month</p>
     </div>
     
-    <?php
-    // Helper function to convert decimal hours to HH:MM:SS format
-    function formatHoursToTime($decimalHours) {
-        if ($decimalHours <= 0) {
-            return '00:00:00';
-        }
-        $totalSeconds = round($decimalHours * 3600);
-        $hours = floor($totalSeconds / 3600);
-        $minutes = floor(($totalSeconds % 3600) / 60);
-        $seconds = $totalSeconds % 60;
-        return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
-    }
-    ?>
     <div class="card" style="text-align: center;">
         <h3 style="color: var(--primary-blue); margin-bottom: 10px;">Regular Hours</h3>
         <div style="font-size: 36px; font-weight: bold; color: var(--primary-blue);">
@@ -140,10 +181,12 @@ $leaveBalance = $db->fetchOne(
         <p style="color: #666;">HH:MM:SS this month</p>
     </div>
 </div>
+<?php endif; ?>
 
+<?php if ($user['role'] !== 'company_owner'): ?>
 <!-- Leave Balance -->
 <div class="card" style="margin-top: 20px;">
-    <h2 class="card-title">Leave Balance (<?php echo $currentYear; ?>)</h2>
+    <h2 class="card-title">Leave Balance (<?php echo date('Y'); ?>)</h2>
     
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; padding: 20px;">
         <div style="text-align: center; padding: 15px; background: var(--light-blue); border-radius: 8px;">
@@ -154,6 +197,7 @@ $leaveBalance = $db->fetchOne(
         </div>
     </div>
 </div>
+<?php endif; ?>
 
 <!-- Change Password Modal -->
 <div id="change-password-modal" class="modal-overlay">

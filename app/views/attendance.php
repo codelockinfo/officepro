@@ -30,11 +30,12 @@ $startDate = $_GET['start_date'] ?? date('Y-m-01');
 $endDate = $_GET['end_date'] ?? date('Y-m-t');
 
 // Get attendance records (now based on timer sessions)
+// Use created_at for first session start and end_time/updated_at for last session end
 $attendance = $db->fetchAll(
     "SELECT a.*, 
             COUNT(DISTINCT ts.id) as session_count,
-            MIN(ts.start_time) as first_session_start,
-            MAX(ts.end_time) as last_session_end
+            MIN(ts.created_at) as first_session_start,
+            MAX(COALESCE(ts.end_time, ts.updated_at)) as last_session_end
      FROM attendance a
      LEFT JOIN timer_sessions ts ON ts.company_id = a.company_id 
          AND ts.user_id = a.user_id 
@@ -129,8 +130,8 @@ foreach ($attendance as $record) {
             <thead>
                 <tr>
                     <th>Date</th>
-                    <th>First Session</th>
-                    <th>Last Session</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
                     <th>Sessions</th>
                     <th>Regular Hours</th>
                     <th>Overtime Hours</th>
