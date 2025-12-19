@@ -413,3 +413,313 @@ Stack trace:
 Stack trace:
 #0 {main}
   thrown in C:\New xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 15:29:31 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given in C:\xampp\htdocs\officepro\app\views\dashboard.php:298
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\views\dashboard.php on line 298
+[18-Dec-2025 15:29:37 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given in C:\xampp\htdocs\officepro\app\views\dashboard.php:228
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\views\dashboard.php on line 228
+[18-Dec-2025 15:29:55 Asia/Kolkata] PHP Fatal error:  Uncaught TypeError: count(): Argument #1 ($value) must be of type Countable|array, null given in C:\xampp\htdocs\officepro\app\views\dashboard.php:228
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\views\dashboard.php on line 228
+[18-Dec-2025 15:35:28 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 15:35:32 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function formatHoursToTime() in C:\xampp\htdocs\officepro\app\views\attendance.php:76
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\views\attendance.php on line 76
+[18-Dec-2025 15:48:27 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' | Code: 42S22 | SQL: SELECT DATE(date) as date_only, SUM(overtime_hours) as total_overtime 
+        FROM attendance 
+        WHERE company_id = ? AND user_id = ? AND MONTH(date) = ? AND YEAR(date) = ? AND status = 'out'
+        GROUP BY DATE(date) | Params: [4,15,12,2025]
+[18-Dec-2025 15:48:27 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT DATE(dat...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\calendar.php(69): Database->fetchAll('SELECT DATE(dat...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:48:31 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' | Code: 42S22 | SQL: SELECT DATE(date) as date_only, SUM(overtime_hours) as total_overtime 
+        FROM attendance 
+        WHERE company_id = ? AND user_id = ? AND MONTH(date) = ? AND YEAR(date) = ? AND status = 'out'
+        GROUP BY DATE(date) | Params: [4,15,12,2025]
+[18-Dec-2025 15:48:31 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT DATE(dat...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\calendar.php(69): Database->fetchAll('SELECT DATE(dat...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:48:32 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' | Code: 42S22 | SQL: SELECT DATE(date) as date_only, SUM(overtime_hours) as total_overtime 
+        FROM attendance 
+        WHERE company_id = ? AND user_id = ? AND MONTH(date) = ? AND YEAR(date) = ? AND status = 'out'
+        GROUP BY DATE(date) | Params: [4,15,12,2025]
+[18-Dec-2025 15:48:32 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT DATE(dat...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\calendar.php(69): Database->fetchAll('SELECT DATE(dat...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:48:33 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' | Code: 42S22 | SQL: SELECT DATE(date) as date_only, SUM(overtime_hours) as total_overtime 
+        FROM attendance 
+        WHERE company_id = ? AND user_id = ? AND MONTH(date) = ? AND YEAR(date) = ? AND status = 'out'
+        GROUP BY DATE(date) | Params: [4,15,12,2025]
+[18-Dec-2025 15:48:33 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT DATE(dat...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\calendar.php(69): Database->fetchAll('SELECT DATE(dat...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:48:34 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' | Code: 42S22 | SQL: SELECT * FROM attendance 
+    WHERE company_id = ? AND user_id = ? AND date BETWEEN ? AND ? 
+    ORDER BY date DESC, check_in DESC | Params: [4,15,"2025-12-01","2025-12-31"]
+[18-Dec-2025 15:48:34 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT * FROM a...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\attendance.php(21): Database->fetchAll('SELECT * FROM a...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:48:36 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' | Code: 42S22 | SQL: SELECT DATE(date) as date_only, SUM(overtime_hours) as total_overtime 
+        FROM attendance 
+        WHERE company_id = ? AND user_id = ? AND MONTH(date) = ? AND YEAR(date) = ? AND status = 'out'
+        GROUP BY DATE(date) | Params: [4,15,12,2025]
+[18-Dec-2025 15:48:36 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT DATE(dat...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\calendar.php(69): Database->fetchAll('SELECT DATE(dat...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:48:40 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' | Code: 42S22 | SQL: SELECT DATE(date) as date_only, SUM(overtime_hours) as total_overtime 
+        FROM attendance 
+        WHERE company_id = ? AND user_id = ? AND MONTH(date) = ? AND YEAR(date) = ? AND status = 'out'
+        GROUP BY DATE(date) | Params: [4,15,12,2025]
+[18-Dec-2025 15:48:40 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT DATE(dat...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\calendar.php(69): Database->fetchAll('SELECT DATE(dat...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:48:42 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' | Code: 42S22 | SQL: SELECT * FROM attendance 
+    WHERE company_id = ? AND user_id = ? AND date BETWEEN ? AND ? 
+    ORDER BY date DESC, check_in DESC | Params: [4,15,"2025-12-01","2025-12-31"]
+[18-Dec-2025 15:48:42 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT * FROM a...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\attendance.php(21): Database->fetchAll('SELECT * FROM a...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:48:47 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' | Code: 42S22 | SQL: SELECT * FROM attendance 
+    WHERE company_id = ? AND user_id = ? AND date BETWEEN ? AND ? 
+    ORDER BY date DESC, check_in DESC | Params: [4,15,"2025-12-01","2025-12-31"]
+[18-Dec-2025 15:48:47 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT * FROM a...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\attendance.php(21): Database->fetchAll('SELECT * FROM a...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:48:50 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' | Code: 42S22 | SQL: SELECT * FROM attendance 
+    WHERE company_id = ? AND user_id = ? AND date BETWEEN ? AND ? 
+    ORDER BY date DESC, check_in DESC | Params: [4,15,"2025-12-01","2025-12-31"]
+[18-Dec-2025 15:48:50 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT * FROM a...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\attendance.php(21): Database->fetchAll('SELECT * FROM a...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:48:51 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' | Code: 42S22 | SQL: SELECT * FROM attendance 
+    WHERE company_id = ? AND user_id = ? AND date BETWEEN ? AND ? 
+    ORDER BY date DESC, check_in DESC | Params: [4,15,"2025-12-01","2025-12-31"]
+[18-Dec-2025 15:48:51 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT * FROM a...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\attendance.php(21): Database->fetchAll('SELECT * FROM a...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:48:51 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' | Code: 42S22 | SQL: SELECT * FROM attendance 
+    WHERE company_id = ? AND user_id = ? AND date BETWEEN ? AND ? 
+    ORDER BY date DESC, check_in DESC | Params: [4,15,"2025-12-01","2025-12-31"]
+[18-Dec-2025 15:48:51 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT * FROM a...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\attendance.php(21): Database->fetchAll('SELECT * FROM a...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:48:52 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' | Code: 42S22 | SQL: SELECT * FROM attendance 
+    WHERE company_id = ? AND user_id = ? AND date BETWEEN ? AND ? 
+    ORDER BY date DESC, check_in DESC | Params: [4,15,"2025-12-01","2025-12-31"]
+[18-Dec-2025 15:48:52 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT * FROM a...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\attendance.php(21): Database->fetchAll('SELECT * FROM a...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:48:52 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' | Code: 42S22 | SQL: SELECT * FROM attendance 
+    WHERE company_id = ? AND user_id = ? AND date BETWEEN ? AND ? 
+    ORDER BY date DESC, check_in DESC | Params: [4,15,"2025-12-01","2025-12-31"]
+[18-Dec-2025 15:48:52 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT * FROM a...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\attendance.php(21): Database->fetchAll('SELECT * FROM a...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:49:44 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'a.status' in 'where clause' | Code: 42S22 | SQL: SELECT DATE(a.date) as date_only, a.user_id, u.full_name as employee_name, 
+                SUM(a.overtime_hours) as total_overtime 
+         FROM attendance a
+         JOIN users u ON a.user_id = u.id
+         WHERE a.company_id = ? AND MONTH(a.date) = ? AND YEAR(a.date) = ? AND a.status = 'out'
+         GROUP BY DATE(a.date), a.user_id | Params: [4,12,2025]
+[18-Dec-2025 15:49:44 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'a.status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT DATE(a.d...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\calendar.php(58): Database->fetchAll('SELECT DATE(a.d...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:49:49 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'a.status' in 'where clause' | Code: 42S22 | SQL: SELECT DATE(a.date) as date_only, a.user_id, u.full_name as employee_name, 
+                SUM(a.overtime_hours) as total_overtime 
+         FROM attendance a
+         JOIN users u ON a.user_id = u.id
+         WHERE a.company_id = ? AND MONTH(a.date) = ? AND YEAR(a.date) = ? AND a.status = 'out'
+         GROUP BY DATE(a.date), a.user_id | Params: [4,12,2025]
+[18-Dec-2025 15:49:49 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'a.status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT DATE(a.d...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\calendar.php(58): Database->fetchAll('SELECT DATE(a.d...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:49:51 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'a.status' in 'where clause' | Code: 42S22 | SQL: SELECT DATE(a.date) as date_only, a.user_id, u.full_name as employee_name, 
+                SUM(a.overtime_hours) as total_overtime 
+         FROM attendance a
+         JOIN users u ON a.user_id = u.id
+         WHERE a.company_id = ? AND MONTH(a.date) = ? AND YEAR(a.date) = ? AND a.status = 'out'
+         GROUP BY DATE(a.date), a.user_id | Params: [4,12,2025]
+[18-Dec-2025 15:49:51 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'a.status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT DATE(a.d...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\calendar.php(58): Database->fetchAll('SELECT DATE(a.d...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:49:54 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'a.status' in 'where clause' | Code: 42S22 | SQL: SELECT DATE(a.date) as date_only, a.user_id, u.full_name as employee_name, 
+                SUM(a.overtime_hours) as total_overtime 
+         FROM attendance a
+         JOIN users u ON a.user_id = u.id
+         WHERE a.company_id = ? AND MONTH(a.date) = ? AND YEAR(a.date) = ? AND a.status = 'out'
+         GROUP BY DATE(a.date), a.user_id | Params: [4,12,2025]
+[18-Dec-2025 15:49:54 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'a.status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT DATE(a.d...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\calendar.php(58): Database->fetchAll('SELECT DATE(a.d...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:49:58 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' | Code: 42S22 | SQL: SELECT * FROM attendance 
+    WHERE company_id = ? AND user_id = ? AND date BETWEEN ? AND ? 
+    ORDER BY date DESC, check_in DESC | Params: [4,15,"2025-12-01","2025-12-31"]
+[18-Dec-2025 15:49:58 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT * FROM a...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\attendance.php(21): Database->fetchAll('SELECT * FROM a...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:49:59 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' | Code: 42S22 | SQL: SELECT DATE(date) as date_only, SUM(overtime_hours) as total_overtime 
+        FROM attendance 
+        WHERE company_id = ? AND user_id = ? AND MONTH(date) = ? AND YEAR(date) = ? AND status = 'out'
+        GROUP BY DATE(date) | Params: [4,15,12,2025]
+[18-Dec-2025 15:49:59 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT DATE(dat...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\calendar.php(69): Database->fetchAll('SELECT DATE(dat...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:50:01 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' | Code: 42S22 | SQL: SELECT * FROM attendance 
+    WHERE company_id = ? AND user_id = ? AND date BETWEEN ? AND ? 
+    ORDER BY date DESC, check_in DESC | Params: [4,15,"2025-12-01","2025-12-31"]
+[18-Dec-2025 15:50:01 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'check_in' in 'order clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT * FROM a...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\attendance.php(21): Database->fetchAll('SELECT * FROM a...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:50:06 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' | Code: 42S22 | SQL: SELECT DATE(date) as date_only, SUM(overtime_hours) as total_overtime 
+        FROM attendance 
+        WHERE company_id = ? AND user_id = ? AND MONTH(date) = ? AND YEAR(date) = ? AND status = 'out'
+        GROUP BY DATE(date) | Params: [4,15,12,2025]
+[18-Dec-2025 15:50:06 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(57): Database->query('SELECT DATE(dat...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\calendar.php(69): Database->fetchAll('SELECT DATE(dat...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:57:03 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' | Code: 42S22 | SQL: SELECT COUNT(DISTINCT user_id) as count 
+    FROM attendance 
+    WHERE company_id = ? AND date = ? AND status = 'out' | Params: [4,"2025-12-18"]
+[18-Dec-2025 15:57:03 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(62): Database->query('SELECT COUNT(DI...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\reports\report_dashboard.php(21): Database->fetchOne('SELECT COUNT(DI...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:57:06 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' | Code: 42S22 | SQL: SELECT COUNT(DISTINCT user_id) as count 
+    FROM attendance 
+    WHERE company_id = ? AND date = ? AND status = 'out' | Params: [4,"2025-12-18"]
+[18-Dec-2025 15:57:06 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(62): Database->query('SELECT COUNT(DI...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\reports\report_dashboard.php(21): Database->fetchOne('SELECT COUNT(DI...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:57:07 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' | Code: 42S22 | SQL: SELECT COUNT(DISTINCT user_id) as count 
+    FROM attendance 
+    WHERE company_id = ? AND date = ? AND status = 'out' | Params: [4,"2025-12-18"]
+[18-Dec-2025 15:57:07 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(62): Database->query('SELECT COUNT(DI...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\reports\report_dashboard.php(21): Database->fetchOne('SELECT COUNT(DI...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:57:08 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' | Code: 42S22 | SQL: SELECT COUNT(DISTINCT user_id) as count 
+    FROM attendance 
+    WHERE company_id = ? AND date = ? AND status = 'out' | Params: [4,"2025-12-18"]
+[18-Dec-2025 15:57:08 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(62): Database->query('SELECT COUNT(DI...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\reports\report_dashboard.php(21): Database->fetchOne('SELECT COUNT(DI...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:57:42 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' | Code: 42S22 | SQL: SELECT COUNT(DISTINCT user_id) as count 
+    FROM attendance 
+    WHERE company_id = ? AND date = ? AND status = 'out' | Params: [4,"2025-12-18"]
+[18-Dec-2025 15:57:42 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(62): Database->query('SELECT COUNT(DI...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\reports\report_dashboard.php(21): Database->fetchOne('SELECT COUNT(DI...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:57:44 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' | Code: 42S22 | SQL: SELECT COUNT(DISTINCT user_id) as count 
+    FROM attendance 
+    WHERE company_id = ? AND date = ? AND status = 'out' | Params: [4,"2025-12-18"]
+[18-Dec-2025 15:57:44 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(62): Database->query('SELECT COUNT(DI...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\reports\report_dashboard.php(21): Database->fetchOne('SELECT COUNT(DI...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:57:44 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' | Code: 42S22 | SQL: SELECT COUNT(DISTINCT user_id) as count 
+    FROM attendance 
+    WHERE company_id = ? AND date = ? AND status = 'out' | Params: [4,"2025-12-18"]
+[18-Dec-2025 15:57:44 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(62): Database->query('SELECT COUNT(DI...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\reports\report_dashboard.php(21): Database->fetchOne('SELECT COUNT(DI...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52
+[18-Dec-2025 15:57:44 Asia/Kolkata] PDO Exception: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' | Code: 42S22 | SQL: SELECT COUNT(DISTINCT user_id) as count 
+    FROM attendance 
+    WHERE company_id = ? AND date = ? AND status = 'out' | Params: [4,"2025-12-18"]
+[18-Dec-2025 15:57:44 Asia/Kolkata] PHP Fatal error:  Uncaught Exception: Database query failed: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'status' in 'where clause' in C:\xampp\htdocs\officepro\app\helpers\Database.php:52
+Stack trace:
+#0 C:\xampp\htdocs\officepro\app\helpers\Database.php(62): Database->query('SELECT COUNT(DI...', Array)
+#1 C:\xampp\htdocs\officepro\app\views\reports\report_dashboard.php(21): Database->fetchOne('SELECT COUNT(DI...', Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\officepro\app\helpers\Database.php on line 52

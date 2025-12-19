@@ -46,14 +46,18 @@ try {
     $employees = [];
     
     if ($type === 'attendance') {
-        // Get employees who were present (checked in or checked out) on this date
+        // Get employees who were present (have timer sessions) on this date
         $employees = $db->fetchAll(
             "SELECT DISTINCT u.id, u.full_name, u.profile_image, 
-                    MIN(a.check_in) as check_in_time
+                    MIN(ts.start_time) as check_in_time
              FROM attendance a
              JOIN users u ON a.user_id = u.id
+             LEFT JOIN timer_sessions ts ON ts.company_id = a.company_id 
+                 AND ts.user_id = a.user_id 
+                 AND ts.date = a.date
              WHERE a.company_id = ? 
              AND a.date = ? 
+             AND a.is_present = 1
              AND u.status = 'active'
              AND u.id NOT IN (
                  SELECT DISTINCT l.user_id 
@@ -67,7 +71,7 @@ try {
             [$companyId, $date, $companyId, $date]
         );
         
-        // Format check-in time
+        // Format first session start time
         foreach ($employees as &$emp) {
             if ($emp['check_in_time']) {
                 $checkInTime = DateTime::createFromFormat('Y-m-d H:i:s', $emp['check_in_time']);
@@ -109,7 +113,7 @@ try {
              JOIN users u ON a.user_id = u.id
              WHERE a.company_id = ? 
              AND a.date = ? 
-             AND a.status = 'out'
+             AND a.is_present = 1
              AND a.overtime_hours > 0
              AND u.status = 'active'
              GROUP BY u.id, u.full_name, u.profile_image

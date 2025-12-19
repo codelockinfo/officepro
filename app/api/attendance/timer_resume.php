@@ -69,23 +69,29 @@ if ($runningSession) {
 try {
     $db->beginTransaction();
     
-    // Calculate the worked duration before pause
-    $startTime = new DateTime($stoppedSession['start_time']);
-    $stopTime = new DateTime($stoppedSession['stop_time']);
-    $workedDuration = $stopTime->getTimestamp() - $startTime->getTimestamp();
+    // IMPORTANT: Preserve the accumulated duration from previous pauses
+    // Get the already worked duration (from duration_seconds if set, otherwise calculate)
+    $accumulatedDuration = intval($stoppedSession['duration_seconds'] ?? 0);
     
-    // Calculate new start_time = current_time - worked_duration
-    // This way, when we calculate duration later, it will be correct
+    // If duration_seconds is 0 or not set, calculate from start_time to stop_time
+    if ($accumulatedDuration == 0) {
+        $startTime = new DateTime($stoppedSession['start_time']);
+        $stopTime = new DateTime($stoppedSession['stop_time']);
+        $accumulatedDuration = $stopTime->getTimestamp() - $startTime->getTimestamp();
+    }
+    
+    // Calculate new start_time = current_time - accumulated_duration
+    // This way, when we calculate duration later, it will include all previous work
     $now = new DateTime();
-    $newStartTime = $now->getTimestamp() - $workedDuration;
+    $newStartTime = $now->getTimestamp() - $accumulatedDuration;
     $newStartTimeFormatted = date('Y-m-d H:i:s', $newStartTime);
     
-    error_log("Resume Timer - Original start: {$stoppedSession['start_time']}, Stop: {$stoppedSession['stop_time']}, Worked: {$workedDuration}s, New start: {$newStartTimeFormatted}");
+    error_log("Resume Timer - Original start: {$stoppedSession['start_time']}, Stop: {$stoppedSession['stop_time']}, Accumulated duration: {$accumulatedDuration}s, New start: {$newStartTimeFormatted}");
     
-    // Resume the stopped session - adjust start_time to account for paused time
-    // This ensures duration calculation from new start_time to end_time is correct
+    // Resume the stopped session - adjust start_time but PRESERVE accumulated duration
+    // Keep duration_seconds so we can accumulate more time when pausing again
     $db->execute(
-        "UPDATE timer_sessions SET start_time = ?, stop_time = NULL, duration_seconds = 0, status = 'running', updated_at = NOW() 
+        "UPDATE timer_sessions SET start_time = ?, stop_time = NULL, status = 'running', updated_at = NOW() 
         WHERE id = ?",
         [$newStartTimeFormatted, $stoppedSession['id']]
     );
@@ -97,7 +103,8 @@ try {
         'message' => 'Timer resumed successfully',
         'data' => [
             'session_id' => $stoppedSession['id'],
-            'start_time' => $newStartTimeFormatted
+            'start_time' => $newStartTimeFormatted,
+            'accumulated_duration' => $accumulatedDuration
         ]
     ]);
     

@@ -13,15 +13,36 @@ $companyId = Tenant::getCurrentCompanyId();
 $userId = $currentUser['id'];
 $db = Database::getInstance();
 
+// Helper function to convert decimal hours to HH:MM:SS format
+function formatHoursToTime($decimalHours) {
+    if ($decimalHours <= 0) {
+        return '00:00:00';
+    }
+    $totalSeconds = round($decimalHours * 3600);
+    $hours = floor($totalSeconds / 3600);
+    $minutes = floor(($totalSeconds % 3600) / 60);
+    $seconds = $totalSeconds % 60;
+    return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+}
+
 // Get date range from query or default to current month
 $startDate = $_GET['start_date'] ?? date('Y-m-01');
 $endDate = $_GET['end_date'] ?? date('Y-m-t');
 
-// Get attendance records
+// Get attendance records (now based on timer sessions)
 $attendance = $db->fetchAll(
-    "SELECT * FROM attendance 
-    WHERE company_id = ? AND user_id = ? AND date BETWEEN ? AND ? 
-    ORDER BY date DESC, check_in DESC",
+    "SELECT a.*, 
+            COUNT(DISTINCT ts.id) as session_count,
+            MIN(ts.start_time) as first_session_start,
+            MAX(ts.end_time) as last_session_end
+     FROM attendance a
+     LEFT JOIN timer_sessions ts ON ts.company_id = a.company_id 
+         AND ts.user_id = a.user_id 
+         AND ts.date = a.date 
+         AND ts.status = 'ended'
+     WHERE a.company_id = ? AND a.user_id = ? AND a.date BETWEEN ? AND ?
+     GROUP BY a.id
+     ORDER BY a.date DESC",
     [$companyId, $userId, $startDate, $endDate]
 );
 
@@ -31,10 +52,12 @@ $totalOvertime = 0;
 $totalDays = 0;
 
 foreach ($attendance as $record) {
-    if ($record['status'] === 'out') {
-        $totalRegular += $record['regular_hours'];
-        $totalOvertime += $record['overtime_hours'];
-        $totalDays++;
+    if ($record['is_present']) {
+        $totalRegular += floatval($record['regular_hours'] ?? 0);
+        $totalOvertime += floatval($record['overtime_hours'] ?? 0);
+        if ($record['regular_hours'] > 0 || $record['overtime_hours'] > 0) {
+            $totalDays++;
+        }
     }
 }
 ?>
@@ -106,8 +129,9 @@ foreach ($attendance as $record) {
             <thead>
                 <tr>
                     <th>Date</th>
-                    <th>Check In</th>
-                    <th>Check Out</th>
+                    <th>First Session</th>
+                    <th>Last Session</th>
+                    <th>Sessions</th>
                     <th>Regular Hours</th>
                     <th>Overtime Hours</th>
                     <th>Total Hours</th>
@@ -118,14 +142,28 @@ foreach ($attendance as $record) {
                 <?php foreach ($attendance as $record): ?>
                 <tr>
                     <td><?php echo date('M d, Y', strtotime($record['date'])); ?></td>
-                    <td><?php echo date('h:i A', strtotime($record['check_in'])); ?></td>
                     <td>
                         <?php 
-                        if ($record['check_out']) {
-                            echo date('h:i A', strtotime($record['check_out']));
+                        if ($record['first_session_start']) {
+                            echo date('h:i A', strtotime($record['first_session_start']));
                         } else {
-                            echo '<span class="badge badge-success">Still Checked In</span>';
+                            echo '-';
                         }
+                        ?>
+                    </td>
+                    <td>
+                        <?php 
+                        if ($record['last_session_end']) {
+                            echo date('h:i A', strtotime($record['last_session_end']));
+                        } else {
+                            echo '-';
+                        }
+                        ?>
+                    </td>
+                    <td>
+                        <?php 
+                        $sessionCount = intval($record['session_count'] ?? 0);
+                        echo $sessionCount > 0 ? $sessionCount : '-';
                         ?>
                     </td>
                     <td><?php echo formatHoursToTime($record['regular_hours']); ?></td>
@@ -137,10 +175,10 @@ foreach ($attendance as $record) {
                     </td>
                     <td><strong><?php echo formatHoursToTime($record['regular_hours'] + $record['overtime_hours']); ?></strong></td>
                     <td>
-                        <?php if ($record['status'] === 'in'): ?>
-                            <span class="badge badge-success">Checked In</span>
+                        <?php if ($record['is_present']): ?>
+                            <span class="badge badge-success">Present</span>
                         <?php else: ?>
-                            <span class="badge badge-primary">Completed</span>
+                            <span class="badge badge-secondary">Absent</span>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -148,7 +186,7 @@ foreach ($attendance as $record) {
             </tbody>
             <tfoot>
                 <tr style="font-weight: bold; background: var(--light-blue);">
-                    <td colspan="3">TOTAL</td>
+                    <td colspan="4">TOTAL</td>
                     <td><?php echo formatHoursToTime($totalRegular); ?></td>
                     <td style="color: var(--overtime-orange);"><?php echo formatHoursToTime($totalOvertime); ?></td>
                     <td><?php echo formatHoursToTime($totalRegular + $totalOvertime); ?></td>
@@ -160,5 +198,3 @@ foreach ($attendance as $record) {
 </div>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>
-
-
