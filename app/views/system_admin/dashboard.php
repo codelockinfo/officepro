@@ -93,7 +93,7 @@ $recentCompanies = $db->fetchAll(
                     </td>
                     <td><?php echo date('M d, Y', strtotime($company['created_at'])); ?></td>
                     <td>
-                        <a href="/officepro/app/views/system_admin/companies.php?id=<?php echo $company['id']; ?>" class="btn btn-sm btn-primary">View</a>
+                        <a href="/public_html/app/views/system_admin/companies.php?id=<?php echo $company['id']; ?>" class="btn btn-sm btn-primary">View</a>
                     </td>
                 </tr>
                 <?php endforeach; ?>

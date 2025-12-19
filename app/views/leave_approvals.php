@@ -222,7 +222,7 @@ $allLeaves = $db->fetchAll(
 
 <script>
     function viewLeaveForApproval(id) {
-        ajaxRequest(`/officepro/app/api/leaves/view.php?id=${id}`, 'GET', null, (response) => {
+        ajaxRequest(`/public_html/app/api/leaves/view.php?id=${id}`, 'GET', null, (response) => {
             if (response.success) {
                 const leave = response.data;
                 const typeLabels = {
@@ -260,7 +260,7 @@ $allLeaves = $db->fetchAll(
     }
     
     function viewLeaveDetails(id) {
-        ajaxRequest(`/officepro/app/api/leaves/view.php?id=${id}`, 'GET', null, (response) => {
+        ajaxRequest(`/public_html/app/api/leaves/view.php?id=${id}`, 'GET', null, (response) => {
             if (response.success) {
                 const leave = response.data;
                 const typeLabels = {
@@ -330,7 +330,7 @@ $allLeaves = $db->fetchAll(
         const formData = new FormData(event.target);
         const data = Object.fromEntries(formData);
         
-        ajaxRequest('/officepro/app/api/leaves/approve.php', 'POST', data, (response) => {
+        ajaxRequest('/public_html/app/api/leaves/approve.php', 'POST', data, (response) => {
             if (response.success) {
                 showMessage('success', `Leave ${data.action}d successfully!`);
                 closeModal('approval-modal');

@@ -77,10 +77,10 @@ if ($user['role'] !== 'company_owner') {
     
     <div style="padding: 20px; display: grid; grid-template-columns: 200px 1fr; gap: 30px;">
         <div style="text-align: center;">
-            <img id="current-profile-image" src="/officepro/<?php echo htmlspecialchars($user['profile_image']); ?>" 
+            <img id="current-profile-image" src="/public_html/<?php echo htmlspecialchars($user['profile_image']); ?>" 
                  alt="Profile" 
                  style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-blue);"
-                 onerror="this.src='/officepro/assets/images/default-avatar.png'">
+                 onerror="this.src='/public_html/assets/images/default-avatar.png'">
             <button onclick="openChangePhotoModal()" class="btn btn-sm btn-secondary custom-btn-secondary" style="margin-top: 15px; width: 100%;">
                 Change Photo
             </button>
@@ -246,7 +246,7 @@ function formatHoursToTime($decimalHours) {
                     <input type="file" id="new_photo" name="profile_image" class="form-control" accept="image/*" onchange="previewPhoto(this)" required>
                     <small class="text-muted">Minimum 200x200 pixels, max 2MB</small>
                     <div id="photo-preview" style="margin-top: 15px; text-align: center;">
-                        <img src="/officepro/<?php echo htmlspecialchars($user['profile_image']); ?>" 
+                        <img src="/public_html/<?php echo htmlspecialchars($user['profile_image']); ?>" 
                              style="max-width: 200px; max-height: 200px; border-radius: 8px;">
                     </div>
                 </div>
@@ -295,7 +295,7 @@ function formatHoursToTime($decimalHours) {
         const formData = new FormData(event.target);
         const data = Object.fromEntries(formData);
         
-        ajaxRequest('/officepro/app/api/user/change_password.php', 'POST', data, (response) => {
+        ajaxRequest('/public_html/app/api/user/change_password.php', 'POST', data, (response) => {
             if (response.success) {
                 showMessage('success', 'Password changed successfully!');
                 closeModal('change-password-modal');
@@ -312,7 +312,7 @@ function formatHoursToTime($decimalHours) {
         
         showLoader();
         
-        fetch('/officepro/app/api/user/change_photo.php', {
+        fetch('/public_html/app/api/user/change_photo.php', {
             method: 'POST',
             body: formData
         })
@@ -324,7 +324,7 @@ function formatHoursToTime($decimalHours) {
                 closeModal('change-photo-modal');
                 
                 // Update all profile images on the page without reload
-                const newImageUrl = '/officepro/' + data.new_image + '?v=' + Date.now();
+                const newImageUrl = '/public_html/' + data.new_image + '?v=' + Date.now();
                 document.getElementById('current-profile-image').src = newImageUrl;
                 
                 // Update header avatar if exists

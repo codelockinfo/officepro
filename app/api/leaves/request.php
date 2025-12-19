@@ -167,7 +167,7 @@ try {
     foreach ($managers as $manager) {
         $db->execute(
             "INSERT INTO notifications (company_id, user_id, type, message, link, created_at) 
-            VALUES (?, ?, 'leave_request', ?, '/officepro/app/views/leave_approvals.php', NOW())",
+            VALUES (?, ?, 'leave_request', ?, '/public_html/app/views/leave_approvals.php', NOW())",
             [$companyId, $manager['id'], $message]
         );
     }

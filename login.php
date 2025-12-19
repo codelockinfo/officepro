@@ -433,11 +433,11 @@ if (isset($_SESSION['user_id'])) {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
-            ajaxRequest('/officepro/app/api/auth/login.php', 'POST', { email, password }, (response) => {
+            ajaxRequest('/public_html/app/api/auth/login.php', 'POST', { email, password }, (response) => {
                 if (response.success) {
                     showMessage('success', 'Login successful! Redirecting...');
                     setTimeout(() => {
-                        window.location.href = '/officepro/app/views/dashboard.php';
+                        window.location.href = '/public_html/app/views/dashboard.php';
                     }, 1000);
                 } else {
                     const errorDiv = document.getElementById('error-message');
@@ -514,7 +514,7 @@ if (isset($_SESSION['user_id'])) {
             hideMessages();
             showLoader();
             
-            ajaxRequest('/officepro/app/api/auth/forgot_password.php', 'POST', { email }, (response) => {
+            ajaxRequest('/public_html/app/api/auth/forgot_password.php', 'POST', { email }, (response) => {
                 hideLoader();
                 if (response.success) {
                     resetEmail = email;
@@ -546,7 +546,7 @@ if (isset($_SESSION['user_id'])) {
             hideMessages();
             showLoader();
             
-            ajaxRequest('/officepro/app/api/auth/verify_reset_code.php', 'POST', { 
+            ajaxRequest('/public_html/app/api/auth/verify_reset_code.php', 'POST', { 
                 email: resetEmail, 
                 reset_code: code 
             }, (response) => {
@@ -582,7 +582,7 @@ if (isset($_SESSION['user_id'])) {
             hideMessages();
             showLoader();
             
-            ajaxRequest('/officepro/app/api/auth/reset_password.php', 'POST', { 
+            ajaxRequest('/public_html/app/api/auth/reset_password.php', 'POST', { 
                 new_password: newPassword,
                 confirm_password: confirmPassword
             }, (response) => {

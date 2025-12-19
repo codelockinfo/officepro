@@ -330,7 +330,7 @@ $leaves = $db->fetchAll(
                 document.getElementById('days-info').style.display = 'block';
             } else if (endDate) {
                 // Call API to calculate days (excludes Sundays and holidays)
-                fetch(`/officepro/app/api/leaves/calculate_days.php?start_date=${startDate}&end_date=${endDate}&leave_duration=full_day`)
+                fetch(`/public_html/app/api/leaves/calculate_days.php?start_date=${startDate}&end_date=${endDate}&leave_duration=full_day`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -372,7 +372,7 @@ $leaves = $db->fetchAll(
         
         showLoader();
         
-            fetch('/officepro/app/api/leaves/request.php', {
+            fetch('/public_html/app/api/leaves/request.php', {
             method: 'POST',
             body: formData
         })
@@ -394,7 +394,7 @@ $leaves = $db->fetchAll(
     }
     
     function viewLeaveDetails(id) {
-        ajaxRequest(`/officepro/app/api/leaves/view.php?id=${id}`, 'GET', null, (response) => {
+        ajaxRequest(`/public_html/app/api/leaves/view.php?id=${id}`, 'GET', null, (response) => {
             if (response.success) {
                 const leave = response.data;
                 const typeLabels = {
@@ -437,7 +437,7 @@ $leaves = $db->fetchAll(
         confirmDialog(
             'This action cannot be undone.',
             () => {
-                ajaxRequest(`/officepro/app/api/leaves/cancel.php?id=${id}`, 'POST', null, (response) => {
+                ajaxRequest(`/public_html/app/api/leaves/cancel.php?id=${id}`, 'POST', null, (response) => {
                     if (response.success) {
                         showMessage('success', 'Leave request cancelled');
                         setTimeout(() => location.reload(), 1000);

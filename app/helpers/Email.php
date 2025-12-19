@@ -108,7 +108,7 @@ class Email {
         $emailer = new self();
         $appConfig = require __DIR__ . '/../config/app.php';
         
-        $registrationLink = $appConfig['app_url'] . '/register.php?token=' . $token;
+        $registrationLink = 'https://lightgray-parrot-671749.hostingersite.com/public_html/register.php?token=' . $token;
         
         $subject = "Invitation to join {$companyName}";
         

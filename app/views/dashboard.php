@@ -17,7 +17,7 @@ try {
     $companyId = Tenant::getCurrentCompanyId();
 } catch (Exception $e) {
     error_log("Dashboard: Tenant error - " . $e->getMessage());
-    header('Location: /officepro/login.php');
+    header('Location: /public_html/login.php');
     exit;
 }
 
@@ -262,18 +262,18 @@ $totalHoursWorked = $totalRegularHours + $totalOvertimeHours;
         <h2 class="card-title">Quick Actions</h2>
         <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px;">
             <?php if ($currentUser['role'] !== 'company_owner'): ?>
-                <a href="/officepro/app/views/leaves.php" class="btn btn-primary custom-btn-primary">Request Leave</a>
+                <a href="/public_html/app/views/leaves.php" class="btn btn-primary custom-btn-primary">Request Leave</a>
             <?php endif; ?>
             <?php if ($currentUser['role'] === 'company_owner'): ?>
-                <a href="/officepro/app/views/company/employees.php" class="btn btn-primary custom-btn-primary">Manage Employees</a>
-                <a href="/officepro/app/views/company/invitations.php" class="btn btn-primary custom-btn-primary">Invite Employees</a>
-                <a href="/officepro/app/views/leave_approvals.php" class="btn btn-secondary custom-btn-secondary">Leave Approvals</a>
-                <a href="/officepro/app/views/reports/report_dashboard.php" class="btn btn-secondary custom-btn-secondary">View Reports</a>
+                <a href="/public_html/app/views/company/employees.php" class="btn btn-primary custom-btn-primary">Manage Employees</a>
+                <a href="/public_html/app/views/company/invitations.php" class="btn btn-primary custom-btn-primary">Invite Employees</a>
+                <a href="/public_html/app/views/leave_approvals.php" class="btn btn-secondary custom-btn-secondary">Leave Approvals</a>
+                <a href="/public_html/app/views/reports/report_dashboard.php" class="btn btn-secondary custom-btn-secondary">View Reports</a>
             <?php else: ?>
-                <a href="/officepro/app/views/employee/tasks.php" class="btn btn-secondary custom-btn-secondary">View My Tasks</a>
-                <a href="/officepro/app/views/employee/credentials.php" class="btn btn-secondary custom-btn-secondary">My Credentials</a>
+                <a href="/public_html/app/views/employee/tasks.php" class="btn btn-secondary custom-btn-secondary">View My Tasks</a>
+                <a href="/public_html/app/views/employee/credentials.php" class="btn btn-secondary custom-btn-secondary">My Credentials</a>
             <?php endif; ?>
-            <a href="/officepro/app/views/calendar.php" class="btn btn-secondary custom-btn-secondary">View Calendar</a>
+            <a href="/public_html/app/views/calendar.php" class="btn btn-secondary custom-btn-secondary">View Calendar</a>
         </div>
     </div>
 </div>
@@ -331,7 +331,7 @@ $totalHoursWorked = $totalRegularHours + $totalOvertimeHours;
     
     function startWorkTimerSession() {
         showLoader();
-        ajaxRequest('/officepro/app/api/attendance/timer_start.php', 'POST', {}, (response) => {
+        ajaxRequest('/public_html/app/api/attendance/timer_start.php', 'POST', {}, (response) => {
             hideLoader();
             if (response.success) {
                 showMessage('success', 'Timer started!');
@@ -358,7 +358,7 @@ $totalHoursWorked = $totalRegularHours + $totalOvertimeHours;
         
         // Make API call to stop timer
         showLoader();
-        ajaxRequest('/officepro/app/api/attendance/timer_end.php', 'POST', {}, (response) => {
+        ajaxRequest('/public_html/app/api/attendance/timer_end.php', 'POST', {}, (response) => {
             hideLoader();
             if (response.success) {
                 showMessage('success', 'Timer stopped! Session saved.');

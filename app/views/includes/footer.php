@@ -2,8 +2,8 @@
         </div>
     </div>
     
-    <script src="/officepro/assets/js/app.js"></script>
-    <script src="/officepro/assets/js/modal.js"></script>
+    <script src="/public_html/assets/js/app.js"></script>
+    <script src="/public_html/assets/js/modal.js"></script>
     <script>
         function toggleUserMenu() {
             const menu = document.getElementById('user-menu');
@@ -39,10 +39,10 @@
             showLoader();
             
             // Perform logout
-            ajaxRequest('/officepro/app/api/auth/logout.php', 'POST', null, () => {
+            ajaxRequest('/public_html/app/api/auth/logout.php', 'POST', null, () => {
                 showMessage('success', 'Logged out successfully!');
                 setTimeout(() => {
-                    window.location.href = '/officepro/login.php';
+                    window.location.href = '/public_html/login.php';
                 }, 500);
             });
         }

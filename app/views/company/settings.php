@@ -100,7 +100,7 @@ error_log("Company Settings - Company ID: $companyId, Logo from DB: " . ($compan
                 <div id="logo-preview-container" style="margin-top: 10px;">
                     <?php if ($hasLogo): ?>
                         <div id="current-logo">
-                            <img id="current-logo-img" src="/officepro/<?php echo htmlspecialchars($company['logo']); ?>" 
+                            <img id="current-logo-img" src="/public_html/<?php echo htmlspecialchars($company['logo']); ?>" 
                                  alt="Current Logo" 
                                  style="max-height: 60px; border: 1px solid #ddd; padding: 5px; border-radius: 4px; display: block;"
                                  onerror="handleLogoError();">
@@ -209,7 +209,7 @@ error_log("Company Settings - Company ID: $companyId, Logo from DB: " . ($compan
         const formData = new FormData();
         formData.append('remove_logo', '1');
         
-        ajaxRequest('/officepro/app/api/company/update_settings.php', 'POST', formData, (response) => {
+        ajaxRequest('/public_html/app/api/company/update_settings.php', 'POST', formData, (response) => {
             removeBtn.disabled = false;
             removeBtn.textContent = originalText;
             
@@ -271,7 +271,7 @@ error_log("Company Settings - Company ID: $companyId, Logo from DB: " . ($compan
         
         console.log('Calling ajaxRequest...');
         // Send to API
-        ajaxRequest('/officepro/app/api/company/update_settings.php', 'POST', formData, (response) => {
+        ajaxRequest('/public_html/app/api/company/update_settings.php', 'POST', formData, (response) => {
             console.log('API Response received:', response);
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
@@ -290,7 +290,7 @@ error_log("Company Settings - Company ID: $companyId, Logo from DB: " . ($compan
                     const removeBtn = currentLogoDiv ? currentLogoDiv.querySelector('button') : null;
                     
                     if (currentLogoImg && currentLogoDiv) {
-                        currentLogoImg.src = '/officepro/' + response.data.company_logo;
+                        currentLogoImg.src = '/public_html/' + response.data.company_logo;
                         currentLogoImg.style.display = 'block';
                         currentLogoDiv.style.display = 'block';
                         
@@ -318,7 +318,7 @@ error_log("Company Settings - Company ID: $companyId, Logo from DB: " . ($compan
                     // Update header logo
                     const headerLogo = document.querySelector('.company-logo');
                     if (headerLogo) {
-                        headerLogo.src = '/officepro/' + response.data.company_logo;
+                        headerLogo.src = '/public_html/' + response.data.company_logo;
                         headerLogo.style.display = 'block';
                     }
                 }

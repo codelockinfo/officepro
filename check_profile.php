@@ -43,7 +43,7 @@ if (file_exists($fullPath)) {
 
 echo "<h2>Image Display Test:</h2>";
 echo "<p>Using path from database:</p>";
-echo "<img src='/officepro/" . htmlspecialchars($imagePath) . "' style='max-width: 200px; border: 2px solid red;'>";
+echo "<img src='/public_html/" . htmlspecialchars($imagePath) . "' style='max-width: 200px; border: 2px solid red;'>";
 
 echo "<h2>Uploaded Files in uploads/profiles/:</h2>";
 $files = glob('uploads/profiles/*');
@@ -59,8 +59,8 @@ foreach ($files as $file) {
 echo "</ul>";
 
 echo "<hr>";
-echo "<a href='/officepro/app/views/profile.php'>Go to Profile Page</a> | ";
-echo "<a href='/officepro/app/views/dashboard.php'>Go to Dashboard</a>";
+echo "<a href='/public_html/app/views/profile.php'>Go to Profile Page</a> | ";
+echo "<a href='/public_html/app/views/dashboard.php'>Go to Dashboard</a>";
 ?>
 
 

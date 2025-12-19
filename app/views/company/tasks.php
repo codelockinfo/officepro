@@ -184,7 +184,7 @@ $employees = $db->fetchAll(
     }
     
     function editTask(id) {
-        ajaxRequest(`/officepro/app/api/employee/tasks.php?action=get&id=${id}`, 'GET', null, (response) => {
+        ajaxRequest(`/public_html/app/api/employee/tasks.php?action=get&id=${id}`, 'GET', null, (response) => {
             if (response.success && response.data) {
                 const task = response.data;
                 
@@ -230,7 +230,7 @@ $employees = $db->fetchAll(
         }
         
         const action = id ? 'update' : 'create';
-        const url = id ? `/officepro/app/api/employee/tasks.php?action=${action}&id=${id}` : `/officepro/app/api/employee/tasks.php?action=${action}`;
+        const url = id ? `/public_html/app/api/employee/tasks.php?action=${action}&id=${id}` : `/public_html/app/api/employee/tasks.php?action=${action}`;
         
         ajaxRequest(url, 'POST', data, (response) => {
             if (response.success) {
@@ -252,7 +252,7 @@ $employees = $db->fetchAll(
         confirmDialog(
             'This task will be permanently deleted.',
             () => {
-                ajaxRequest(`/officepro/app/api/employee/tasks.php?action=delete&id=${id}`, 'DELETE', null, (response) => {
+                ajaxRequest(`/public_html/app/api/employee/tasks.php?action=delete&id=${id}`, 'DELETE', null, (response) => {
                     if (response.success) {
                         showMessage('success', 'Task deleted');
                         setTimeout(() => location.reload(), 1000);

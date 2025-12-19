@@ -369,16 +369,16 @@ Add these to your crontab for automated tasks:
 
 ```bash
 # Expire old invitations (daily at midnight)
-0 0 * * * php /path/to/officepro/scripts/expire_invitations.php
+0 0 * * * php /path/to/public_html/scripts/expire_invitations.php
 
 # Auto-checkout employees (daily at midnight)
-0 0 * * * php /path/to/officepro/scripts/auto_checkout.php
+0 0 * * * php /path/to/public_html/scripts/auto_checkout.php
 
 # Send task reminders (daily at 9 AM)
-0 9 * * * php /path/to/officepro/scripts/task_reminders.php
+0 9 * * * php /path/to/public_html/scripts/task_reminders.php
 
 # Database backup (daily at 2 AM)
-0 2 * * * php /path/to/officepro/scripts/backup_db.php
+0 2 * * * php /path/to/public_html/scripts/backup_db.php
 ```
 
 ## Development Roadmap

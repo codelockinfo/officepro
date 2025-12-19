@@ -85,7 +85,7 @@ switch ($action) {
                 $currentUser = Auth::getCurrentUser();
             $db->execute(
                 "INSERT INTO notifications (company_id, user_id, type, message, link, created_at) 
-                VALUES (?, ?, 'task_assigned', ?, '/officepro/app/views/employee/tasks.php', NOW())",
+                VALUES (?, ?, 'task_assigned', ?, '/public_html/app/views/employee/tasks.php', NOW())",
                 [$companyId, $assignedTo, "{$currentUser['full_name']} assigned you a task: {$title}"]
             );
             }
@@ -192,7 +192,7 @@ switch ($action) {
                     
                     $db->execute(
                         "INSERT INTO notifications (company_id, user_id, type, message, link, created_at) 
-                        VALUES (?, ?, 'task_status', ?, '/officepro/app/views/company/tasks.php', NOW())",
+                        VALUES (?, ?, 'task_status', ?, '/public_html/app/views/company/tasks.php', NOW())",
                         [$companyId, $ownerId, $message]
                     );
                 }
@@ -360,7 +360,7 @@ switch ($action) {
                 $currentUser = Auth::getCurrentUser();
                 $db->execute(
                     "INSERT INTO notifications (company_id, user_id, type, message, link, created_at) 
-                    VALUES (?, ?, 'task_assigned', ?, '/officepro/app/views/employee/tasks.php', NOW())",
+                    VALUES (?, ?, 'task_assigned', ?, '/public_html/app/views/employee/tasks.php', NOW())",
                     [$companyId, $assignedTo, "{$currentUser['full_name']} assigned you a task: {$title}"]
                 );
             }
