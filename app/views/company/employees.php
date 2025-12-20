@@ -175,7 +175,7 @@ $employees = $db->fetchAll(
     function viewEmployee(id) {
         // Find employee data from table
         ajaxRequest(`/officepro/app/api/company/employee_details.php?id=${id}`, 'GET', null, (response) => {
-            if (response.success) {
+            if (response && response.success) {
                 const emp = response.data;
                 
                 const roleLabels = {
@@ -268,15 +268,18 @@ $employees = $db->fetchAll(
                 
                 createModal('<i class="fas fa-user"></i> Employee Details', content, footer, 'modal-lg');
             } else {
-                showMessage('error', response.message || 'Failed to load employee details');
+                showMessage('error', (response && response.message) ? response.message : 'Failed to load employee details');
             }
+        }, (error) => {
+            console.error('View employee error:', error);
+            showMessage('error', 'Failed to load employee details. Please check your connection and try again.');
         });
     }
     
     function editEmployee(id) {
         // Fetch employee details
         ajaxRequest(`/officepro/app/api/company/employee_details.php?id=${id}`, 'GET', null, (response) => {
-            if (response.success) {
+            if (response && response.success) {
                 const emp = response.data;
                 
                 // Format join date for date input (YYYY-MM-DD)
@@ -317,8 +320,11 @@ $employees = $db->fetchAll(
                 
                 createModal('<i class="fas fa-edit"></i> Edit Employee', content, footer, 'modal-md');
             } else {
-                showMessage('error', response.message || 'Failed to load employee details');
+                showMessage('error', (response && response.message) ? response.message : 'Failed to load employee details');
             }
+        }, (error) => {
+            console.error('Edit employee error:', error);
+            showMessage('error', 'Failed to load employee details. Please check your connection and try again.');
         });
     }
     

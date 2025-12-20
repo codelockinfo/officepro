@@ -19,65 +19,80 @@ if (!Auth::isLoggedIn()) {
 
 Auth::requireRole(['company_owner', 'manager']);
 
-$companyId = Tenant::getCurrentCompanyId();
-$employeeId = $_GET['id'] ?? 0;
-$db = Database::getInstance();
+try {
+    $companyId = Tenant::getCurrentCompanyId();
+    $employeeId = $_GET['id'] ?? 0;
+    $db = Database::getInstance();
 
-// Set timezone from config
-$appConfig = require __DIR__ . '/../../config/app.php';
-date_default_timezone_set($appConfig['timezone']);
+    // Set timezone from config
+    $appConfig = require __DIR__ . '/../../config/app.php';
+    date_default_timezone_set($appConfig['timezone']);
 
-// Get employee details
-$employee = $db->fetchOne(
-    "SELECT u.*, d.name as department_name 
-    FROM users u 
-    LEFT JOIN departments d ON u.department_id = d.id 
-    WHERE u.id = ? AND u.company_id = ?",
-    [$employeeId, $companyId]
-);
+    // Get employee details
+    $employee = $db->fetchOne(
+        "SELECT u.*, d.name as department_name 
+        FROM users u 
+        LEFT JOIN departments d ON u.department_id = d.id 
+        WHERE u.id = ? AND u.company_id = ?",
+        [$employeeId, $companyId]
+    );
 
-if (!$employee) {
-    echo json_encode(['success' => false, 'message' => 'Employee not found']);
+    if (!$employee) {
+        echo json_encode(['success' => false, 'message' => 'Employee not found']);
+        exit;
+    }
+} catch (Exception $e) {
+    error_log("Employee Details API Error: " . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Failed to load employee details. Please try again.']);
     exit;
 }
 
-// Get this month's attendance stats
-$currentMonth = date('Y-m');
-$attendanceStats = $db->fetchOne(
-    "SELECT 
-        COUNT(DISTINCT date) as days_worked,
-        SUM(regular_hours) as regular_hours,
-        SUM(overtime_hours) as overtime_hours,
-        SUM(regular_hours + overtime_hours) as total_hours
-    FROM attendance 
-    WHERE company_id = ? AND user_id = ? AND DATE_FORMAT(date, '%Y-%m') = ? AND is_present = 1",
-    [$companyId, $employeeId, $currentMonth]
-);
+try {
+    // Get this month's attendance stats
+    $currentMonth = date('Y-m');
+    $attendanceStats = $db->fetchOne(
+        "SELECT 
+            COUNT(DISTINCT date) as days_worked,
+            SUM(regular_hours) as regular_hours,
+            SUM(overtime_hours) as overtime_hours,
+            SUM(regular_hours + overtime_hours) as total_hours
+        FROM attendance 
+        WHERE company_id = ? AND user_id = ? AND DATE_FORMAT(date, '%Y-%m') = ? AND is_present = 1",
+        [$companyId, $employeeId, $currentMonth]
+    );
 
-// Get current year leave balance - Calculate from allocation minus taken leaves
-$currentYear = date('Y');
+    // Get current year leave balance - Calculate from allocation minus taken leaves
+    $currentYear = date('Y');
 
-// Get paid leave allocation from company_settings
-$paidLeaveSetting = $db->fetchOne(
-    "SELECT setting_value FROM company_settings WHERE company_id = ? AND setting_key = 'paid_leave_allocation' LIMIT 1",
-    [$companyId]
-);
-$paidLeaveAllocation = $paidLeaveSetting ? floatval($paidLeaveSetting['setting_value']) : 12.0;
+    // Get paid leave allocation from company_settings
+    $paidLeaveSetting = $db->fetchOne(
+        "SELECT setting_value FROM company_settings WHERE company_id = ? AND setting_key = 'paid_leave_allocation' LIMIT 1",
+        [$companyId]
+    );
+    $paidLeaveAllocation = $paidLeaveSetting ? floatval($paidLeaveSetting['setting_value']) : 12.0;
 
-// Calculate total approved leaves taken for this year
-$takenLeave = $db->fetchOne(
-    "SELECT COALESCE(SUM(days_count), 0) as total_days
-     FROM leaves 
-     WHERE company_id = ? AND user_id = ? 
-     AND status = 'approved'
-     AND leave_type = 'paid_leave'
-     AND YEAR(start_date) = ?",
-    [$companyId, $employeeId, $currentYear]
-);
-$takenLeaveDays = floatval($takenLeave['total_days'] ?? 0);
+    // Calculate total approved leaves taken for this year
+    $takenLeave = $db->fetchOne(
+        "SELECT COALESCE(SUM(days_count), 0) as total_days
+         FROM leaves 
+         WHERE company_id = ? AND user_id = ? 
+         AND status = 'approved'
+         AND leave_type = 'paid_leave'
+         AND YEAR(start_date) = ?",
+        [$companyId, $employeeId, $currentYear]
+    );
+    $takenLeaveDays = floatval($takenLeave['total_days'] ?? 0);
 
-// Calculate remaining balance
-$remainingBalance = max(0, $paidLeaveAllocation - $takenLeaveDays);
+    // Calculate remaining balance
+    $remainingBalance = max(0, $paidLeaveAllocation - $takenLeaveDays);
+} catch (Exception $e) {
+    error_log("Employee Details API - Stats Error: " . $e->getMessage());
+    // Continue with empty stats if there's an error
+    $attendanceStats = null;
+    $currentYear = date('Y');
+    $remainingBalance = 0;
+}
 
 // Helper function to convert decimal hours to HH:MM:SS format
 function formatHoursToTime($decimalHours) {
@@ -114,9 +129,15 @@ $employee['leave_balance'] = [
 // Remove password from response
 unset($employee['password']);
 
-echo json_encode([
-    'success' => true,
-    'data' => $employee
-]);
+try {
+    echo json_encode([
+        'success' => true,
+        'data' => $employee
+    ]);
+} catch (Exception $e) {
+    error_log("Employee Details API - JSON Encode Error: " . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Failed to format response. Please try again.']);
+}
 
 
