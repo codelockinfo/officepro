@@ -23,49 +23,79 @@ $user = $db->fetchOne(
     [$userId, $companyId]
 );
 
+// Check if user data was found
+if (!$user) {
+    die('User not found. Please contact administrator.');
+}
+
 // Get this month's attendance summary (only for non-company owners)
 $attendanceSummary = null;
 if ($user['role'] !== 'company_owner') {
-    $currentMonth = date('Y-m');
-    $attendanceSummary = $db->fetchOne(
-        "SELECT 
-            COUNT(DISTINCT date) as days_worked,
-            SUM(regular_hours) as total_regular,
-            SUM(overtime_hours) as total_overtime
-        FROM attendance 
-        WHERE company_id = ? AND user_id = ? AND DATE_FORMAT(date, '%Y-%m') = ? AND is_present = 1",
-        [$companyId, $userId, $currentMonth]
-    );
+    try {
+        $currentMonth = date('Y-m');
+        $attendanceSummary = $db->fetchOne(
+            "SELECT 
+                COUNT(DISTINCT date) as days_worked,
+                SUM(regular_hours) as total_regular,
+                SUM(overtime_hours) as total_overtime
+            FROM attendance 
+            WHERE company_id = ? AND user_id = ? AND DATE_FORMAT(date, '%Y-%m') = ? AND is_present = 1",
+            [$companyId, $userId, $currentMonth]
+        );
+        // Ensure we have default values even if query returns null
+        if (!$attendanceSummary) {
+            $attendanceSummary = [
+                'days_worked' => 0,
+                'total_regular' => 0,
+                'total_overtime' => 0
+            ];
+        }
+    } catch (Exception $e) {
+        error_log("Profile page attendance summary error: " . $e->getMessage());
+        $attendanceSummary = [
+            'days_worked' => 0,
+            'total_regular' => 0,
+            'total_overtime' => 0
+        ];
+    }
 }
 
 // Get leave balance (only for non-company owners) - Calculate from allocation minus taken leaves
 $leaveBalance = null;
 if ($user['role'] !== 'company_owner') {
-    $currentYear = date('Y');
-    
-    // Get paid leave allocation from company_settings
-    $paidLeaveAllocation = floatval(Tenant::getCompanySetting('paid_leave_allocation', '12'));
-    
-    // Calculate total approved leaves taken for this year
-    $takenLeave = $db->fetchOne(
-        "SELECT COALESCE(SUM(days_count), 0) as total_days
-         FROM leaves 
-         WHERE company_id = ? AND user_id = ? 
-         AND status = 'approved'
-         AND leave_type = 'paid_leave'
-         AND YEAR(start_date) = ?",
-        [$companyId, $userId, $currentYear]
-    );
-    $takenLeaveDays = floatval($takenLeave['total_days'] ?? 0);
-    
-    // Calculate remaining balance
-    $remainingBalance = max(0, $paidLeaveAllocation - $takenLeaveDays);
-    
-    // Set leave balance with calculated value
-    $leaveBalance = [
-        'paid_leave' => $remainingBalance,
-        'year' => $currentYear
-    ];
+    try {
+        $currentYear = date('Y');
+        
+        // Get paid leave allocation from company_settings
+        $paidLeaveAllocation = floatval(Tenant::getCompanySetting('paid_leave_allocation', '12'));
+        
+        // Calculate total approved leaves taken for this year
+        $takenLeave = $db->fetchOne(
+            "SELECT COALESCE(SUM(days_count), 0) as total_days
+             FROM leaves 
+             WHERE company_id = ? AND user_id = ? 
+             AND status = 'approved'
+             AND leave_type = 'paid_leave'
+             AND YEAR(start_date) = ?",
+            [$companyId, $userId, $currentYear]
+        );
+        $takenLeaveDays = floatval($takenLeave['total_days'] ?? 0);
+        
+        // Calculate remaining balance
+        $remainingBalance = max(0, $paidLeaveAllocation - $takenLeaveDays);
+        
+        // Set leave balance with calculated value
+        $leaveBalance = [
+            'paid_leave' => $remainingBalance,
+            'year' => $currentYear
+        ];
+    } catch (Exception $e) {
+        error_log("Profile page leave balance error: " . $e->getMessage());
+        $leaveBalance = [
+            'paid_leave' => 0,
+            'year' => date('Y')
+        ];
+    }
 }
 ?>
 
