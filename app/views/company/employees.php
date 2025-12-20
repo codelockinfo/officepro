@@ -64,10 +64,23 @@ $employees = $db->fetchAll(
             
             <!-- Profile Picture -->
             <div style="text-align: center; margin-top: 10px; margin-bottom: 15px;">
-                <img src="/officepro/<?php echo htmlspecialchars($emp['profile_image']); ?>" 
-                     alt="Profile" 
-                     style="width: 100px; height: 100px; border-radius: 12px; object-fit: cover; border: 2px solid #e0e0e0;"
-                     onerror="this.src='/officepro/assets/images/default-avatar.png'">
+                <?php 
+                $profileImage = trim($emp['profile_image'] ?? '');
+                $hasProfileImage = !empty($profileImage) && $profileImage !== 'assets/images/default-avatar.png';
+                if ($hasProfileImage): 
+                ?>
+                    <img src="/officepro/<?php echo htmlspecialchars($profileImage); ?>" 
+                         alt="Profile" 
+                         style="width: 100px; height: 100px; border-radius: 12px; object-fit: cover; border: 2px solid #e0e0e0;"
+                         onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div style="width: 100px; height: 100px; border-radius: 12px; border: 2px solid #e0e0e0; background: #f5f5f5; display: none; align-items: center; justify-content: center; margin: 0 auto;">
+                        <i class="fas fa-user" style="font-size: 50px; color: #999;"></i>
+                    </div>
+                <?php else: ?>
+                    <div style="width: 100px; height: 100px; border-radius: 12px; border: 2px solid #e0e0e0; background: #f5f5f5; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <i class="fas fa-user" style="font-size: 50px; color: #999;"></i>
+                    </div>
+                <?php endif; ?>
             </div>
             
             <!-- Name -->
@@ -177,13 +190,16 @@ $employees = $db->fetchAll(
                     'suspended': 'badge-danger'
                 };
                 
+                // Check if profile image exists (not empty and not default avatar)
+                const hasProfileImage = emp.profile_image && emp.profile_image.trim() !== '' && emp.profile_image !== 'assets/images/default-avatar.png';
+                const profileImageHtml = hasProfileImage 
+                    ? `<img src="/officepro/${emp.profile_image}" alt="Profile" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-blue);" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';"><div style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--primary-blue); background: #f5f5f5; display: none; align-items: center; justify-content: center; margin: 0 auto;"><i class="fas fa-user" style="font-size: 60px; color: #999;"></i></div>`
+                    : `<div style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--primary-blue); background: #f5f5f5; display: flex; align-items: center; justify-content: center; margin: 0 auto;"><i class="fas fa-user" style="font-size: 60px; color: #999;"></i></div>`;
+                
                 const content = `
                     <div style="padding: 20px;">
                         <div style="text-align: center; margin-bottom: 20px;">
-                            <img src="/officepro/${emp.profile_image}" 
-                                 alt="Profile" 
-                                 style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-blue);"
-                                 onerror="this.src='/officepro/assets/images/default-avatar.png'">
+                            ${profileImageHtml}
                         </div>
                         
                         <table style="width: 100%; border-collapse: collapse;">

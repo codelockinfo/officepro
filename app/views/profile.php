@@ -107,10 +107,23 @@ if ($user['role'] !== 'company_owner') {
     
     <div style="padding: 20px; display: grid; grid-template-columns: 200px 1fr; gap: 30px;">
         <div style="text-align: center;">
-            <img id="current-profile-image" src="/officepro/<?php echo htmlspecialchars($user['profile_image']); ?>" 
-                 alt="Profile" 
-                 style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-blue);"
-                 onerror="this.src='/officepro/assets/images/default-avatar.png'">
+            <?php 
+            $profileImage = trim($user['profile_image'] ?? '');
+            $hasProfileImage = !empty($profileImage) && $profileImage !== 'assets/images/default-avatar.png';
+            if ($hasProfileImage): 
+            ?>
+                <img id="current-profile-image" src="/officepro/<?php echo htmlspecialchars($profileImage); ?>" 
+                     alt="Profile" 
+                     style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-blue);"
+                     onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div id="current-profile-icon" style="width: 150px; height: 150px; border-radius: 50%; border: 3px solid var(--primary-blue); background: #f5f5f5; display: none; align-items: center; justify-content: center; margin: 0 auto;">
+                    <i class="fas fa-user" style="font-size: 75px; color: #999;"></i>
+                </div>
+            <?php else: ?>
+                <div id="current-profile-icon" style="width: 150px; height: 150px; border-radius: 50%; border: 3px solid var(--primary-blue); background: #f5f5f5; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                    <i class="fas fa-user" style="font-size: 75px; color: #999;"></i>
+                </div>
+            <?php endif; ?>
             <button onclick="openChangePhotoModal()" class="btn btn-sm btn-secondary custom-btn-secondary" style="margin-top: 15px; width: 100%;">
                 Change Photo
             </button>
@@ -276,8 +289,18 @@ function formatHoursToTime($decimalHours) {
                     <input type="file" id="new_photo" name="profile_image" class="form-control" accept="image/*" onchange="previewPhoto(this)" required>
                     <small class="text-muted">Minimum 200x200 pixels, max 2MB</small>
                     <div id="photo-preview" style="margin-top: 15px; text-align: center;">
-                        <img src="/officepro/<?php echo htmlspecialchars($user['profile_image']); ?>" 
-                             style="max-width: 200px; max-height: 200px; border-radius: 8px;">
+                        <?php if ($hasProfileImage): ?>
+                            <img src="/officepro/<?php echo htmlspecialchars($profileImage); ?>" 
+                                 style="max-width: 200px; max-height: 200px; border-radius: 8px;"
+                                 onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="width: 200px; height: 200px; border-radius: 8px; border: 2px solid #e0e0e0; background: #f5f5f5; display: none; align-items: center; justify-content: center; margin: 0 auto;">
+                                <i class="fas fa-user" style="font-size: 100px; color: #999;"></i>
+                            </div>
+                        <?php else: ?>
+                            <div style="width: 200px; height: 200px; border-radius: 8px; border: 2px solid #e0e0e0; background: #f5f5f5; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                <i class="fas fa-user" style="font-size: 100px; color: #999;"></i>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 
@@ -355,7 +378,19 @@ function formatHoursToTime($decimalHours) {
                 
                 // Update all profile images on the page without reload
                 const newImageUrl = '/officepro/' + data.new_image + '?v=' + Date.now();
-                document.getElementById('current-profile-image').src = newImageUrl;
+                const currentProfileImage = document.getElementById('current-profile-image');
+                // If it's an img tag, update src; if it's a div with icon, replace with img
+                if (currentProfileImage.tagName === 'IMG') {
+                    currentProfileImage.src = newImageUrl;
+                } else {
+                    // Replace icon div with image
+                    const newImg = document.createElement('img');
+                    newImg.id = 'current-profile-image';
+                    newImg.src = newImageUrl;
+                    newImg.alt = 'Profile';
+                    newImg.style.cssText = 'width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-blue);';
+                    currentProfileImage.parentNode.replaceChild(newImg, currentProfileImage);
+                }
                 
                 // Update header avatar if exists
                 const headerAvatar = document.querySelector('.user-avatar');
