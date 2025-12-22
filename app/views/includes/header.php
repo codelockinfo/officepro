@@ -64,12 +64,19 @@ if (empty($profileImage) || trim($profileImage) === '') {
         </defs>
     </svg>
     <div class="main-layout">
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
         <?php include __DIR__ . '/sidebar.php'; ?>
         
         <div class="content-wrapper">
             <header class="header">
                 <div class="header-left">
-                    <button id="sidebar-toggle" class="btn btn-secondary" style="display: none;"><i class="fas fa-bars"></i></button>
+                    <button id="sidebar-toggle" class="togglebtn" style="display: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: block;">
+                            <path d="M4 18L20 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M4 12L20 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M4 6L20 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
                     <?php if ($companyLogo && !empty(trim($companyLogo))): ?>
                         <img src="/officepro/<?php echo htmlspecialchars($companyLogo); ?>" 
                              alt="Company Logo" 
@@ -108,7 +115,7 @@ if (empty($profileImage) || trim($profileImage) === '') {
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     
-                    <div id="user-menu" class="user-menu" style="display: none; position: absolute; right: 20px; top: 60px; background: white; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); min-width: 200px;">
+                    <div id="user-menu" class="user-menu" style="display: none; position: absolute; right: 20px; top: 70px; background: white; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); min-width: 200px;">
                         <div style="padding: 10px; border-bottom: 1px solid #ddd;">
                             <strong><?php echo htmlspecialchars($currentUser['full_name']); ?></strong><br>
                             <small><?php echo htmlspecialchars($currentUser['role']); ?></small>

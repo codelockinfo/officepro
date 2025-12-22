@@ -479,6 +479,11 @@ function initBlobButtonsSecondary() {
     const secondaryButtons = document.querySelectorAll('.btn-secondary');
     
     secondaryButtons.forEach(button => {
+        // Skip sidebar-toggle button (it has SVG icon, not text)
+        if (button.id === 'sidebar-toggle') {
+            return;
+        }
+        
         // Skip if already initialized
         if (button.querySelector('.blob-btn__inner')) {
             return;
@@ -563,10 +568,51 @@ document.addEventListener('DOMContentLoaded', function() {
     // Toggle sidebar on mobile 
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebar = document.querySelector('.sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    
+    function toggleSidebar() {
+        if (sidebar) {
+            sidebar.classList.toggle('active');
+            if (sidebarOverlay) {
+                sidebarOverlay.classList.toggle('active');
+            }
+        }
+    }
+    
+    function closeSidebar() {
+        if (sidebar) {
+            sidebar.classList.remove('active');
+            if (sidebarOverlay) {
+                sidebarOverlay.classList.remove('active');
+            }
+        }
+    }
     
     if (sidebarToggle && sidebar) {
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
+        sidebarToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleSidebar();
+        });
+    }
+    
+    // Close sidebar when clicking overlay
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', () => {
+            closeSidebar();
+        });
+    }
+    
+    // Close sidebar when resizing from mobile to desktop
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 767 && sidebar && sidebar.classList.contains('active')) {
+            closeSidebar();
+        }
+    });
+    
+    // Prevent sidebar from closing when clicking inside it
+    if (sidebar) {
+        sidebar.addEventListener('click', (e) => {
+            e.stopPropagation();
         });
     }
     

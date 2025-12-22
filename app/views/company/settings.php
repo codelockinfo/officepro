@@ -31,7 +31,7 @@ error_log("Company Settings - Company ID: $companyId, Logo from DB: " . ($compan
 <div class="card" style="margin-top: 20px;">
     <h2 class="card-title">Company Information</h2>
     
-    <form id="company-settings-form" enctype="multipart/form-data" onsubmit="saveSettings(event); return false;" style="padding: 20px;">
+    <form id="company-settings-form" enctype="multipart/form-data" onsubmit="saveSettings(event); return false;">
         <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
             <div class="form-group">
                 <label class="form-label" for="company_name">Company Name *</label>

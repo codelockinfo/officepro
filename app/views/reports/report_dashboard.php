@@ -151,7 +151,7 @@ $totalEmployees = $db->fetchOne(
 <!-- Generate Reports -->
 <div class="card">
     <h2 class="card-title">Generate Reports</h2>
-    <div style="padding: 20px;">
+    <div>
         <form id="report-form" style="display: grid; gap: 20px;">
             <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group">

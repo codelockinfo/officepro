@@ -61,9 +61,21 @@ $invitations = Invitation::getCompanyInvitations($companyId);
                     </td>
                     <td>
                         <?php if ($inv['status'] === 'pending'): ?>
-                            <button onclick="copyInviteLink('<?php echo htmlspecialchars($inv['token']); ?>')" class="btn btn-sm btn-primary">Copy Link</button>
-                            <button onclick="resendInvite(<?php echo $inv['id']; ?>)" class="btn btn-sm btn-primary">Resend</button>
-                            <button onclick="cancelInvite(<?php echo $inv['id']; ?>)" class="btn btn-sm btn-danger">Cancel</button>
+                            <button onclick="copyInviteLink('<?php echo htmlspecialchars($inv['token']); ?>')" class="btn btn-sm invite-action-btn" title="Copy Link" style="padding: 8px 12px; width: 40px; height: 36px; margin-right: 5px; background: #4da6ff; color: white; border: 1px solid #4da6ff;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                            </button>
+                            <button onclick="resendInvite(<?php echo $inv['id']; ?>)" class="btn btn-sm invite-action-btn" title="Resend" style="padding: 8px 12px; width: 40px; height: 36px; margin-right: 5px; background: #f0f0f0; color: #333; border: 1px solid #ddd;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                                    <path d="M21 3v5h-5"></path>
+                                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                                    <path d="M3 21v-5h5"></path>
+                                </svg>
+                            </button>
+                            <button onclick="cancelInvite(<?php echo $inv['id']; ?>)" class="btn btn-sm btn-danger invite-action-btn" title="Cancel" style="padding: 8px 12px; width: 40px; height: 36px;"><i class="fas fa-times"></i></button>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -108,6 +120,21 @@ $invitations = Invitation::getCompanyInvitations($companyId);
         </div>
     </div>
 </div>
+
+<style>
+    .invite-action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+    }
+    
+    .invite-action-btn:first-child:hover {
+        background: #000000 !important;
+        color: #ffffff !important;
+        border-color: #000000 !important;
+    }
+</style>
 
 <script>
     function openInviteModal() {

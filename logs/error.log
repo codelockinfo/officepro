@@ -986,3 +986,29 @@ Stack trace:
 [20-Dec-2025 09:44:12 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
 [20-Dec-2025 09:44:42 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
 [20-Dec-2025 09:44:42 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[20-Dec-2025 12:48:03 Asia/Kolkata] Company Settings - Company ID: 6, Logo from DB: NULL
+[20-Dec-2025 12:48:03 Asia/Kolkata] Company Settings - Logo check: hasLogo=false, logo=NULL
+[20-Dec-2025 12:49:42 Asia/Kolkata] Company Settings - Company ID: 6, Logo from DB: NULL
+[20-Dec-2025 12:49:42 Asia/Kolkata] Company Settings - Logo check: hasLogo=false, logo=NULL
+[20-Dec-2025 12:49:59 Asia/Kolkata] Company Settings - Company ID: 6, Logo from DB: NULL
+[20-Dec-2025 12:49:59 Asia/Kolkata] Company Settings - Logo check: hasLogo=false, logo=NULL
+[20-Dec-2025 12:59:37 Asia/Kolkata] Company Settings - Company ID: 6, Logo from DB: NULL
+[20-Dec-2025 12:59:37 Asia/Kolkata] Company Settings - Logo check: hasLogo=false, logo=NULL
+[20-Dec-2025 13:02:30 Asia/Kolkata] Company Settings - Company ID: 6, Logo from DB: NULL
+[20-Dec-2025 13:02:30 Asia/Kolkata] Company Settings - Logo check: hasLogo=false, logo=NULL
+[20-Dec-2025 13:14:15 Asia/Kolkata] Company Settings - Company ID: 6, Logo from DB: NULL
+[20-Dec-2025 13:14:15 Asia/Kolkata] Company Settings - Logo check: hasLogo=false, logo=NULL
+[20-Dec-2025 13:14:16 Asia/Kolkata] Company Settings - Company ID: 6, Logo from DB: NULL
+[20-Dec-2025 13:14:16 Asia/Kolkata] Company Settings - Logo check: hasLogo=false, logo=NULL
+[20-Dec-2025 13:17:39 Asia/Kolkata] Company Settings - Company ID: 6, Logo from DB: NULL
+[20-Dec-2025 13:17:39 Asia/Kolkata] Company Settings - Logo check: hasLogo=false, logo=NULL
+[20-Dec-2025 13:19:14 Asia/Kolkata] Company Settings - Company ID: 6, Logo from DB: NULL
+[20-Dec-2025 13:19:14 Asia/Kolkata] Company Settings - Logo check: hasLogo=false, logo=NULL
+[20-Dec-2025 13:20:03 Asia/Kolkata] Company Settings - Company ID: 6, Logo from DB: NULL
+[20-Dec-2025 13:20:03 Asia/Kolkata] Company Settings - Logo check: hasLogo=false, logo=NULL
+[20-Dec-2025 13:38:21 Asia/Kolkata] Company Settings - Company ID: 6, Logo from DB: NULL
+[20-Dec-2025 13:38:21 Asia/Kolkata] Company Settings - Logo check: hasLogo=false, logo=NULL
+[20-Dec-2025 13:48:05 Asia/Kolkata] Company Settings - Company ID: 6, Logo from DB: NULL
+[20-Dec-2025 13:48:05 Asia/Kolkata] Company Settings - Logo check: hasLogo=false, logo=NULL
+[20-Dec-2025 13:49:13 Asia/Kolkata] Company Settings - Company ID: 6, Logo from DB: NULL
+[20-Dec-2025 13:49:13 Asia/Kolkata] Company Settings - Logo check: hasLogo=false, logo=NULL

@@ -156,13 +156,13 @@ if ($nextMonth > 12) {
 
 <!-- Month Navigation -->
 <div class="card" style="margin-bottom: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-    <div style="padding: 25px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--primary-blue) 0%, #3d8ce6 100%); border-radius: 12px;">
+    <div style="padding: 15px; display: flex; justify-content: space-between; align-items: center;text-align: center; background: linear-gradient(135deg, var(--primary-blue) 0%, #3d8ce6 100%); border-radius: 12px;">
         <a href="?month=<?php echo $prevMonth; ?>&year=<?php echo $prevYear; ?>" 
            class="btn btn-secondary" 
            style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 10px 20px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-chevron-left"></i> Previous
         </a>
-        <h2 style="margin: 0; color: white; font-size: 28px; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+        <h2 style="margin: 0; color: white; line-height: 1.2; font-size: 25px; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
             <?php echo date('F Y', $firstDay); ?>
         </h2>
         <a href="?month=<?php echo $nextMonth; ?>&year=<?php echo $nextYear; ?>" 
@@ -432,11 +432,11 @@ if ($nextMonth > 12) {
 <?php if (Auth::hasRole(['company_owner'])): ?>
 <!-- Employee Filter Tabs (Company Owner Only) -->
 <div id="filter-section-card" class="card" style="margin-bottom: 25px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); scroll-margin-top: 20px;">
-    <div style="padding: 20px;">
+    <div>
         <h3 style="margin: 0 0 20px 0; color: var(--primary-blue); font-size: 16px; font-weight: 600;">
             <i class="fas fa-filter"></i> Filter Employees
         </h3>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
             <button onclick="showEmployeeList('attendance')" id="tab-attendance" class="calendar-tab active">
                 <i class="fas fa-check-circle"></i> Attendance
             </button>

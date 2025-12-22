@@ -85,7 +85,7 @@ $totalOvertimeHours = floatval($todayAttendance['overtime_hours'] ?? 0);
 $totalHoursWorked = $totalRegularHours + $totalOvertimeHours;
 ?>
 
-<h1>Welcome, <?php echo htmlspecialchars($currentUser['full_name']); ?>! </h1>
+<h1 class="profile-name">Welcome, <?php echo htmlspecialchars($currentUser['full_name']); ?>! </h1>
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px;">
     <?php if ($currentUser['role'] !== 'company_owner'): ?>
