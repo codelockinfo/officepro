@@ -374,6 +374,7 @@ $employees = $db->fetchAll(
         });
     }
     
+    
     // Calendar functions removed - now using month selector for stats only
     
     function editEmployee(id) {
