@@ -70,8 +70,27 @@ $validator->required($ownerData['password'], 'Password');
 $validator->minLength($ownerData['password'], 8, 'Password');
 
 // Handle profile image upload (required)
+$profileImageUploaded = false;
 if (!isset($_FILES['profile_image']) || $_FILES['profile_image']['error'] !== UPLOAD_ERR_OK) {
-    $validator->required('', 'Profile Image');
+    // Check for specific upload errors
+    if (isset($_FILES['profile_image'])) {
+        $uploadError = $_FILES['profile_image']['error'];
+        $errorMessages = [
+            UPLOAD_ERR_INI_SIZE => 'File exceeds upload_max_filesize in php.ini',
+            UPLOAD_ERR_FORM_SIZE => 'File exceeds MAX_FILE_SIZE in form',
+            UPLOAD_ERR_PARTIAL => 'File was only partially uploaded',
+            UPLOAD_ERR_NO_FILE => 'No file was uploaded',
+            UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder',
+            UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
+            UPLOAD_ERR_EXTENSION => 'File upload stopped by extension'
+        ];
+        $errorMsg = $errorMessages[$uploadError] ?? 'Unknown upload error';
+        error_log("Company Registration - Profile image upload error: $errorMsg (code: $uploadError)");
+        echo json_encode(['success' => false, 'message' => 'Profile image upload failed: ' . $errorMsg]);
+        exit;
+    } else {
+        $validator->required('', 'Profile Image');
+    }
 } else {
     error_log("Company Registration - Profile image upload attempt");
     error_log("Company Registration - Files array: " . print_r($_FILES, true));
@@ -87,14 +106,22 @@ if (!isset($_FILES['profile_image']) || $_FILES['profile_image']['error'] !== UP
         if (!file_exists($uploadDir)) {
             if (!mkdir($uploadDir, 0755, true)) {
                 error_log("Company Registration - Failed to create upload directory");
-                echo json_encode(['success' => false, 'message' => 'Failed to create upload directory']);
+                echo json_encode(['success' => false, 'message' => 'Failed to create upload directory. Please check server permissions.']);
                 exit;
             }
+        }
+        
+        // Check if directory is writable after creation
+        if (!is_writable($uploadDir)) {
+            error_log("Company Registration - Upload directory is not writable: $uploadDir");
+            echo json_encode(['success' => false, 'message' => 'Upload directory is not writable. Please check server permissions.']);
+            exit;
         }
         
         $profileFilename = Validator::uploadFile($_FILES['profile_image'], $uploadDir, 'profile_');
         if ($profileFilename) {
             $ownerData['profile_image'] = 'uploads/profiles/' . $profileFilename;
+            $profileImageUploaded = true;
             error_log("Company Registration - Profile image uploaded successfully: " . $ownerData['profile_image']);
             
             // Verify file exists
@@ -103,13 +130,18 @@ if (!isset($_FILES['profile_image']) || $_FILES['profile_image']['error'] !== UP
                 error_log("Company Registration - Verified profile image file exists at: $fullPath");
             } else {
                 error_log("Company Registration - WARNING: Profile image file does not exist at: $fullPath");
+                // File was supposed to be uploaded but doesn't exist - use default
+                $ownerData['profile_image'] = 'assets/images/default-avatar.png';
+                error_log("Company Registration - Using default avatar instead");
             }
         } else {
             error_log("Company Registration - Profile image upload failed - Validator::uploadFile returned false");
             $uploadErrors = $validator->getErrors();
             error_log("Company Registration - Upload errors: " . json_encode($uploadErrors));
-            echo json_encode(['success' => false, 'message' => 'Failed to upload profile image: ' . json_encode($uploadErrors)]);
-            exit;
+            
+            // Use default avatar if upload fails but don't block registration
+            $ownerData['profile_image'] = 'assets/images/default-avatar.png';
+            error_log("Company Registration - Using default avatar due to upload failure");
         }
     } else {
         $validationErrors = $validator->getErrors();
@@ -117,6 +149,12 @@ if (!isset($_FILES['profile_image']) || $_FILES['profile_image']['error'] !== UP
         echo json_encode(['success' => false, 'message' => 'Invalid profile image', 'errors' => $validationErrors]);
         exit;
     }
+}
+
+// Ensure profile_image is always set (fallback to default)
+if (empty($ownerData['profile_image'])) {
+    $ownerData['profile_image'] = 'assets/images/default-avatar.png';
+    error_log("Company Registration - Profile image not set, using default avatar");
 }
 
 if ($validator->hasErrors()) {

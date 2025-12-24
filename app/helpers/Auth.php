@@ -34,6 +34,15 @@ class Auth {
             
             // Create owner user
             $hashedPassword = password_hash($ownerData['password'], PASSWORD_BCRYPT);
+            
+            // Ensure profile_image is set (fallback to default)
+            $profileImage = $ownerData['profile_image'] ?? 'assets/images/default-avatar.png';
+            if (empty($profileImage) || trim($profileImage) === '') {
+                $profileImage = 'assets/images/default-avatar.png';
+            }
+            
+            error_log("Register Company - Inserting user with profile_image: $profileImage");
+            
             $db->execute(
                 "INSERT INTO users (company_id, email, password, full_name, profile_image, role, status, created_at) 
                 VALUES (?, ?, ?, ?, ?, 'company_owner', 'active', NOW())",
@@ -42,7 +51,7 @@ class Auth {
                     $ownerData['email'],
                     $hashedPassword,
                     $ownerData['full_name'],
-                    $ownerData['profile_image']
+                    $profileImage
                 ]
             );
             

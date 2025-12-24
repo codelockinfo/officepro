@@ -72,18 +72,21 @@ $employees = $db->fetchAll(
                         <td>
                             <?php
                             $statusColors = [
-                                'todo' => 'badge-secondary',
-                                'in_progress' => 'badge-warning',
-                                'done' => 'badge-success'
+                                'todo' => '#c36522',
+                                'in_progress' => '#1276e2',
+                                'done' => '#00ad25'
                             ];
                             $statusLabels = [
                                 'todo' => 'Pending',
                                 'in_progress' => 'Processing',
                                 'done' => 'Completed'
                             ];
+                            $currentStatus = $task['status'] ?? 'todo';
+                            $badgeColor = $statusColors[$currentStatus] ?? '#c36522';
+                            $badgeText = $statusLabels[$currentStatus] ?? 'Pending';
                             ?>
-                            <span class="badge <?php echo $statusColors[$task['status']]; ?>">
-                                <?php echo $statusLabels[$task['status']]; ?>
+                            <span class="badge" style="background-color: <?php echo $badgeColor; ?>; color: white; padding: 6px 12px; border-radius: 4px; font-weight: 500;">
+                                <?php echo $badgeText; ?>
                             </span>
                         </td>
                         <td><?php echo $task['due_date'] ? date('M d, Y', strtotime($task['due_date'])) : '-'; ?></td>

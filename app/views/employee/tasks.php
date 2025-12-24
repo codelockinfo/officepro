@@ -74,14 +74,14 @@ $completedTasks = array_filter($allTasks, function($task) {
                         <div>
                             <?php
                             $statusBadges = [
-                                'todo' => ['class' => 'badge-secondary', 'text' => 'Pending'],
-                                'in_progress' => ['class' => 'badge-warning', 'text' => 'Processing'],
-                                'done' => ['class' => 'badge-success', 'text' => 'Completed']
+                                'todo' => ['color' => '#c36522', 'text' => 'Pending'],
+                                'in_progress' => ['color' => '#1276e2', 'text' => 'Processing'],
+                                'done' => ['color' => '#00ad25', 'text' => 'Completed']
                             ];
                             $currentStatus = $task['status'] ?? 'todo';
                             $badge = $statusBadges[$currentStatus] ?? $statusBadges['todo'];
                             ?>
-                            <span class="badge <?php echo $badge['class']; ?>"><?php echo $badge['text']; ?></span>
+                            <span class="badge" style="background-color: <?php echo $badge['color']; ?>; color: white; padding: 6px 12px; border-radius: 4px; font-weight: 500;"><?php echo $badge['text']; ?></span>
                         </div>
                     </div>
                     
@@ -119,7 +119,7 @@ $completedTasks = array_filter($allTasks, function($task) {
                             <p style="margin: 0; color: #666; font-size: 14px;">Created by: <?php echo htmlspecialchars($task['created_by_name']); ?></p>
                         </div>
                         <div>
-                            <span class="badge badge-warning">Processing</span>
+                            <span class="badge" style="background-color: #1276e2; color: white; padding: 6px 12px; border-radius: 4px; font-weight: 500;">Processing</span>
                         </div>
                     </div>
                     
@@ -157,7 +157,7 @@ $completedTasks = array_filter($allTasks, function($task) {
                             <p style="margin: 0; color: #666; font-size: 14px;">Created by: <?php echo htmlspecialchars($task['created_by_name']); ?></p>
                         </div>
                         <div>
-                            <span class="badge badge-success">Completed</span>
+                            <span class="badge" style="background-color: #00ad25; color: white; padding: 6px 12px; border-radius: 4px; font-weight: 500;">Completed</span>
                         </div>
                     </div>
                     
