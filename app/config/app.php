@@ -31,7 +31,7 @@ return [
     'profile_image_min_height' => 100,
     
     // Session
-    'session_lifetime' => 1800, // 30 minutes in seconds
+    'session_lifetime' => 31536000, // 1 year in seconds (365 days) - prevents auto logout
     
     // Security
     'bcrypt_cost' => 12,

@@ -8,9 +8,13 @@
 ini_set('session.cookie_httponly', 1);
 ini_set('session.use_strict_mode', 1);
 ini_set('session.cookie_samesite', 'Lax');
+ini_set('session.cookie_lifetime', 31536000); // 1 year (365 days) - cookie lifetime
+ini_set('session.gc_maxlifetime', 31536000); // 1 year (365 days) - garbage collection max lifetime
 
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
+    // Set session cookie parameters for long-lasting session (1 year)
+    session_set_cookie_params(31536000, '/', '', false, true); // lifetime, path, domain, secure, httponly
     session_start();
 }
 
