@@ -217,11 +217,15 @@ $totalEmployees = $db->fetchOne(
         
         if (format === 'view') {
             ajaxRequest(`/officepro/app/api/reports/attendance.php?${params}`, 'GET', null, (response) => {
-                if (response.success) {
+                console.log('Report API Response:', response);
+                if (response && response.success) {
                     displayReport(response);
                 } else {
-                    showMessage('error', response.message || 'Failed to generate report');
+                    showMessage('error', (response && response.message) ? response.message : 'Failed to generate report');
                 }
+            }, (error) => {
+                console.error('Report API Error:', error);
+                showMessage('error', 'Failed to load report. Please check your connection and try again.');
             });
         } else {
             // For CSV and PDF, open in new window
@@ -243,11 +247,23 @@ $totalEmployees = $db->fetchOne(
     }
     
     function displayReport(response) {
+        console.log('Displaying report with response:', response);
+        
+        const reportResultsDiv = document.getElementById('report-results');
+        if (!reportResultsDiv) {
+            console.error('Report results div not found!');
+            showMessage('error', 'Report display area not found. Please refresh the page.');
+            return;
+        }
+        
         const data = response.data || [];
         const summary = response.summary || {};
         
-        if (data.length === 0) {
-            document.getElementById('report-results').innerHTML = '<p style="text-align: center; padding: 40px;">No data found for selected period</p>';
+        console.log('Report data:', data);
+        console.log('Report summary:', summary);
+        
+        if (!data || data.length === 0) {
+            reportResultsDiv.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">No data found for selected period</p>';
             return;
         }
         
@@ -264,19 +280,19 @@ $totalEmployees = $db->fetchOne(
         
         // Total Overtime Card
         html += '<div class="card" style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff9933 0%, #cc6600 100%); color: white; border-radius: 8px;">';
-        html += '<h4 style="margin: 0 0 10px 0; font-size: 14px; opacity: 0.9;color: white;">Total Overtime</h4>';
+        html += '<h4 style="margin: 0 0 10px 0; font-size: 14px; opacity: 0.9; color: white;">Total Overtime</h4>';
         html += `<div style="font-size: 32px; font-weight: bold;">${summary.total_overtime_formatted || '00:00:00'}</div>`;
         html += '</div>';
         
         // Total Leave Card (Red)
         html += '<div class="card" style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%); color: white; border-radius: 8px;">';
-        html += '<h4 style="margin: 0 0 10px 0; font-size: 14px; opacity: 0.9;color: white;">Total Leave</h4>';
+        html += '<h4 style="margin: 0 0 10px 0; font-size: 14px; opacity: 0.9; color: white;">Total Leave</h4>';
         html += `<div style="font-size: 32px; font-weight: bold;">${summary.total_leave_days || 0} <span style="font-size: 18px;">days</span></div>`;
         html += '</div>';
         
         // Total Attendance Card (Green)
         html += '<div class="card" style="text-align: center; padding: 20px; background: linear-gradient(135deg, #00ad25 0%, #006600 100%); color: white; border-radius: 8px;">';
-        html += '<h4 style="margin: 0 0 10px 0; font-size: 14px; opacity: 0.9;color: white;">Total Attendance</h4>';
+        html += '<h4 style="margin: 0 0 10px 0; font-size: 14px; opacity: 0.9; color: white;">Total Attendance</h4>';
         html += `<div style="font-size: 32px; font-weight: bold;">${summary.total_attendance || 0} <span style="font-size: 18px;">days</span></div>`;
         html += '</div>';
         
@@ -315,7 +331,8 @@ $totalEmployees = $db->fetchOne(
         html += `<td>${formatHoursToTime(totalHours)}</td></tr>`;
         html += '</tbody></table>';
         
-        document.getElementById('report-results').innerHTML = html;
+        reportResultsDiv.innerHTML = html;
+        console.log('Report displayed successfully');
     }
 </script>
 

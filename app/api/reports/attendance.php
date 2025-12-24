@@ -97,7 +97,6 @@ try {
     $totalHours = $totalRegularHours + $totalOvertimeHours;
     
     // Calculate total leave days for the selected period
-    $leaveParams = [$companyId, $startDate, $endDate];
     $leaveSql = "SELECT COALESCE(SUM(days_count), 0) as total_days
                  FROM leaves 
                  WHERE company_id = ? 
@@ -127,14 +126,23 @@ try {
         'total_attendance' => $totalAttendanceDays
     ];
     
-    echo json_encode([
+    $response = [
         'success' => true, 
         'data' => $data,
         'summary' => $summary
-    ]);
+    ];
+    
+    echo json_encode($response);
+    exit;
 } catch (Exception $e) {
     error_log("Report Error: " . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => 'Failed to generate report']);
+    error_log("Report Error Trace: " . $e->getTraceAsString());
+    http_response_code(500);
+    echo json_encode([
+        'success' => false, 
+        'message' => 'Failed to generate report: ' . $e->getMessage()
+    ]);
+    exit;
 }
 
 
