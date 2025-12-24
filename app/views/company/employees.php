@@ -223,30 +223,6 @@ $employees = $db->fetchAll(
                             </tr>
                         </table>
                         
-                        ${emp.attendance_stats ? `
-                            <div style="margin-top: 30px; padding: 20px; background: var(--light-blue); border-radius: 8px;">
-                                <h4 style="color: var(--primary-blue); margin-bottom: 15px;">This Month's Stats</h4>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                    <div>
-                                        <p style="margin: 0; color: #666;">Days Worked</p>
-                                        <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--primary-blue);">${emp.attendance_stats.days_worked || 0}</p>
-                                    </div>
-                                    <div>
-                                        <p style="margin: 0; color: #666;">Total Hours</p>
-                                        <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--primary-blue);">${emp.attendance_stats.total_hours || '00:00:00'}</p>
-                                    </div>
-                                    <div>
-                                        <p style="margin: 0; color: #666;">Regular Hours</p>
-                                        <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--primary-blue);">${emp.attendance_stats.regular_hours || '00:00:00'}</p>
-                                    </div>
-                                    <div>
-                                        <p style="margin: 0; color: #666;">Overtime Hours</p>
-                                        <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--overtime-orange);">${emp.attendance_stats.overtime_hours || '00:00:00'}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ` : ''}
-                        
                         ${emp.leave_balance ? `
                             <div style="margin-top: 20px; padding: 20px; background: #f9f9f9; border-radius: 8px;">
                                 <h4 style="color: var(--primary-blue); margin-bottom: 15px;">Leave Balance (${new Date().getFullYear()})</h4>
@@ -258,6 +234,42 @@ $employees = $db->fetchAll(
                                 </div>
                             </div>
                         ` : ''}
+                        
+                        <div style="margin-top: 20px; padding: 20px; background: #f0f8ff; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h4 style="color: var(--primary-blue); margin: 0;">Monthly Stats</h4>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <select id="stats-month-${id}" class="form-control" style="width: 140px; padding: 8px 12px; font-size: 14px; border: 1px solid #ddd; border-radius: 6px;" onchange="changeEmployeeStatsMonth(${id})">
+                                        ${generateMonthOptions()}
+                                    </select>
+                                    <select id="stats-year-${id}" class="form-control" style="width: 100px; padding: 8px 12px; font-size: 14px; border: 1px solid #ddd; border-radius: 6px;" onchange="changeEmployeeStatsMonth(${id})">
+                                        ${generateYearOptions()}
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="employee-stats-${id}">
+                                ${emp.attendance_stats ? `
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                        <div>
+                                            <p style="margin: 0; color: #666;">Days Worked</p>
+                                            <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--primary-blue);">${emp.attendance_stats.days_worked || 0}</p>
+                                        </div>
+                                        <div>
+                                            <p style="margin: 0; color: #666;">Total Hours</p>
+                                            <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--primary-blue);">${emp.attendance_stats.total_hours || '00:00:00'}</p>
+                                        </div>
+                                        <div>
+                                            <p style="margin: 0; color: #666;">Regular Hours</p>
+                                            <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--primary-blue);">${emp.attendance_stats.regular_hours || '00:00:00'}</p>
+                                        </div>
+                                        <div>
+                                            <p style="margin: 0; color: #666;">Overtime Hours</p>
+                                            <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--overtime-orange);">${emp.attendance_stats.overtime_hours || '00:00:00'}</p>
+                                        </div>
+                                    </div>
+                                ` : '<p style="text-align: center; color: #666; padding: 20px;">No stats available for this month</p>'}
+                            </div>
+                        </div>
                     </div>
                 `;
                 
@@ -267,6 +279,18 @@ $employees = $db->fetchAll(
                 `;
                 
                 createModal('<i class="fas fa-user"></i> Employee Details', content, footer, 'modal-lg');
+                
+                // Set default month/year in selectors
+                const currentDate = new Date();
+                const currentMonth = currentDate.getMonth() + 1;
+                const currentYear = currentDate.getFullYear();
+                
+                setTimeout(() => {
+                    const monthSelect = document.getElementById('stats-month-' + id);
+                    const yearSelect = document.getElementById('stats-year-' + id);
+                    if (monthSelect) monthSelect.value = currentMonth;
+                    if (yearSelect) yearSelect.value = currentYear;
+                }, 100);
             } else {
                 showMessage('error', (response && response.message) ? response.message : 'Failed to load employee details');
             }
@@ -275,6 +299,82 @@ $employees = $db->fetchAll(
             showMessage('error', 'Failed to load employee details. Please check your connection and try again.');
         });
     }
+    
+    function generateMonthOptions() {
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+        let options = '';
+        for (let i = 1; i <= 12; i++) {
+            options += `<option value="${i}">${monthNames[i - 1]}</option>`;
+        }
+        return options;
+    }
+    
+    function generateYearOptions() {
+        const currentYear = new Date().getFullYear();
+        let options = '';
+        // Show current year and 2 years back
+        for (let i = currentYear; i >= currentYear - 2; i--) {
+            options += `<option value="${i}">${i}</option>`;
+        }
+        return options;
+    }
+    
+    function changeEmployeeStatsMonth(employeeId) {
+        const monthSelect = document.getElementById('stats-month-' + employeeId);
+        const yearSelect = document.getElementById('stats-year-' + employeeId);
+        const statsContainer = document.getElementById('employee-stats-' + employeeId);
+        
+        if (!monthSelect || !yearSelect || !statsContainer) return;
+        
+        const month = parseInt(monthSelect.value);
+        const year = parseInt(yearSelect.value);
+        
+        // Show loading
+        statsContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Loading stats...</p>';
+        
+        // Fetch stats for selected month/year
+        ajaxRequest(`/officepro/app/api/company/employee_details.php?id=${employeeId}&month=${month}&year=${year}`, 'GET', null, (response) => {
+            if (response && response.success && response.data) {
+                const emp = response.data;
+                let statsHTML = '';
+                
+                if (emp.attendance_stats) {
+                    statsHTML = `
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div>
+                                <p style="margin: 0; color: #666;">Days Worked</p>
+                                <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--primary-blue);">${emp.attendance_stats.days_worked || 0}</p>
+                            </div>
+                            <div>
+                                <p style="margin: 0; color: #666;">Total Hours</p>
+                                <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--primary-blue);">${emp.attendance_stats.total_hours || '00:00:00'}</p>
+                            </div>
+                            <div>
+                                <p style="margin: 0; color: #666;">Regular Hours</p>
+                                <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--primary-blue);">${emp.attendance_stats.regular_hours || '00:00:00'}</p>
+                            </div>
+                            <div>
+                                <p style="margin: 0; color: #666;">Overtime Hours</p>
+                                <p style="margin: 0; font-size: 24px; font-weight: bold; color: var(--overtime-orange);">${emp.attendance_stats.overtime_hours || '00:00:00'}</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    statsHTML = '<p style="text-align: center; color: #666; padding: 20px;">No stats available for this month</p>';
+                }
+                
+                statsContainer.innerHTML = statsHTML;
+            } else {
+                statsContainer.innerHTML = '<p style="text-align: center; color: #dc3545; padding: 20px;">Failed to load stats. Please try again.</p>';
+            }
+        }, (error) => {
+            console.error('Failed to load employee stats:', error);
+            statsContainer.innerHTML = '<p style="text-align: center; color: #dc3545; padding: 20px;">Error loading stats. Please try again.</p>';
+        });
+    }
+    
+    // Calendar functions removed - now using month selector for stats only
     
     function editEmployee(id) {
         // Fetch employee details

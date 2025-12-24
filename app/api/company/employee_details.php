@@ -21,8 +21,17 @@ Auth::requireRole(['company_owner', 'manager']);
 
 try {
     $companyId = Tenant::getCurrentCompanyId();
-    $employeeId = $_GET['id'] ?? 0;
+    $employeeId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
     $db = Database::getInstance();
+    
+    // Validate employee ID
+    if ($employeeId <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid employee ID']);
+        exit;
+    }
+    
+    // Debug logging
+    error_log("Employee Details API - Request for Employee ID: $employeeId, Company ID: $companyId");
 
     // Set timezone from config
     $appConfig = require __DIR__ . '/../../config/app.php';
@@ -49,8 +58,20 @@ try {
 }
 
 try {
-    // Get this month's attendance stats
-    $currentMonth = date('Y-m');
+    // Get attendance stats for specified month/year or current month
+    $statsMonth = isset($_GET['month']) ? (int) $_GET['month'] : date('n');
+    $statsYear = isset($_GET['year']) ? (int) $_GET['year'] : date('Y');
+    
+    // Validate month and year
+    if ($statsMonth < 1 || $statsMonth > 12) {
+        $statsMonth = date('n');
+    }
+    if ($statsYear < 2020 || $statsYear > 2100) {
+        $statsYear = date('Y');
+    }
+    
+    $monthYear = sprintf('%04d-%02d', $statsYear, $statsMonth);
+    
     $attendanceStats = $db->fetchOne(
         "SELECT 
             COUNT(DISTINCT date) as days_worked,
@@ -59,7 +80,7 @@ try {
             SUM(regular_hours + overtime_hours) as total_hours
         FROM attendance 
         WHERE company_id = ? AND user_id = ? AND DATE_FORMAT(date, '%Y-%m') = ? AND is_present = 1",
-        [$companyId, $employeeId, $currentMonth]
+        [$companyId, $employeeId, $monthYear]
     );
 
     // Get current year leave balance - Calculate from allocation minus taken leaves
@@ -126,14 +147,31 @@ $employee['leave_balance'] = [
     'year' => $currentYear
 ];
 
+// Calendar data fetching removed - not needed anymore
+
 // Remove password from response
 unset($employee['password']);
 
+// Final debug logging
+error_log("Employee Details API - Final Response Summary:");
+error_log("  - Employee ID: " . ($employee['id'] ?? 'N/A'));
+error_log("  - Has attendance_stats: " . (isset($employee['attendance_stats']) ? 'YES' : 'NO'));
+error_log("  - Has leave_balance: " . (isset($employee['leave_balance']) ? 'YES' : 'NO'));
+error_log("  - Has calendar_data: " . (isset($employee['calendar_data']) ? 'YES' : 'NO'));
+if (isset($employee['calendar_data'])) {
+    $cal = $employee['calendar_data'];
+    error_log("  - Calendar data counts - Attendance: " . count($cal['attendance'] ?? []) . 
+              ", Leaves: " . count($cal['leaves'] ?? []) . 
+              ", Holidays: " . count($cal['holidays'] ?? []) . 
+              ", Overtime: " . count($cal['overtime'] ?? []));
+}
+
 try {
-    echo json_encode([
+    $response = [
         'success' => true,
         'data' => $employee
-    ]);
+    ];
+    echo json_encode($response);
 } catch (Exception $e) {
     error_log("Employee Details API - JSON Encode Error: " . $e->getMessage());
     http_response_code(500);

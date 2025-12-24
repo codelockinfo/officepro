@@ -71,6 +71,11 @@ $sql .= " GROUP BY a.id
 try {
     $data = $db->fetchAll($sql, $params);
     
+    // Calculate summary statistics
+    $totalRegularHours = 0;
+    $totalOvertimeHours = 0;
+    $totalAttendanceDays = 0;
+    
     // Format times from timer sessions and convert hours to HH:MM:SS
     foreach ($data as &$row) {
         $row['check_in'] = $row['first_session_start'] ? date('h:i A', strtotime($row['first_session_start'])) : '-';
@@ -81,9 +86,52 @@ try {
         $row['overtime_hours_formatted'] = formatHoursToTime($row['overtime_hours'] ?? 0);
         $totalHours = ($row['regular_hours'] ?? 0) + ($row['overtime_hours'] ?? 0);
         $row['total_hours_formatted'] = formatHoursToTime($totalHours);
+        
+        // Accumulate totals
+        $totalRegularHours += ($row['regular_hours'] ?? 0);
+        $totalOvertimeHours += ($row['overtime_hours'] ?? 0);
+        $totalAttendanceDays++;
     }
     
-    echo json_encode(['success' => true, 'data' => $data]);
+    // Calculate total hours
+    $totalHours = $totalRegularHours + $totalOvertimeHours;
+    
+    // Calculate total leave days for the selected period
+    $leaveParams = [$companyId, $startDate, $endDate];
+    $leaveSql = "SELECT COALESCE(SUM(days_count), 0) as total_days
+                 FROM leaves 
+                 WHERE company_id = ? 
+                 AND status = 'approved'
+                 AND (
+                     (start_date BETWEEN ? AND ?) 
+                     OR (end_date BETWEEN ? AND ?)
+                     OR (start_date <= ? AND end_date >= ?)
+                 )";
+    $leaveParams = [$companyId, $startDate, $endDate, $startDate, $endDate, $startDate, $endDate];
+    
+    if ($employeeId) {
+        $leaveSql .= " AND user_id = ?";
+        $leaveParams[] = $employeeId;
+    }
+    
+    $totalLeaveResult = $db->fetchOne($leaveSql, $leaveParams);
+    $totalLeaveDays = floatval($totalLeaveResult['total_days'] ?? 0);
+    
+    // Prepare summary statistics
+    $summary = [
+        'total_hours' => $totalHours,
+        'total_hours_formatted' => formatHoursToTime($totalHours),
+        'total_overtime' => $totalOvertimeHours,
+        'total_overtime_formatted' => formatHoursToTime($totalOvertimeHours),
+        'total_leave_days' => $totalLeaveDays,
+        'total_attendance' => $totalAttendanceDays
+    ];
+    
+    echo json_encode([
+        'success' => true, 
+        'data' => $data,
+        'summary' => $summary
+    ]);
 } catch (Exception $e) {
     error_log("Report Error: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Failed to generate report']);

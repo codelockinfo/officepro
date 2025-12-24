@@ -218,7 +218,7 @@ $totalEmployees = $db->fetchOne(
         if (format === 'view') {
             ajaxRequest(`/officepro/app/api/reports/attendance.php?${params}`, 'GET', null, (response) => {
                 if (response.success) {
-                    displayReport(response.data);
+                    displayReport(response);
                 } else {
                     showMessage('error', response.message || 'Failed to generate report');
                 }
@@ -242,13 +242,49 @@ $totalEmployees = $db->fetchOne(
                String(seconds).padStart(2, '0');
     }
     
-    function displayReport(data) {
+    function displayReport(response) {
+        const data = response.data || [];
+        const summary = response.summary || {};
+        
         if (data.length === 0) {
             document.getElementById('report-results').innerHTML = '<p style="text-align: center; padding: 40px;">No data found for selected period</p>';
             return;
         }
         
-        let html = '<h3>Attendance Report</h3><table class="table"><thead><tr>';
+        // Summary Statistics Section
+        let html = '<div style="margin-bottom: 30px;">';
+        html += '<h3 style="margin-bottom: 20px; color: var(--primary-blue);">Summary Statistics</h3>';
+        html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">';
+        
+        // Total Hours Card
+        html += '<div class="card" style="text-align: center; padding: 20px; background: linear-gradient(135deg, #4da6ff 0%, #0066cc 100%); color: white; border-radius: 8px;">';
+        html += '<h4 style="margin: 0 0 10px 0; font-size: 14px; opacity: 0.9; color: white;">Total Hours</h4>';
+        html += `<div style="font-size: 32px; font-weight: bold;">${summary.total_hours_formatted || '00:00:00'}</div>`;
+        html += '</div>';
+        
+        // Total Overtime Card
+        html += '<div class="card" style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff9933 0%, #cc6600 100%); color: white; border-radius: 8px;">';
+        html += '<h4 style="margin: 0 0 10px 0; font-size: 14px; opacity: 0.9;color: white;">Total Overtime</h4>';
+        html += `<div style="font-size: 32px; font-weight: bold;">${summary.total_overtime_formatted || '00:00:00'}</div>`;
+        html += '</div>';
+        
+        // Total Leave Card (Red)
+        html += '<div class="card" style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%); color: white; border-radius: 8px;">';
+        html += '<h4 style="margin: 0 0 10px 0; font-size: 14px; opacity: 0.9;color: white;">Total Leave</h4>';
+        html += `<div style="font-size: 32px; font-weight: bold;">${summary.total_leave_days || 0} <span style="font-size: 18px;">days</span></div>`;
+        html += '</div>';
+        
+        // Total Attendance Card (Green)
+        html += '<div class="card" style="text-align: center; padding: 20px; background: linear-gradient(135deg, #00ad25 0%, #006600 100%); color: white; border-radius: 8px;">';
+        html += '<h4 style="margin: 0 0 10px 0; font-size: 14px; opacity: 0.9;color: white;">Total Attendance</h4>';
+        html += `<div style="font-size: 32px; font-weight: bold;">${summary.total_attendance || 0} <span style="font-size: 18px;">days</span></div>`;
+        html += '</div>';
+        
+        html += '</div></div>';
+        
+        // Attendance Report Table
+        html += '<h3 style="margin-bottom: 15px; color: var(--primary-blue);">Attendance Report</h3>';
+        html += '<table class="table"><thead><tr>';
         html += '<th>Employee</th><th>Date</th><th>Check In</th><th>Check Out</th>';
         html += '<th>Regular Hours</th><th>Overtime Hours</th><th>Total Hours</th></tr></thead><tbody>';
         
