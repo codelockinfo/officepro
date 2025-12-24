@@ -12,47 +12,83 @@ require_once __DIR__ . '/../../helpers/Tenant.php';
 // Only managers and owners can access
 Auth::checkRole(['company_owner', 'manager'], 'Only managers and company owners can access reports.');
 
-$companyId = Tenant::getCurrentCompanyId();
-$db = Database::getInstance();
+try {
+    $companyId = Tenant::getCurrentCompanyId();
+    $db = Database::getInstance();
+} catch (Exception $e) {
+    error_log("Reports Dashboard Error: " . $e->getMessage());
+    echo '<div class="card" style="padding: 20px; color: red;"><h3>Error Loading Page</h3><p>' . htmlspecialchars($e->getMessage()) . '</p></div>';
+    include __DIR__ . '/../includes/footer.php';
+    exit;
+}
 
-// Today's stats
-$today = date('Y-m-d');
+try {
+    // Today's stats
+    $today = date('Y-m-d');
 
-$presentToday = $db->fetchOne(
-    "SELECT COUNT(DISTINCT user_id) as count 
-    FROM attendance 
-    WHERE company_id = ? AND date = ? AND is_present = 1",
-    [$companyId, $today]
-);
+    $presentToday = $db->fetchOne(
+        "SELECT COUNT(DISTINCT user_id) as count 
+        FROM attendance 
+        WHERE company_id = ? AND date = ? AND is_present = 1",
+        [$companyId, $today]
+    );
 
-$onLeaveToday = $db->fetchOne(
-    "SELECT COUNT(DISTINCT user_id) as count 
-    FROM leaves 
-    WHERE company_id = ? AND status = 'approved' AND ? BETWEEN start_date AND end_date",
-    [$companyId, $today]
-);
+    $onLeaveToday = $db->fetchOne(
+        "SELECT COUNT(DISTINCT user_id) as count 
+        FROM leaves 
+        WHERE company_id = ? AND status = 'approved' AND ? BETWEEN start_date AND end_date",
+        [$companyId, $today]
+    );
 
-// This month's overtime
-$currentMonth = date('Y-m');
-$overtimeThisMonth = $db->fetchOne(
-    "SELECT SUM(overtime_hours) as total 
-    FROM attendance 
-    WHERE company_id = ? AND DATE_FORMAT(date, '%Y-%m') = ?",
-    [$companyId, $currentMonth]
-);
+    // This month's overtime
+    $currentMonth = date('Y-m');
+    $overtimeThisMonth = $db->fetchOne(
+        "SELECT SUM(overtime_hours) as total 
+        FROM attendance 
+        WHERE company_id = ? AND DATE_FORMAT(date, '%Y-%m') = ?",
+        [$companyId, $currentMonth]
+    );
 
-// Late arrivals this month (after 9:15 AM) - based on first timer session start time
-$lateArrivals = $db->fetchOne(
-    "SELECT COUNT(DISTINCT CONCAT(user_id, '-', date)) as count 
-    FROM (
-        SELECT user_id, date, MIN(start_time) as first_start
-        FROM timer_sessions
-        WHERE company_id = ? AND DATE_FORMAT(date, '%Y-%m') = ?
-        GROUP BY user_id, date
-        HAVING TIME(first_start) > '09:15:00'
-    ) late_days",
-    [$companyId, $currentMonth]
-);
+    // Late arrivals this month (after 9:15 AM) - based on first timer session start time
+    $lateArrivals = $db->fetchOne(
+        "SELECT COUNT(DISTINCT CONCAT(user_id, '-', date)) as count 
+        FROM (
+            SELECT user_id, date, MIN(start_time) as first_start
+            FROM timer_sessions
+            WHERE company_id = ? AND DATE_FORMAT(date, '%Y-%m') = ?
+            GROUP BY user_id, date
+            HAVING TIME(first_start) > '09:15:00'
+        ) late_days",
+        [$companyId, $currentMonth]
+    );
+
+    // Top overtime employees this month (exclude company owners)
+    $topOvertime = $db->fetchAll(
+        "SELECT u.full_name, SUM(a.overtime_hours) as total_overtime 
+        FROM attendance a 
+        JOIN users u ON a.user_id = u.id 
+        WHERE a.company_id = ? AND DATE_FORMAT(a.date, '%Y-%m') = ? AND u.role != 'company_owner'
+        GROUP BY a.user_id, u.full_name 
+        HAVING total_overtime > 0 
+        ORDER BY total_overtime DESC 
+        LIMIT 5",
+        [$companyId, $currentMonth]
+    );
+
+    // Total employees (exclude company owners)
+    $totalEmployees = $db->fetchOne(
+        "SELECT COUNT(*) as count FROM users WHERE company_id = ? AND status = 'active' AND role != 'company_owner'",
+        [$companyId]
+    );
+} catch (Exception $e) {
+    error_log("Reports Dashboard Query Error: " . $e->getMessage());
+    $presentToday = ['count' => 0];
+    $onLeaveToday = ['count' => 0];
+    $overtimeThisMonth = ['total' => 0];
+    $lateArrivals = ['count' => 0];
+    $topOvertime = [];
+    $totalEmployees = ['count' => 0];
+}
 
 // Helper function to convert decimal hours to HH:MM:SS format
 function formatHoursToTime($decimalHours) {
@@ -65,25 +101,6 @@ function formatHoursToTime($decimalHours) {
     $seconds = $totalSeconds % 60;
     return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
 }
-
-// Top overtime employees this month (exclude company owners)
-$topOvertime = $db->fetchAll(
-    "SELECT u.full_name, SUM(a.overtime_hours) as total_overtime 
-    FROM attendance a 
-    JOIN users u ON a.user_id = u.id 
-    WHERE a.company_id = ? AND DATE_FORMAT(a.date, '%Y-%m') = ? AND u.role != 'company_owner'
-    GROUP BY a.user_id, u.full_name 
-    HAVING total_overtime > 0 
-    ORDER BY total_overtime DESC 
-    LIMIT 5",
-    [$companyId, $currentMonth]
-);
-
-// Total employees (exclude company owners)
-$totalEmployees = $db->fetchOne(
-    "SELECT COUNT(*) as count FROM users WHERE company_id = ? AND status = 'active' AND role != 'company_owner'",
-    [$companyId]
-);
 ?>
 
 <h1><i class="fas fa-chart-line"></i> Reports Dashboard</h1>
@@ -170,12 +187,17 @@ $totalEmployees = $db->fetchOne(
                 <select id="employee_id" name="employee_id" class="form-control" required>
                     <option value="">Select Employee</option>
                     <?php
-                    $employees = $db->fetchAll(
-                        "SELECT id, full_name FROM users WHERE company_id = ? AND status = 'active' AND role != 'company_owner' ORDER BY full_name",
-                        [$companyId]
-                    );
-                    foreach ($employees as $emp) {
-                        echo '<option value="' . $emp['id'] . '">' . htmlspecialchars($emp['full_name']) . '</option>';
+                    try {
+                        $employees = $db->fetchAll(
+                            "SELECT id, full_name FROM users WHERE company_id = ? AND status = 'active' AND role != 'company_owner' ORDER BY full_name",
+                            [$companyId]
+                        );
+                        foreach ($employees as $emp) {
+                            echo '<option value="' . htmlspecialchars($emp['id']) . '">' . htmlspecialchars($emp['full_name']) . '</option>';
+                        }
+                    } catch (Exception $e) {
+                        error_log("Employee List Error: " . $e->getMessage());
+                        echo '<option value="">Error loading employees</option>';
                     }
                     ?>
                 </select>
