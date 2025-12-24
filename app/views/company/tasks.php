@@ -93,18 +93,21 @@ $employees = $db->fetchAll(
                         <td>
                             <?php
                             $priorityColors = [
-                                'low' => 'badge-info',
-                                'medium' => 'badge-warning',
-                                'high' => 'badge-danger'
+                                'high' => '#ffc53d',
+                                'medium' => '#3e63dd',
+                                'low' => '#606060'
                             ];
                             $priorityLabels = [
                                 'low' => 'Low',
                                 'medium' => 'Medium',
                                 'high' => 'High'
                             ];
+                            $currentPriority = $task['priority'] ?? 'medium';
+                            $priorityColor = $priorityColors[$currentPriority] ?? '#606060';
+                            $priorityText = $priorityLabels[$currentPriority] ?? ucfirst($currentPriority);
                             ?>
-                            <span class="badge <?php echo $priorityColors[$task['priority']] ?? 'badge-secondary'; ?>">
-                                <?php echo $priorityLabels[$task['priority']] ?? ucfirst($task['priority']); ?>
+                            <span class="badge" style="background-color: <?php echo $priorityColor; ?>; color: white; padding: 6px 12px; border-radius: 4px; font-weight: 500;">
+                                <?php echo $priorityText; ?>
                             </span>
                         </td>
                         <td>
