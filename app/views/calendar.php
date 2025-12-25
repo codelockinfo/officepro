@@ -57,7 +57,7 @@ if ($isManager) {
         "SELECT l.*, u.full_name as employee_name 
         FROM leaves l 
         JOIN users u ON l.user_id = u.id 
-        WHERE l.company_id = ? AND l.user_id = ? 
+        WHERE l.company_id = ? AND l.user_id = ? AND l.status = 'approved'
         AND ((MONTH(start_date) = ? AND YEAR(start_date) = ?) OR (MONTH(end_date) = ? AND YEAR(end_date) = ?))
         ORDER BY start_date",
         [$companyId, $userId, $month, $year, $month, $year]
