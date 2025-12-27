@@ -9,6 +9,10 @@ include __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/../helpers/Database.php';
 require_once __DIR__ . '/../helpers/Tenant.php';
 
+// Set timezone from config
+$appConfig = require __DIR__ . '/../config/app.php';
+date_default_timezone_set($appConfig['timezone']);
+
 // Only managers and owners can access
 Auth::checkRole(['company_owner', 'manager'], 'Only managers and company owners can approve leaves.');
 
@@ -101,7 +105,11 @@ $allLeaves = $db->fetchAll(
                             echo number_format($leave['days_count'], 1);
                         }
                     ?></td>
-                    <td><?php echo date('M d, Y h:i A', strtotime($leave['created_at'])); ?></td>
+                    <td><?php 
+                        // Use DateTime with timezone to properly format the timestamp
+                        $dateTime = new DateTime($leave['created_at'], new DateTimeZone($appConfig['timezone']));
+                        echo $dateTime->format('M d, Y h:i A');
+                    ?></td>
                     <td>
                         <button onclick="viewLeaveForApproval(<?php echo $leave['id']; ?>)" class="btn btn-sm btn-primary">View & Approve</button>
                     </td>
