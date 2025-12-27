@@ -16,6 +16,10 @@ if (!Auth::isLoggedIn()) {
     exit;
 }
 
+// Set timezone from config
+$appConfig = require __DIR__ . '/../../config/app.php';
+date_default_timezone_set($appConfig['timezone']);
+
 $companyId = Tenant::getCurrentCompanyId();
 $userId = Auth::getCurrentUser()['id'];
 $db = Database::getInstance();
@@ -35,6 +39,14 @@ $notifications = $db->fetchAll(
     LIMIT 20",
     [$companyId, $userId]
 );
+
+// Convert timestamps to ISO 8601 format with timezone
+foreach ($notifications as &$notif) {
+    if (isset($notif['created_at'])) {
+        $date = new DateTime($notif['created_at'], new DateTimeZone($appConfig['timezone']));
+        $notif['created_at'] = $date->format('c'); // ISO 8601 format with timezone
+    }
+}
 
 echo json_encode([
     'success' => true,

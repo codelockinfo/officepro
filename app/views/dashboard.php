@@ -376,8 +376,28 @@ $totalHoursWorked = $totalRegularHours + $totalOvertimeHours;
             clearInterval(workTimerInterval);
         }
         
-        // Parse start time
-        workTimerStartTime = new Date(startTime.replace(' ', 'T')).getTime();
+        if (!startTime) {
+            console.error('No start time provided');
+            return;
+        }
+        
+        // Parse start time - if no timezone info, assume server timezone (Asia/Kolkata, UTC+5:30)
+        let date;
+        if (startTime.includes('T') || startTime.includes('+') || startTime.includes('Z')) {
+            // Already has timezone info
+            date = new Date(startTime);
+        } else {
+            // No timezone info - assume server timezone (Asia/Kolkata = UTC+5:30)
+            const dateStr = startTime.replace(' ', 'T');
+            // Add timezone offset for Asia/Kolkata (UTC+5:30 = +05:30)
+            date = new Date(dateStr + '+05:30');
+        }
+        
+        workTimerStartTime = date.getTime();
+        
+        console.log('Work timer started. Start time:', startTime);
+        console.log('Parsed date:', date);
+        console.log('Timer start timestamp:', workTimerStartTime);
         
         // Update immediately
         updateWorkTimerDisplay();

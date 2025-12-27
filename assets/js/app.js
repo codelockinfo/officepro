@@ -185,10 +185,28 @@ function startTimer(checkInTime) {
     // Stop any existing timer
     stopTimer();
     
+    if (!checkInTime) {
+        console.error('No check-in time provided');
+        return;
+    }
+    
     // Parse check-in time from server (format: YYYY-MM-DD HH:MM:SS)
-    timerStartTime = new Date(checkInTime.replace(' ', 'T')).getTime();
+    // If no timezone info, assume server timezone (Asia/Kolkata, UTC+5:30)
+    let date;
+    if (checkInTime.includes('T') || checkInTime.includes('+') || checkInTime.includes('Z')) {
+        // Already has timezone info
+        date = new Date(checkInTime);
+    } else {
+        // No timezone info - assume server timezone (Asia/Kolkata = UTC+5:30)
+        const dateStr = checkInTime.replace(' ', 'T');
+        // Add timezone offset for Asia/Kolkata (UTC+5:30 = +05:30)
+        date = new Date(dateStr + '+05:30');
+    }
+    
+    timerStartTime = date.getTime();
     
     console.log('Timer started. Check-in time:', checkInTime);
+    console.log('Parsed date:', date);
     console.log('Timer start timestamp:', timerStartTime);
     console.log('Current time:', Date.now());
     
@@ -404,9 +422,26 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function formatTimeAgo(dateString) {
-    const date = new Date(dateString);
+    if (!dateString) return 'Just now';
+    
+    // Parse the date string - if it doesn't have timezone info, assume it's in server timezone (Asia/Kolkata, UTC+5:30)
+    let date;
+    if (dateString.includes('T') || dateString.includes('+') || dateString.includes('Z')) {
+        // Already has timezone info
+        date = new Date(dateString);
+    } else {
+        // No timezone info - assume server timezone (Asia/Kolkata = UTC+5:30)
+        // Convert "YYYY-MM-DD HH:MM:SS" to ISO format with timezone offset
+        const dateStr = dateString.replace(' ', 'T');
+        // Add timezone offset for Asia/Kolkata (UTC+5:30 = +05:30)
+        date = new Date(dateStr + '+05:30');
+    }
+    
     const now = new Date();
     const seconds = Math.floor((now - date) / 1000);
+    
+    // Handle negative seconds (future dates) - should not happen but safety check
+    if (seconds < 0) return 'Just now';
     
     if (seconds < 60) return 'Just now';
     if (seconds < 3600) return Math.floor(seconds / 60) + ' minutes ago';

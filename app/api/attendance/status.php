@@ -36,22 +36,25 @@ $attendance = $db->fetchOne(
 
 if ($attendance) {
     // Calculate elapsed time
-    $checkInTime = new DateTime($attendance['check_in']);
-    $now = new DateTime();
+    $checkInTime = new DateTime($attendance['check_in'], new DateTimeZone($appConfig['timezone']));
+    $now = new DateTime('now', new DateTimeZone($appConfig['timezone']));
     $interval = $checkInTime->diff($now);
     
     $elapsedSeconds = ($interval->days * 86400) + ($interval->h * 3600) + ($interval->i * 60) + $interval->s;
     
     // Check if overtime
-    $appConfig = require __DIR__ . '/../../config/app.php';
     $standardWorkHours = $appConfig['standard_work_hours'];
     $isOvertime = $elapsedSeconds >= ($standardWorkHours * 3600);
+    
+    // Format check-in time as ISO 8601 with timezone
+    $checkInTimeISO = $checkInTime->format('c'); // ISO 8601 format with timezone
     
     echo json_encode([
         'success' => true,
         'data' => [
             'status' => 'in',
-            'check_in_time' => $attendance['check_in'],
+            'check_in_time' => $checkInTimeISO,
+            'check_in_time_display' => $attendance['check_in'], // Keep original format for display
             'elapsed_seconds' => $elapsedSeconds,
             'is_overtime' => $isOvertime
         ]

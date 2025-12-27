@@ -57,11 +57,16 @@ try {
     $attendanceId = $db->lastInsertId();
     error_log("Check-in: Success! Attendance ID: $attendanceId, Time: $now");
     
+    // Format check-in time as ISO 8601 with timezone for JavaScript
+    $checkInDateTime = new DateTime($now, new DateTimeZone($appConfig['timezone']));
+    $checkInTimeISO = $checkInDateTime->format('c'); // ISO 8601 format with timezone
+    
     echo json_encode([
         'success' => true,
         'message' => 'Checked in successfully',
         'data' => [
-            'check_in_time' => $now,
+            'check_in_time' => $checkInTimeISO,
+            'check_in_time_display' => $now, // Keep original format for display
             'attendance_id' => $attendanceId
         ]
     ]);
