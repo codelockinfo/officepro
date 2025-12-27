@@ -106,9 +106,19 @@ $allLeaves = $db->fetchAll(
                         }
                     ?></td>
                     <td><?php 
-                        // Use DateTime with timezone to properly format the timestamp
-                        $dateTime = new DateTime($leave['created_at'], new DateTimeZone($appConfig['timezone']));
-                        echo $dateTime->format('M d, Y h:i A');
+                        // MySQL TIMESTAMP columns are stored in UTC internally
+                        // Convert from UTC to India/Kolkata (IST = UTC+5:30)
+                        try {
+                            // Try to parse as UTC first (most reliable)
+                            $utcTime = new DateTime($leave['created_at'], new DateTimeZone('UTC'));
+                            $istTime = clone $utcTime;
+                            $istTime->setTimezone(new DateTimeZone('Asia/Kolkata'));
+                            echo $istTime->format('M d, Y h:i A');
+                        } catch (Exception $e) {
+                            // Fallback: assume it's already in IST
+                            $dateTime = new DateTime($leave['created_at'], new DateTimeZone('Asia/Kolkata'));
+                            echo $dateTime->format('M d, Y h:i A');
+                        }
                     ?></td>
                     <td>
                         <button onclick="viewLeaveForApproval(<?php echo $leave['id']; ?>)" class="btn btn-sm btn-primary">View & Approve</button>

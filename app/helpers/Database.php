@@ -13,6 +13,11 @@ class Database {
         try {
             $dsn = "mysql:host={$config['host']};dbname={$config['dbname']};charset={$config['charset']}";
             $this->pdo = new PDO($dsn, $config['username'], $config['password'], $config['options']);
+            
+            // Set MySQL session timezone to Asia/Kolkata (IST) for proper timestamp handling
+            $appConfig = require __DIR__ . '/../config/app.php';
+            $timezone = $appConfig['timezone'] ?? 'Asia/Kolkata';
+            $this->pdo->exec("SET time_zone = '+05:30'"); // IST is UTC+5:30
         } catch (PDOException $e) {
             error_log("Database Connection Error: " . $e->getMessage());
             throw new Exception("Database connection failed");
