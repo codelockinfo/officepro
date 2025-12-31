@@ -31,6 +31,16 @@ class Database {
         return self::$instance;
     }
     
+    public function insert($table, array $data){
+        
+        $columns = implode(',', array_keys($data));
+        $placeholders = implode(',', array_fill(0, count($data), '?'));
+    
+        $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
+        return $this->query($sql, array_values($data));
+    }
+    
+
     public function query($sql, $params = []) {
         try {
             $stmt = $this->pdo->prepare($sql);

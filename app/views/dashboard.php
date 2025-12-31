@@ -33,6 +33,15 @@ $timerSession = $db->fetchOne(
     [$companyId, $userId, $today]
 );
 
+$lunchSession = $db->fetchOne(
+    "SELECT * FROM lunch_breaks 
+     WHERE company_id = ? AND user_id = ? AND date = ? AND status = 'taken'
+     ORDER BY lunch_start DESC LIMIT 1",
+    [$companyId, $userId, $today]
+);
+
+$isLunchRunning = !empty($lunchSession);
+
 // Get all ended timer sessions for today - include created_at and updated_at for accurate time display
 $todaySessions = $db->fetchAll(
     "SELECT id, start_time, end_time, stop_time, duration_seconds, status, created_at, updated_at
@@ -140,16 +149,48 @@ $totalHoursWorked = $totalRegularHours + $totalOvertimeHours;
                     });
                 </script>
             <?php else: ?>
-                <!-- No timer running - Show Start Button -->
-                <div style="margin: 20px 0;">
-                    <p style="color: var(--dark-gray); margin-bottom: 20px;">Click to start tracking your work time</p>
-                    <button onclick="startWorkTimerSession()" class="btn" style="width: 70px; height: 70px; border-radius: 50%; background-color: #28a745; color: #fff; border: none; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); padding: 0;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+            <!-- No timer running -->
+            <div style="margin: 20px 0;">
+                <p style="color: var(--dark-gray); margin-bottom: 20px;">
+                    <?php echo $isLunchRunning ? 'Lunch break in progress' : 'Click to start tracking your work time'; ?>
+                </p>
+                        
+                <div style="display:flex; gap:20px; justify-content:center; flex-wrap:wrap;">
+
+                    <!-- START WORK TIMER -->
+                    <?php if (!$isLunchRunning): ?>
+                        <button onclick="startWorkTimerSession()"
+                            style="width:70px;height:70px;border-radius:50%;
+                                   background:#28a745;color:#fff;border:none;
+                                   cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.2);">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
                             <polygon points="8,5 19,12 8,19"/>
                         </svg>
-                    </button>
+                        </button>
+                    <?php endif; ?>
+                    
+                    <!-- LUNCH BUTTON -->
+                    <?php if (!$isLunchRunning): ?>
+                        <button onclick="startLunch()"
+                            style="width:70px;height:70px;border-radius:50%;
+                                   background:#a5210c;color:#fff;border:none;
+                                   cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.2);">
+                            TAKE LUNCH
+                        </button>
+                    <?php else: ?>
+                        <button onclick="endLunch()"
+                            style="width:70px;height:70px;border-radius:50%;
+                                   background:#17a2b8;color:#fff;border:none;
+                                   cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,0.2);">
+                            LUNCH OVER
+                        </button>
+                    <?php endif; ?>
+                    
                 </div>
+
+            </div>
             <?php endif; ?>
+
         </div>
     </div>
     
@@ -451,6 +492,36 @@ $totalHoursWorked = $totalRegularHours + $totalOvertimeHours;
             }
         }
     }
+
+    // --------------------
+    // Lunch Functions
+    // --------------------
+    function startLunch() {
+        showLoader();
+        ajaxRequest('/officepro/app/api/attendance/lunch_start.php', 'POST', {}, (response) => {
+            hideLoader();
+            if (response.success) {
+                showMessage('success', 'Lunch started');
+                setTimeout(() => location.reload(), 500);
+            } else {
+                showMessage('error', response.message || 'Unable to start lunch');
+            }
+        });
+    }
+
+    function endLunch() {
+        showLoader();
+        ajaxRequest('/officepro/app/api/attendance/lunch_end.php', 'POST', {}, (response) => {
+            hideLoader();
+            if (response.success) {
+                showMessage('success', 'Lunch ended');
+                setTimeout(() => location.reload(), 500);
+            } else {
+                showMessage('error', response.message || 'Unable to end lunch');
+            }
+        });
+    }
+
 </script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

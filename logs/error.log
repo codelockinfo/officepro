@@ -986,3 +986,59 @@ Stack trace:
 [20-Dec-2025 09:44:12 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
 [20-Dec-2025 09:44:42 Asia/Kolkata] Company Settings - Company ID: 4, Logo from DB: uploads/logos/logo_693a5acf2f009_1765432015.webp
 [20-Dec-2025 09:44:42 Asia/Kolkata] Company Settings - Logo check: hasLogo=true, logo=uploads/logos/logo_693a5acf2f009_1765432015.webp
+[31-Dec-2025 16:10:27 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined method Database::insert() in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php:47
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php on line 47
+[31-Dec-2025 16:10:42 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined method Database::insert() in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php:47
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php on line 47
+[31-Dec-2025 16:10:48 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined method Database::insert() in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php:47
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php on line 47
+[31-Dec-2025 16:11:45 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined method Database::insert() in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php:47
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php on line 47
+[31-Dec-2025 16:11:50 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined method Database::insert() in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php:47
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php on line 47
+[31-Dec-2025 16:13:01 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined method Database::insert() in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php:49
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php on line 49
+[31-Dec-2025 16:13:08 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined method Database::insert() in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php:49
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php on line 49
+[31-Dec-2025 16:15:26 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined method Database::insert() in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php:53
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php on line 53
+[31-Dec-2025 16:15:30 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined method Database::insert() in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php:53
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php on line 53
+[31-Dec-2025 16:15:54 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined method Database::insert() in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php:53
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php on line 53
+[31-Dec-2025 16:16:25 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined method Database::insert() in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php:53
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php on line 53
+[31-Dec-2025 16:17:25 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined method Database::insert() in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php:53
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php on line 53
+[31-Dec-2025 16:19:16 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined method Database::insert() in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php:53
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\api\attendance\lunch_start.php on line 53
+[31-Dec-2025 16:27:44 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined method Database::update() in C:\xampp\htdocs\officepro\app\api\attendance\lunch_end.php:39
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\officepro\app\api\attendance\lunch_end.php on line 39

@@ -184,64 +184,6 @@ if ($user['role'] !== 'company_owner') {
     </div>
 </div>
 
-<?php if ($user['role'] !== 'company_owner'): ?>
-<!-- This Month's Summary -->
-<?php
-// Helper function to convert decimal hours to HH:MM:SS format
-function formatHoursToTime($decimalHours) {
-    if ($decimalHours <= 0) {
-        return '00:00:00';
-    }
-    $totalSeconds = round($decimalHours * 3600);
-    $hours = floor($totalSeconds / 3600);
-    $minutes = floor(($totalSeconds % 3600) / 60);
-    $seconds = $totalSeconds % 60;
-    return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
-}
-?>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
-    <div class="card" style="text-align: center;">
-        <h3 style="color: var(--primary-blue); margin-bottom: 10px;">Days Worked</h3>
-        <div style="font-size: 36px; font-weight: bold; color: var(--primary-blue);">
-            <?php echo $attendanceSummary['days_worked'] ?? 0; ?>
-        </div>
-        <p style="color: #666;">this month</p>
-    </div>
-    
-    <div class="card" style="text-align: center;">
-        <h3 style="color: var(--primary-blue); margin-bottom: 10px;">Regular Hours</h3>
-        <div style="font-size: 36px; font-weight: bold; color: var(--primary-blue);">
-            <?php echo formatHoursToTime($attendanceSummary['total_regular'] ?? 0); ?>
-        </div>
-        <p style="color: #666;">HH:MM:SS this month</p>
-    </div>
-    
-    <div class="card" style="text-align: center;">
-        <h3 style="color: var(--overtime-orange); margin-bottom: 10px;">Overtime Hours</h3>
-        <div style="font-size: 36px; font-weight: bold; color: var(--overtime-orange);">
-            <?php echo formatHoursToTime($attendanceSummary['total_overtime'] ?? 0); ?>
-        </div>
-        <p style="color: #666;">HH:MM:SS this month</p>
-    </div>
-</div>
-<?php endif; ?>
-
-<?php if ($user['role'] !== 'company_owner'): ?>
-<!-- Leave Balance -->
-<div class="card" style="margin-top: 20px;">
-    <h2 class="card-title">Leave Balance (<?php echo date('Y'); ?>)</h2>
-    
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; padding: 20px;">
-        <div style="text-align: center; padding: 15px; background: var(--light-blue); border-radius: 8px;">
-            <div style="font-size: 24px; font-weight: bold; color: var(--primary-blue);">
-                <?php echo $leaveBalance['paid_leave'] ?? 0; ?>
-            </div>
-            <p style="margin: 0; color: #666;">Paid Leave</p>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
-
 <!-- Change Password Modal -->
 <div id="change-password-modal" class="modal-overlay">
     <div class="modal-content modal-sm">

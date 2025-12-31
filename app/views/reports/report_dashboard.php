@@ -3,6 +3,10 @@
  * Reports Dashboard
  */
 
+// Default current month dates
+$defaultStartDate = date('Y-m-01'); // First day of current month
+$defaultEndDate   = date('Y-m-t');  // Last day of current month
+
 $pageTitle = 'Reports Dashboard';
 include __DIR__ . '/../includes/header.php';
 
@@ -173,12 +177,12 @@ function formatHoursToTime($decimalHours) {
             <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div class="form-group">
                     <label class="form-label" for="start_date">Start Date</label>
-                    <input type="date" id="start_date" name="start_date" class="form-control" required>
+                    <input type="date" id="start_date" name="start_date" class="form-control" required value="<?php echo $defaultStartDate; ?>">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label" for="end_date">End Date</label>
-                    <input type="date" id="end_date" name="end_date" class="form-control" required>
+                    <input type="date" id="end_date" name="end_date" class="form-control" required value="<?php echo $defaultEndDate; ?>">
                 </div>
             </div>
             
@@ -192,8 +196,12 @@ function formatHoursToTime($decimalHours) {
                             "SELECT id, full_name FROM users WHERE company_id = ? AND status = 'active' AND role != 'company_owner' ORDER BY full_name",
                             [$companyId]
                         );
+                        $first = true;
                         foreach ($employees as $emp) {
-                            echo '<option value="' . htmlspecialchars($emp['id']) . '">' . htmlspecialchars($emp['full_name']) . '</option>';
+                            echo '<option value="' . htmlspecialchars($emp['id']) . '" ' . ($first ? 'selected' : '') . '>';
+                            echo htmlspecialchars($emp['full_name']);
+                            echo '</option>';
+                            $first = false;
                         }
                     } catch (Exception $e) {
                         error_log("Employee List Error: " . $e->getMessage());
@@ -323,23 +331,27 @@ function formatHoursToTime($decimalHours) {
         // Attendance Report Table
         html += '<h3 style="margin-bottom: 15px; color: var(--primary-blue);">Attendance Report</h3>';
         html += '<table class="table"><thead><tr>';
-        html += '<th>Employee</th><th>Date</th><th>Check In</th><th>Check Out</th>';
+        html += '<th>Employee</th><th>Date</th><th>Check In</th><th>Check Out</th><th>Lunch Time</th>';
         html += '<th>Regular Hours</th><th>Overtime Hours</th><th>Total Hours</th></tr></thead><tbody>';
         
         let totalRegular = 0;
         let totalOvertime = 0;
+        let totalLunch = 0;
         
         data.forEach(row => {
             const regular = parseFloat(row.regular_hours || 0);
             const overtime = parseFloat(row.overtime_hours || 0);
+            const lunch = parseFloat(row.lunch_time || 0);
             totalRegular += regular;
             totalOvertime += overtime;
+            totalLunch += lunch;
             
             html += '<tr>';
             html += `<td>${row.employee_name}</td>`;
             html += `<td>${row.date}</td>`;
             html += `<td>${row.check_in}</td>`;
             html += `<td>${row.check_out || '-'}</td>`;
+            html += `<td>${row.lunch_time || '00:00:00'}</td>`;
             html += `<td>${row.regular_hours_formatted || '00:00:00'}</td>`;
             html += `<td style="color: var(--overtime-orange);">${row.overtime_hours_formatted || '00:00:00'}</td>`;
             html += `<td>${row.total_hours_formatted || '00:00:00'}</td>`;
@@ -348,6 +360,7 @@ function formatHoursToTime($decimalHours) {
         
         const totalHours = totalRegular + totalOvertime;
         html += '<tr style="font-weight: bold; background: var(--light-blue);"><td colspan="4">TOTAL</td>';
+        html += `<td></td>`;
         html += `<td>${formatHoursToTime(totalRegular)}</td>`;
         html += `<td style="color: var(--overtime-orange);">${formatHoursToTime(totalOvertime)}</td>`;
         html += `<td>${formatHoursToTime(totalHours)}</td></tr>`;
@@ -356,6 +369,36 @@ function formatHoursToTime($decimalHours) {
         reportResultsDiv.innerHTML = html;
         console.log('Report displayed successfully');
     }
+
+    // document.addEventListener('DOMContentLoaded', function () {
+
+    //     // ---------- Default Date Range: Current Month ----------
+    //     const startDateInput = document.getElementById('start_date');
+    //     const endDateInput   = document.getElementById('end_date');
+
+    //     const today = new Date();
+
+    //     // First day of current month
+    //     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    //     // Last day of current month
+    //     const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+    //     const formatDate = (date) => date.toISOString().split('T')[0];
+
+    //     if (startDateInput && endDateInput) {
+    //         startDateInput.value = formatDate(firstDay);
+    //         endDateInput.value   = formatDate(lastDay);
+    //     }
+
+    //     // ---------- Default Employee Selection (First Employee) ----------
+    //     const employeeSelect = document.getElementById('employee_id');
+
+    //     if (employeeSelect && employeeSelect.options.length > 1) {
+    //         employeeSelect.selectedIndex = 1; // 0 = "Select Employee", 1 = first real employee
+    //     }
+    
+    // });
 </script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
